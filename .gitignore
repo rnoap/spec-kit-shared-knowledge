@@ -1,0 +1,11 @@
+# cross-repo-knowledge cache (local only; do not commit)
+.specify/extensions/cross-repo-knowledge/cache/
+.specify/extensions/cross-repo-knowledge/knowledge-index.md
+
+# OS / editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+.idea/
+.vscode/

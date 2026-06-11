@@ -1,0 +1,24 @@
+# cross-repo-knowledge.yml
+# Schema version: 1.0
+#
+# This file declares which Git repositories are knowledge sources for this project.
+# Commit this file to share knowledge source configuration with your team.
+# The cache/ directory and knowledge-index.md are local only — add them to .gitignore.
+#
+# Usage:
+#   specify extension run speckit.xrepo.configure https://github.com/org/repo specs/
+#   specify extension run speckit.xrepo.sync
+#
+# See: https://github.com/walmart-developer-experience/spec-kit-cross-repo-knowledge
+
+schema_version: "1.0"   # required; must be exactly "1.0"
+
+sources:                 # required; may be empty list []
+
+  # Example entry (remove or replace):
+  # - url: https://gecgithub01.walmart.com/org/repo  # required; SSH or HTTPS Git URL
+  #   label: my-service                               # optional; human-readable name for attribution
+  #                                                   # default: derived as <host>/<org>/<repo> from URL
+  #   path_filter: specs/                             # optional; only index .md files under this path
+  #                                                   # default: all .md files in the repository
+  #   enabled: true                                   # optional; default true; set false to skip without removing

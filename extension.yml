@@ -1,0 +1,57 @@
+schema_version: "1.0"
+
+extension:
+  id: cross-repo-knowledge
+  name: "Cross-Repository Shared Knowledge"
+  version: "1.0.0"
+  description: "Inject architectural decisions, API contracts, and conventions from other Git repositories into your spec-kit workflow"
+  author: walmart-developer-experience
+  repository: https://github.com/walmart-developer-experience/spec-kit-cross-repo-knowledge
+  license: MIT
+
+requires:
+  speckit_version: ">=0.10.0"
+  tools:
+    - name: git
+      required: true
+
+provides:
+  commands:
+    - name: speckit.xrepo.configure
+      file: commands/speckit.xrepo.configure.md
+      description: "Initialize or edit the knowledge source configuration for the current project"
+    - name: speckit.xrepo.sync
+      file: commands/speckit.xrepo.sync.md
+      description: "Refresh local cache for all configured knowledge sources"
+    - name: speckit.xrepo.search
+      file: commands/speckit.xrepo.search.md
+      description: "Browse and search the knowledge corpus across all configured sources"
+    - name: speckit.xrepo.status
+      file: commands/speckit.xrepo.status.md
+      description: "Show reachability, last-sync timestamp, item count, and cache age per source"
+
+  config:
+    - name: "cross-repo-knowledge.yml"
+      template: "config-template.yml"
+      location: ".specify/extensions/cross-repo-knowledge/"
+      required: false
+
+hooks:
+  before_specify:
+    command: speckit.xrepo.sync
+    optional: true
+    prompt: "Sync cross-repo knowledge sources before specifying?"
+    description: "Refresh knowledge cache before spec generation so context is current"
+  before_plan:
+    command: speckit.xrepo.sync
+    optional: true
+    prompt: "Sync cross-repo knowledge sources before planning?"
+    description: "Refresh knowledge cache before implementation planning"
+
+tags:
+  - "cross-repo"
+  - "knowledge"
+  - "context"
+  - "multi-repo"
+  - "shared-decisions"
+  - "contracts"
