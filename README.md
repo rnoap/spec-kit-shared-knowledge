@@ -1,4 +1,4 @@
-# spec-kit-cross-repo-knowledge
+# spec-kit-shared-knowledge
 
 > A spec-kit extension that injects architectural decisions, API contracts, and shared conventions from other Git repositories into your spec-kit workflow.
 
@@ -20,17 +20,41 @@ When working in a microservices or multi-repo environment, architectural decisio
 
 ## Installation
 
+### Published (once available in the catalog)
+
 ```bash
-specify extension add cross-repo-knowledge
+specify extension add shared-knowledge
 ```
 
 Or from a local ZIP:
 
 ```bash
-specify extension add cross-repo-knowledge --from /path/to/cross-repo-knowledge.zip
+specify extension add shared-knowledge --from /path/to/shared-knowledge.zip
 ```
 
-This copies `config-template.yml` to `.specify/extensions/cross-repo-knowledge/cross-repo-knowledge.yml` with an empty `sources: []`.
+### Local / Development Install
+
+If the extension has not been published yet (or you want to test changes), use the install script:
+
+```bash
+# Install into the current project
+bash /path/to/spec-kit-shared-knowledge/scripts/install-local.sh
+
+# Install into a specific project
+bash scripts/install-local.sh /path/to/your-project
+
+# Install commands globally (available in all projects)
+bash scripts/install-local.sh --global
+```
+
+The script:
+1. Copies the 4 command files to `<project>/.wibey/commands/` with the correct hyphen-naming (`speckit-xrepo-sync.md`, etc.)
+2. Copies `config-template.yml` to `.specify/extensions/shared-knowledge/shared-knowledge.yml` (skips if already present)
+3. Prints a `.gitignore` reminder
+
+After install, reload Wibey (`Ctrl+Shift+P` → **Wibey: Reload**) so it picks up the new commands.
+
+This copies `config-template.yml` to `.specify/extensions/shared-knowledge/shared-knowledge.yml` with an empty `sources: []`.
 
 ## Quick Start
 
@@ -51,7 +75,7 @@ This copies `config-template.yml` to `.specify/extensions/cross-repo-knowledge/c
 Initialize or edit the knowledge source configuration for the current project.
 
 ```
-✅ cross-repo-knowledge.yml updated.
+✅ shared-knowledge.yml updated.
 
 Configured sources:
   1. payment-service  →  https://gecgithub01.walmart.com/org/payment-service  (path: specs/)
@@ -69,7 +93,7 @@ Refresh the local cache for all configured, enabled knowledge sources.
   payment-service    ✅ fresh    12 items  (synced 2026-06-11T14:00:00Z)
 
 ✅ Knowledge index updated: 12 items from 1 source.
-   → .specify/extensions/cross-repo-knowledge/knowledge-index.md
+   → .specify/extensions/shared-knowledge/knowledge-index.md
 ```
 
 **Flags**: `--verbose` — list all files loaded and items written to index
@@ -117,14 +141,14 @@ Add the following entries to your project's `.specify/extensions.yml`:
 ```yaml
 hooks:
   before_specify:
-    - extension: cross-repo-knowledge
+    - extension: shared-knowledge
       command: speckit.xrepo.sync
       optional: true
       prompt: "Sync cross-repo knowledge sources before specifying?"
       description: "Refresh knowledge cache before spec generation so context is current"
 
   before_plan:
-    - extension: cross-repo-knowledge
+    - extension: shared-knowledge
       command: speckit.xrepo.sync
       optional: true
       prompt: "Sync cross-repo knowledge sources before planning?"
@@ -137,7 +161,7 @@ Add the following preamble to `.wibey/skills/speckit-specify/SKILL.md` immediate
 
 ```markdown
 **Cross-repo knowledge check**: If the file
-`.specify/extensions/cross-repo-knowledge/knowledge-index.md` exists in the
+`.specify/extensions/shared-knowledge/knowledge-index.md` exists in the
 project root, read it and all `.md` files it references from the cache
 directories BEFORE drafting the specification. Surface relevant knowledge
 from those files as context — cite the source (label + path) for each
@@ -148,7 +172,7 @@ Add the equivalent preamble to `.wibey/skills/speckit-plan/SKILL.md` immediately
 
 ```markdown
 **Cross-repo knowledge check**: If the file
-`.specify/extensions/cross-repo-knowledge/knowledge-index.md` exists in the
+`.specify/extensions/shared-knowledge/knowledge-index.md` exists in the
 project root, read it and all `.md` files it references from the cache
 directories BEFORE drafting the implementation plan. Surface relevant knowledge
 from those files as context — cite the source (label + path) for each
@@ -157,7 +181,7 @@ piece of referenced information.
 
 > **Why both steps are required**: The hooks (Step 1) trigger a sync so the cache is fresh. The SKILL.md amendments (Step 2) instruct the agent to read `knowledge-index.md` before generating output. Without Step 2, the sync runs correctly but context never flows into spec or plan output.
 
-> **No-op when not configured**: If `.specify/extensions/cross-repo-knowledge/cross-repo-knowledge.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
+> **No-op when not configured**: If `.specify/extensions/shared-knowledge/shared-knowledge.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
 
 ## Configuration Reference
 
@@ -174,12 +198,12 @@ Key fields:
 Add the following to your project's `.gitignore`:
 
 ```gitignore
-# cross-repo-knowledge cache (local only; do not commit)
-.specify/extensions/cross-repo-knowledge/cache/
-.specify/extensions/cross-repo-knowledge/knowledge-index.md
+# shared-knowledge cache (local only; do not commit)
+.specify/extensions/shared-knowledge/cache/
+.specify/extensions/shared-knowledge/knowledge-index.md
 ```
 
-The `cross-repo-knowledge.yml` config file **should** be committed — it declares your team's knowledge sources and is shared across all developers.
+The `shared-knowledge.yml` config file **should** be committed — it declares your team's knowledge sources and is shared across all developers.
 
 ## Troubleshooting
 
