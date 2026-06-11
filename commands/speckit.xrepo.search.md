@@ -17,7 +17,7 @@ description: "Browse and search the knowledge corpus across all configured sourc
 
 ### 1. Load knowledge index
 
-Read `.specify/extensions/cross-repo-knowledge/knowledge-index.md`.
+Read `.specify/extensions/shared-knowledge/knowledge-index.md`.
 
 - If absent: print the following and run sync first:
   ```
@@ -26,7 +26,7 @@ Read `.specify/extensions/cross-repo-knowledge/knowledge-index.md`.
   Execute `speckit.xrepo.sync` (i.e., invoke `/speckit-xrepo-sync`), then re-read the index.
   If sync also fails or index is still absent after sync, print:
   ```
-  ❌ Unable to build knowledge index. Check that cross-repo-knowledge.yml is configured and at least one source is reachable.
+  ❌ Unable to build knowledge index. Check that shared-knowledge.yml is configured and at least one source is reachable.
   ```
   Exit 0.
 

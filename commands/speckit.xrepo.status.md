@@ -21,11 +21,11 @@ Uses the same **Source Slug Generation** and **Cache Integrity Check** algorithm
 
 ### 1. Read configuration
 
-Read `.specify/extensions/cross-repo-knowledge/cross-repo-knowledge.yml`.
+Read `.specify/extensions/shared-knowledge/shared-knowledge.yml`.
 
 - If absent: print:
   ```
-  ℹ️  cross-repo-knowledge is not configured for this project.
+  ℹ️  shared-knowledge is not configured for this project.
   Run /speckit-xrepo-configure to add knowledge sources.
   ```
   Exit 0.
@@ -45,14 +45,21 @@ Cache age is computed from `synced_at` to now:
 
 ### 3. Check reachability
 
-For each enabled source, run:
+**Detect source type**: `url` starts with `/`, `~/`, `./` → local path; otherwise remote URL.
 
+**Remote URL**:
 ```bash
 timeout 5 git ls-remote --exit-code <url> HEAD
 ```
-
 - Exit 0 → `✅ reachable`
 - Non-zero / timeout → `❌ timeout`
+
+**Local path** (expand `~` to `$HOME` first):
+```bash
+[ -d "<expanded-path>/.git" ] || git -C "<expanded-path>" rev-parse --git-dir 2>/dev/null
+```
+- Directory exists and is a git repo → `✅ reachable (local)`
+- Directory absent or not a git repo → `❌ not found`
 
 Disabled sources: show `— disabled` without a reachability check.
 
@@ -60,8 +67,8 @@ Disabled sources: show `— disabled` without a reachability check.
 
 ```
 📊 Cross-Repo Knowledge Status
-   Config: .specify/extensions/cross-repo-knowledge/cross-repo-knowledge.yml
-   Index:  .specify/extensions/cross-repo-knowledge/knowledge-index.md
+   Config: .specify/extensions/shared-knowledge/shared-knowledge.yml
+   Index:  .specify/extensions/shared-knowledge/knowledge-index.md
 
 ┌──────────────────────┬──────────────┬──────────┬───────┬────────────┐
 │ Source               │ Reachability │ Status   │ Items │ Cache Age  │
