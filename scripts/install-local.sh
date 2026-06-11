@@ -5,15 +5,6 @@
 #   bash scripts/install-local.sh                        # installs into current working directory
 #   bash scripts/install-local.sh /path/to/project       # installs into a specific project
 #   bash scripts/install-local.sh --global               # installs commands to ~/.wibey/commands/
-#
-# What this does:
-#   1. Copies the 4 command files to <project>/.wibey/commands/ (or ~/.wibey/commands/)
-#   2. Copies config-template.yml to <project>/.specify/extensions/shared-knowledge/shared-knowledge.yml
-#      (only if not already present — never overwrites existing config)
-#
-# After install:
-#   - Edit .specify/extensions/shared-knowledge/shared-knowledge.yml to add your sources
-#   - Run /speckit-xrepo-configure or /speckit-xrepo-sync in Wibey
 
 set -euo pipefail
 
@@ -35,7 +26,7 @@ done
 
 if [ "$GLOBAL" = true ]; then
   COMMANDS_DIR="${HOME}/.wibey/commands"
-  CONFIG_DIR=""   # global install doesn't write config (project-specific)
+  CONFIG_DIR=""
   echo "Installing commands globally → ${COMMANDS_DIR}/"
 else
   PROJECT_DIR="${TARGET_PROJECT:-$(pwd)}"
@@ -44,34 +35,30 @@ else
   echo "Installing into project: ${PROJECT_DIR}"
 fi
 
-# --- Install commands ---
+# --- Install commands (bash 3.2 compatible — no associative arrays) ---
 mkdir -p "${COMMANDS_DIR}"
 
-declare -A CMD_MAP=(
-  ["speckit.xrepo.configure.md"]="speckit-xrepo-configure.md"
-  ["speckit.xrepo.sync.md"]="speckit-xrepo-sync.md"
-  ["speckit.xrepo.search.md"]="speckit-xrepo-search.md"
-  ["speckit.xrepo.status.md"]="speckit-xrepo-status.md"
-)
-
 INSTALLED=0
-for src_name in "${!CMD_MAP[@]}"; do
-  src="${EXTENSION_ROOT}/commands/${src_name}"
-  dst="${COMMANDS_DIR}/${CMD_MAP[$src_name]}"
-  if [ -f "$src" ]; then
-    cp "$src" "$dst"
-    echo "  ✓ /$(basename "$dst" .md)"
-    INSTALLED=$((INSTALLED + 1))
-  else
-    echo "  ✗ Missing source: $src" >&2
-  fi
+for src in "${EXTENSION_ROOT}/commands/"speckit.xrepo.*.md; do
+  [ -f "$src" ] || continue
+  # speckit.xrepo.configure.md → speckit-xrepo-configure.md
+  dst_name="$(basename "$src" | sed 's/\./-/g')"
+  dst="${COMMANDS_DIR}/${dst_name}"
+  cp "$src" "$dst"
+  echo "  ✓ /$(basename "$dst" .md)"
+  INSTALLED=$((INSTALLED + 1))
 done
 
 echo "${INSTALLED} command(s) installed → ${COMMANDS_DIR}/"
 
-# --- Install config template (project installs only) ---
+# --- Install extension.yml so `specify extension list` recognises it ---
 if [ -n "${CONFIG_DIR:-}" ]; then
   mkdir -p "${CONFIG_DIR}"
+
+  EXT_YML="${CONFIG_DIR}/extension.yml"
+  cp "${EXTENSION_ROOT}/extension.yml" "${EXT_YML}"
+  echo "  ✓ extension.yml → ${EXT_YML}"
+
   CONFIG_FILE="${CONFIG_DIR}/shared-knowledge.yml"
   if [ -f "$CONFIG_FILE" ]; then
     echo ""
