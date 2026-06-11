@@ -7,10 +7,10 @@
 #
 # What this does:
 #   1. Copies command files → .specify/extensions/shared-knowledge/commands/
-#   2. Copies extension.yml → .specify/extensions/shared-knowledge/extension.yml
-#   3. Copies config-template.yml → .specify/extensions/shared-knowledge/shared-knowledge.yml
-#      (only if not already present)
-#   4. Registers the extension in .specify/extensions/.registry
+#   2. Copies extension.yml + config-template → .specify/extensions/shared-knowledge/
+#   3. Registers in .specify/extensions/.registry
+#   4. Generates SKILL.md wrappers in .wibey/skills/ AND .claude/skills/
+#      (same pattern as built-in extensions like git and brownfield)
 
 set -euo pipefail
 
@@ -29,13 +29,12 @@ if [ ! -d "${PROJECT_DIR}/.specify/extensions" ]; then
   exit 1
 fi
 
-# --- Copy command files ---
+# --- Copy command files to extension dir ---
 mkdir -p "${EXT_DIR}/commands"
 INSTALLED=0
 for src in "${EXTENSION_ROOT}/commands/"speckit.xrepo.*.md; do
   [ -f "$src" ] || continue
-  dst="${EXT_DIR}/commands/$(basename "$src")"
-  cp "$src" "$dst"
+  cp "$src" "${EXT_DIR}/commands/$(basename "$src")"
   echo "  ✓ commands/$(basename "$src")"
   INSTALLED=$((INSTALLED + 1))
 done
@@ -60,7 +59,6 @@ if [ ! -f "$REGISTRY" ]; then
   exit 1
 fi
 
-# Compute manifest hash from extension.yml
 if command -v sha256sum >/dev/null 2>&1; then
   HASH=$(sha256sum "${EXT_DIR}/extension.yml" | cut -c1-64)
 else
@@ -69,16 +67,13 @@ fi
 INSTALLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%S.000000+00:00")
 
 python3 - <<PYEOF
-import json, sys
-
+import json
 registry_path = "${REGISTRY}"
 with open(registry_path) as f:
     reg = json.load(f)
-
 ext = reg.setdefault("extensions", {})
 if "${EXTENSION_ID}" in ext:
     print("  ℹ️  Already registered — updating entry")
-
 ext["${EXTENSION_ID}"] = {
     "version": "1.0.0",
     "source": "local",
@@ -96,13 +91,56 @@ ext["${EXTENSION_ID}"] = {
     "registered_skills": [],
     "installed_at": "${INSTALLED_AT}"
 }
-
 with open(registry_path, "w") as f:
     json.dump(reg, f, indent=2)
     f.write("\n")
-
 print("  ✓ registered in .registry")
 PYEOF
+
+# --- Generate SKILL.md wrappers in .wibey/skills/ and .claude/skills/ ---
+# Same pattern as git/brownfield extensions: frontmatter wrapper + command body
+echo ""
+echo "Generating Wibey/Claude skill wrappers..."
+
+generate_skill() {
+  local cmd_file="$1"
+  local target_dir="$2"
+  local cmd_base
+  cmd_base="$(basename "$cmd_file" .md)"               # speckit.xrepo.configure
+  local skill_name
+  skill_name="$(echo "$cmd_base" | sed 's/\./-/g')"   # speckit-xrepo-configure
+
+  # Extract description from frontmatter (line starting with "description:")
+  local description
+  description=$(grep '^description:' "$cmd_file" | head -1 | sed 's/^description:[[:space:]]*//' | sed 's/^"//' | sed 's/"$//')
+
+  # Extract body (everything after closing ---)
+  local body
+  body=$(awk '/^---/{found++; if(found==2){found=3; next}} found==3{print}' "$cmd_file")
+
+  local skill_dir="${target_dir}/${skill_name}"
+  mkdir -p "$skill_dir"
+
+  cat > "${skill_dir}/SKILL.md" <<SKILL
+---
+name: ${skill_name}
+description: ${description}
+compatibility: Requires spec-kit project structure with .specify/ directory
+metadata:
+  author: walmart-developer-experience
+  source: shared-knowledge:commands/${cmd_base}.md
+---
+${body}
+SKILL
+
+  echo "  ✓ ${skill_name}"
+}
+
+for src in "${EXT_DIR}/commands/"speckit.xrepo.*.md; do
+  [ -f "$src" ] || continue
+  generate_skill "$src" "${PROJECT_DIR}/.wibey/skills"
+  generate_skill "$src" "${PROJECT_DIR}/.claude/skills"
+done
 
 # --- .gitignore reminder ---
 echo ""
@@ -110,4 +148,4 @@ echo "Remember to add to .gitignore:"
 echo "  .specify/extensions/shared-knowledge/cache/"
 echo "  .specify/extensions/shared-knowledge/knowledge-index.md"
 echo ""
-echo "Done. Run: specify extension list"
+echo "Done. Reload Wibey (Ctrl+Shift+P → 'Wibey: Reload') to pick up the new commands."
