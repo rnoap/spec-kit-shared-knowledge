@@ -9,3 +9,5 @@ Thumbs.db
 *.tmp
 .idea/
 .vscode/
+.claude/
+.wibey/
