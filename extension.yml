@@ -4,7 +4,7 @@ extension:
   id: knowledge
   name: "Shared Knowledge"
   version: "1.1.0"
-  description: "Inject cross-repo decisions, contracts, and conventions into your spec-kit workflow"
+  description: "Inject cross-repo decisions, contracts, and conventions into your spec-kit workflow."
   author: "Raúl Noa Pedroso"
   repository: "https://github.com/rnoap/spec-kit-shared-knowledge"
   homepage: "https://github.com/rnoap/spec-kit-shared-knowledge"

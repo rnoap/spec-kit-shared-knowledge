@@ -1,0 +1,17 @@
+{
+  "workflow": "speckit",
+  "specName": "003-auto-integration",
+  "branch": "003-auto-integration",
+  "selectedAt": "2026-06-17T18:07:04.168Z",
+  "currentStep": "tasks",
+  "status": "ready-to-implement",
+  "history": [
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-06-17T18:10:38.786Z"
+    }
+  ]
+}
