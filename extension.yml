@@ -6,8 +6,8 @@ extension:
   version: "1.0.0"
   description: "Inject cross-repo decisions, contracts, and conventions into your spec-kit workflow"
   author: "Raúl Noa Pedroso"
-  # repository: ""  # TODO: set after publishing, e.g. https://github.com/<owner>/spec-kit-shared-knowledge
-  # homepage: ""    # TODO: set after publishing (usually same as repository)
+  repository: "https://github.com/rnoap/spec-kit-shared-knowledge"
+  homepage: "https://github.com/rnoap/spec-kit-shared-knowledge"
   license: MIT
 
 requires:

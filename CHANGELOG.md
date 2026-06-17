@@ -32,5 +32,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-<!-- [Unreleased]: https://github.com/<owner>/spec-kit-shared-knowledge/compare/v1.0.0...HEAD -->
-<!-- [1.0.0]: https://github.com/<owner>/spec-kit-shared-knowledge/releases/tag/v1.0.0 -->
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.0.0
