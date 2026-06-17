@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `extension.yml` now declares `python3` as a required tool (used by `install-local.sh` for JSON registry update)
+- `install-local.sh` auto-appends `.gitignore` entries for `cache/` and `knowledge-index.md` on install (idempotent; skips lines already present)
+
+### Fixed
+- `knowledge-index.md` HTML comment header now includes `schema_version=1.0` for forward-compatibility
+
 ## [1.0.0] - TBD
 
 ### Added

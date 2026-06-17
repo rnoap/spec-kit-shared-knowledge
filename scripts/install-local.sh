@@ -142,10 +142,22 @@ for src in "${EXT_DIR}/commands/"speckit.xrepo.*.md; do
   generate_skill "$src" "${PROJECT_DIR}/.claude/skills"
 done
 
-# --- .gitignore reminder ---
-echo ""
-echo "Remember to add to .gitignore:"
-echo "  .specify/extensions/shared-knowledge/cache/"
-echo "  .specify/extensions/shared-knowledge/knowledge-index.md"
+# --- .gitignore: idempotent auto-append ---
+GITIGNORE="${PROJECT_DIR}/.gitignore"
+CACHE_ENTRY=".specify/extensions/shared-knowledge/cache/"
+INDEX_ENTRY=".specify/extensions/shared-knowledge/knowledge-index.md"
+
+touch "$GITIGNORE"
+if ! grep -qF "$CACHE_ENTRY" "$GITIGNORE"; then
+  printf "\n# shared-knowledge cache (local only; do not commit)\n%s\n%s\n" \
+    "$CACHE_ENTRY" "$INDEX_ENTRY" >> "$GITIGNORE"
+  echo "  → Added .gitignore entries for cache/ and knowledge-index.md"
+elif ! grep -qF "$INDEX_ENTRY" "$GITIGNORE"; then
+  printf "%s\n" "$INDEX_ENTRY" >> "$GITIGNORE"
+  echo "  → Added .gitignore entry for knowledge-index.md"
+else
+  echo "  → .gitignore entries already present (skipped)"
+fi
+
 echo ""
 echo "Done. Reload Wibey (Ctrl+Shift+P → 'Wibey: Reload') to pick up the new commands."

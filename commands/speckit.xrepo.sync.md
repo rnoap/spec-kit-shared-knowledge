@@ -54,7 +54,7 @@ Run this check before using an existing cache as fallback:
 Written to `.specify/extensions/shared-knowledge/knowledge-index.md`. This is the **only file** that `speckit-specify` and `speckit-plan` read directly.
 
 ```markdown
-<!-- shared-knowledge-index: generated_at=<ISO8601> sources=<N> items=<N> -->
+<!-- shared-knowledge-index: schema_version=1.0 generated_at=<ISO8601> sources=<N> items=<N> -->
 
 ## Cross-Repo Knowledge Index
 

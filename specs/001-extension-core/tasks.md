@@ -77,5 +77,5 @@ feature: extension-core
 |-----|----------|---------------|
 | No automated test for `install-local.sh` | Medium | Add `tests/test-install.sh` — creates temp dir, runs `specify init`, runs install, asserts file presence and `specify extension list` output |
 | No test for bash 3.2 compatibility | Low | Add CI job on macOS with system bash, or document tested bash version in README |
-| `.gitignore` reminder is printed but not automated | Low | Consider adding `.gitignore` entries automatically during install (with user prompt) |
-| `python3` hard dependency not documented in `extension.yml` `requires` | Low | Add `python3` to `requires.tools` in `extension.yml` |
+| ~~`.gitignore` reminder is printed but not automated~~ | ~~Low~~ | ✅ Fixed — `install-local.sh` now auto-appends `.gitignore` entries (idempotent) |
+| ~~`python3` hard dependency not documented in `extension.yml` `requires`~~ | ~~Low~~ | ✅ Fixed — `python3` added to `requires.tools` in `extension.yml` |

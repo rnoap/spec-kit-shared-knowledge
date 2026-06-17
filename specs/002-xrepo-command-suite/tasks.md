@@ -127,4 +127,4 @@ feature: xrepo-command-suite
 | No timeout test coverage for sync | Medium | Integration test: mock a slow remote (or use `git daemon` with firewall) to verify `cached` fallback behavior |
 | `speckit.xrepo.search` reads first 500 chars of each file for matching — O(N×M) for large corpora | Low | Document performance limit in README; consider index pre-built text excerpts in knowledge-index.md |
 | No support for SSH key authentication in configure/sync (relies on system git config) | Low | Document SSH key setup requirement in README |
-| `knowledge-index.md` format is not versioned (no schema_version) | Low | Add `schema_version: "1.0"` to the HTML comment header for future compatibility |
+| ~~`knowledge-index.md` format is not versioned (no schema_version)~~ | ~~Low~~ | ✅ Fixed — `schema_version=1.0` added to the HTML comment header in `speckit.xrepo.sync.md` |

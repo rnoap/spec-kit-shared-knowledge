@@ -16,6 +16,7 @@ When working in a microservices or multi-repo environment, architectural decisio
 ## Prerequisites
 
 - `git >= 2.25` (sparse-checkout support required)
+- `python3` (stdlib only — used by the install script for JSON registry update)
 - spec-kit `>= 0.10.0`
 
 ## Installation
@@ -48,9 +49,9 @@ bash scripts/install-local.sh --global
 ```
 
 The script:
-1. Copies the 4 command files to `<project>/.wibey/commands/` with the correct hyphen-naming (`speckit-xrepo-sync.md`, etc.)
+1. Copies the 4 command files to `.specify/extensions/shared-knowledge/commands/` and generates `SKILL.md` wrappers in `.wibey/skills/` and `.claude/skills/`
 2. Copies `config-template.yml` to `.specify/extensions/shared-knowledge/shared-knowledge.yml` (skips if already present)
-3. Prints a `.gitignore` reminder
+3. Auto-appends `.gitignore` entries for `cache/` and `knowledge-index.md` (idempotent)
 
 After install, reload Wibey (`Ctrl+Shift+P` → **Wibey: Reload**) so it picks up the new commands.
 
