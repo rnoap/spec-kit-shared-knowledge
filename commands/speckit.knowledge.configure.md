@@ -8,8 +8,11 @@ description: "Initialize or edit the knowledge source configuration for the curr
 
 **Arguments**: `$ARGUMENTS` — optional. May contain:
 - A Git repository URL (SSH or HTTPS), e.g. `https://github.com/your-org/your-repo`
-- A local filesystem path to a Git repository, e.g. `/Users/me/repos/payment-service` or `~/repos/payment-service`
-- An optional path filter after the URL/path, e.g. `https://github.com/your-org/your-repo specs/`
+- **Or** a local filesystem path to a Git repository — absolute (`/Users/me/repos/your-repo`) or tilde (`~/repos/your-repo`)
+- **Optional path filter(s)** after the URL/path. Pass one **or more** folder paths to scope indexing to only those folders. Examples:
+  - `https://github.com/your-org/your-repo specs/`
+  - `~/repos/your-repo specs/ docs/decisions/`
+  - `/abs/path/to/repo` (no filter — indexes every `.md` file in the repo)
 - The flag `--verbose` to print full YAML after write
 
 ---
@@ -34,10 +37,14 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
    - Detect type:
      - **Local path**: starts with `/`, `./`, `../`, or `~` → expand `~` to `$HOME`
      - **Remote URL**: everything else (SSH `git@...` or HTTPS `https://...`)
-3. Second token (if present) is the **path_filter**. Validate:
-   - Must not start with `/` (no absolute paths)
-   - Must not contain `..` (no directory traversal)
-   - If invalid: print an error for that field and stop — do not write
+3. **All remaining tokens** (zero or more, after the first) are **path filters**. Each must:
+   - Not start with `/` (no absolute paths)
+   - Not contain `..` (no directory traversal)
+   - Not be `--verbose` (skip flag tokens)
+   - If any token is invalid: print an error for that field and stop — do not write
+   - **Zero tokens** → omit `path_filter` from the source entry (indexes all `.md` files in the repo)
+   - **One token** → store as a single string for readability: `path_filter: specs/`
+   - **Two or more tokens** → store as a YAML list: `path_filter: [specs/, docs/decisions/]`
 4. Derive **label** if no explicit label is provided:
    - **Local path**: use the last path component of the directory (e.g. `/Users/me/repos/payment-service` → `payment-service`)
    - **Remote URL**:
@@ -50,7 +57,7 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
    ```yaml
    - url: <url>
      label: <derived-or-provided-label>
-     path_filter: <path_filter>   # only if provided
+     path_filter: <path_filter>   # omit if no filters; string if one filter; YAML list if two+
    ```
    If a source with the same `url` already exists: update its `path_filter` (and label if not already set) instead of appending a duplicate.
 
@@ -62,6 +69,7 @@ Print the numbered sources list:
 Configured sources:
   1. payment-service  →  https://github.com/your-org/payment-service  (path: specs/)
   2. identity-service →  https://github.com/your-org/identity-service  (path: all .md files)
+  3. shared-contracts →  ~/repos/shared-contracts                     (paths: specs/, docs/decisions/)
 ```
 
 Prompt the developer to confirm or edit the displayed configuration before writing.

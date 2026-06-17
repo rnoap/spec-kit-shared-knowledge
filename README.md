@@ -64,8 +64,17 @@ Then reload your editor / AI agent so it picks up the new commands.
 ## Quick Start
 
 ```bash
-# 1. Add a knowledge source
+# 1a. Add a knowledge source from a REMOTE repository (single folder filter)
 /speckit-knowledge-configure https://github.com/your-org/payment-service specs/
+
+# 1b. … or from a LOCAL repository on your machine
+/speckit-knowledge-configure ~/repos/payment-service specs/
+
+# 1c. … or with NO filter (indexes every .md file in the repo)
+/speckit-knowledge-configure git@github.com:your-org/architecture-decisions.git
+
+# 1d. … or scoped to MULTIPLE folders
+/speckit-knowledge-configure ~/repos/shared-contracts specs/ docs/decisions/
 
 # 2. Sync (fetch & cache)
 /speckit-knowledge-sync
@@ -75,15 +84,43 @@ Then reload your editor / AI agent so it picks up the new commands.
 
 ## Commands
 
-### `/speckit-knowledge-configure [url] [path_filter]`
+### `/speckit-knowledge-configure [url-or-path] [path_filter1] [path_filter2] ...`
 
-Initialize or edit the knowledge source configuration for the current project.
+Initialize or edit the knowledge source configuration for the current project. Accepts:
+
+- **A remote Git URL** — HTTPS (`https://github.com/your-org/your-repo`) or SSH (`git@github.com:your-org/your-repo`).
+- **A local filesystem path to a Git repository** — use this when the repo is already cloned on your machine and you want to avoid network roundtrips, or when it lives on a private network. Both **absolute** paths and **`~`-prefixed** paths are supported (the tilde is expanded to `$HOME`).
+- **Zero or more path filters** after the URL/path. With zero filters every `.md` file in the repo is indexed; with one or more filters, indexing is restricted to those folders only.
+
+**Examples**:
+
+```bash
+# Remote URL, single folder filter
+/speckit-knowledge-configure https://github.com/your-org/payment-service specs/
+
+# Local absolute path, single folder filter
+/speckit-knowledge-configure /Users/devuser/repos/payment-service specs/
+
+# Local path with tilde, NO filter (indexes every .md in the repo)
+/speckit-knowledge-configure ~/repos/architecture-decisions
+
+# Local path, MULTIPLE folder filters
+/speckit-knowledge-configure ~/repos/shared-contracts specs/ docs/decisions/
+
+# Absolute path, multiple folders
+/speckit-knowledge-configure /opt/repos/team-platform specs/ docs/contracts/ docs/runbooks/
+```
+
+**Output**:
 
 ```
 ✅ knowledge.yml updated.
+✅ .gitignore updated with cache exclusion entries.
 
 Configured sources:
-  1. payment-service  →  https://github.com/your-org/payment-service  (path: specs/)
+  1. payment-service     →  https://github.com/your-org/payment-service  (path: specs/)
+  2. architecture-decisions → ~/repos/architecture-decisions             (path: all .md files)
+  3. shared-contracts    →  ~/repos/shared-contracts                     (paths: specs/, docs/decisions/)
 ```
 
 **Flags**: `--verbose` — print full YAML after write
@@ -147,11 +184,19 @@ The `before_specify` and `before_plan` hooks declared in [`extension.yml`](exten
 
 See [`config-template.yml`](config-template.yml) for the full annotated configuration schema.
 
-Key fields:
-- `sources[*].url` — required; SSH or HTTPS Git URL
-- `sources[*].label` — optional; defaults to `<host>/<org>/<repo>` derived from URL
-- `sources[*].path_filter` — optional; scope to a subdirectory (e.g., `specs/`)
-- `sources[*].enabled` — optional; default `true`; set `false` to skip without removing
+Key fields per source entry:
+
+- `sources[*].url` — **required**. One of:
+  - HTTPS Git URL: `https://github.com/your-org/your-repo`
+  - SSH Git URL: `git@github.com:your-org/your-repo`
+  - **Local absolute path** to a Git repository: `/Users/devuser/repos/your-repo`
+  - **Local tilde path** (expanded to `$HOME`): `~/repos/your-repo`
+- `sources[*].label` — optional; human-readable name used for attribution. Defaults: for remote URLs, `<host>/<org>/<repo>` derived from the URL; for local paths, the last path component (e.g. `~/repos/payment-service` → `payment-service`).
+- `sources[*].path_filter` — optional. Three forms:
+  - **Omitted** → every `.md` file in the repo is indexed.
+  - **Single string** → `path_filter: specs/` indexes only files under `specs/`.
+  - **YAML list** → `path_filter: [specs/, docs/decisions/]` indexes those two trees and nothing else.
+- `sources[*].enabled` — optional; default `true`; set `false` to skip a source without removing it from the file.
 
 ## .gitignore
 
