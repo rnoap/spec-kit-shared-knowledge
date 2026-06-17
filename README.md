@@ -24,18 +24,27 @@ When working in a microservices or multi-repo environment, architectural decisio
 ### Published (once available in the catalog)
 
 ```bash
-specify extension add shared-knowledge
+specify extension add knowledge
 ```
 
 Or from a local ZIP:
 
 ```bash
-specify extension add shared-knowledge --from /path/to/shared-knowledge.zip
+specify extension add knowledge --from /path/to/spec-kit-shared-knowledge.zip
 ```
 
 ### Local / Development Install
 
-If the extension has not been published yet (or you want to test changes), use the install script:
+The officially supported way to test an extension locally is:
+
+```bash
+cd /path/to/your/spec-kit-project
+specify extension add --dev /path/to/spec-kit-shared-knowledge
+```
+
+Alternatively, this repo ships a small helper script that performs the same
+copy + register flow and additionally generates `SKILL.md` wrappers for AI
+agents that consume them (e.g. Claude Code skills):
 
 ```bash
 # Install into the current project
@@ -43,48 +52,45 @@ bash /path/to/spec-kit-shared-knowledge/scripts/install-local.sh
 
 # Install into a specific project
 bash scripts/install-local.sh /path/to/your-project
-
-# Install commands globally (available in all projects)
-bash scripts/install-local.sh --global
 ```
 
 The script:
-1. Copies the 4 command files to `.specify/extensions/shared-knowledge/commands/` and generates `SKILL.md` wrappers in `.wibey/skills/` and `.claude/skills/`
-2. Copies `config-template.yml` to `.specify/extensions/shared-knowledge/shared-knowledge.yml` (skips if already present)
+1. Copies the 4 command files to `.specify/extensions/knowledge/commands/` and generates `SKILL.md` wrappers under `.claude/skills/`
+2. Copies `config-template.yml` to `.specify/extensions/knowledge/knowledge.yml` (skips if already present)
 3. Auto-appends `.gitignore` entries for `cache/` and `knowledge-index.md` (idempotent)
 
-After install, reload Wibey (`Ctrl+Shift+P` → **Wibey: Reload**) so it picks up the new commands.
+After install, reload your editor / AI agent so it picks up the new commands.
 
-This copies `config-template.yml` to `.specify/extensions/shared-knowledge/shared-knowledge.yml` with an empty `sources: []`.
+This copies `config-template.yml` to `.specify/extensions/knowledge/knowledge.yml` with an empty `sources: []`.
 
 ## Quick Start
 
 ```bash
 # 1. Add a knowledge source
-/speckit-xrepo-configure https://gecgithub01.walmart.com/payment-platform/payment-service specs/
+/speckit-knowledge-configure https://github.com/your-org/payment-service specs/
 
 # 2. Sync (fetch & cache)
-/speckit-xrepo-sync
+/speckit-knowledge-sync
 
 # 3. Use — next time you run /speckit-specify, cross-repo context is injected automatically
 ```
 
 ## Commands
 
-### `/speckit-xrepo-configure [url] [path_filter]`
+### `/speckit-knowledge-configure [url] [path_filter]`
 
 Initialize or edit the knowledge source configuration for the current project.
 
 ```
-✅ shared-knowledge.yml updated.
+✅ knowledge.yml updated.
 
 Configured sources:
-  1. payment-service  →  https://gecgithub01.walmart.com/org/payment-service  (path: specs/)
+  1. payment-service  →  https://github.com/your-org/payment-service  (path: specs/)
 ```
 
 **Flags**: `--verbose` — print full YAML after write
 
-### `/speckit-xrepo-sync`
+### `/speckit-knowledge-sync`
 
 Refresh the local cache for all configured, enabled knowledge sources.
 
@@ -94,12 +100,12 @@ Refresh the local cache for all configured, enabled knowledge sources.
   payment-service    ✅ fresh    12 items  (synced 2026-06-11T14:00:00Z)
 
 ✅ Knowledge index updated: 12 items from 1 source.
-   → .specify/extensions/shared-knowledge/knowledge-index.md
+   → .specify/extensions/knowledge/knowledge-index.md
 ```
 
 **Flags**: `--verbose` — list all files loaded and items written to index
 
-### `/speckit-xrepo-search <query>`
+### `/speckit-knowledge-search <query>`
 
 Browse and search the knowledge corpus without triggering a full spec workflow.
 
@@ -115,12 +121,12 @@ Found 2 items across 1 source:
 
 **Flags**: `--source <label>`, `--tag <tag>`, `--verbose`
 
-### `/speckit-xrepo-status`
+### `/speckit-knowledge-status`
 
 Display current state of all configured sources.
 
 ```
-📊 Cross-Repo Knowledge Status
+📊 Shared Knowledge Status
 
 ┌──────────────────┬──────────────┬────────┬───────┬────────────┐
 │ Source           │ Reachability │ Status │ Items │ Cache Age  │
@@ -142,15 +148,15 @@ Add the following entries to your project's `.specify/extensions.yml`:
 ```yaml
 hooks:
   before_specify:
-    - extension: shared-knowledge
-      command: speckit.xrepo.sync
+    - extension: knowledge
+      command: speckit.knowledge.sync
       optional: true
       prompt: "Sync cross-repo knowledge sources before specifying?"
       description: "Refresh knowledge cache before spec generation so context is current"
 
   before_plan:
-    - extension: shared-knowledge
-      command: speckit.xrepo.sync
+    - extension: knowledge
+      command: speckit.knowledge.sync
       optional: true
       prompt: "Sync cross-repo knowledge sources before planning?"
       description: "Refresh knowledge cache before implementation planning"
@@ -158,22 +164,22 @@ hooks:
 
 ### Step 2: Amend your SKILL.md files
 
-Add the following preamble to `.wibey/skills/speckit-specify/SKILL.md` immediately before the `## Outline` section:
+Add the following preamble to `.claude/skills/speckit-specify/SKILL.md` immediately before the `## Outline` section:
 
 ```markdown
 **Cross-repo knowledge check**: If the file
-`.specify/extensions/shared-knowledge/knowledge-index.md` exists in the
+`.specify/extensions/knowledge/knowledge-index.md` exists in the
 project root, read it and all `.md` files it references from the cache
 directories BEFORE drafting the specification. Surface relevant knowledge
 from those files as context — cite the source (label + path) for each
 piece of referenced information.
 ```
 
-Add the equivalent preamble to `.wibey/skills/speckit-plan/SKILL.md` immediately before the `## Outline` section:
+Add the equivalent preamble to `.claude/skills/speckit-plan/SKILL.md` immediately before the `## Outline` section:
 
 ```markdown
 **Cross-repo knowledge check**: If the file
-`.specify/extensions/shared-knowledge/knowledge-index.md` exists in the
+`.specify/extensions/knowledge/knowledge-index.md` exists in the
 project root, read it and all `.md` files it references from the cache
 directories BEFORE drafting the implementation plan. Surface relevant knowledge
 from those files as context — cite the source (label + path) for each
@@ -182,7 +188,7 @@ piece of referenced information.
 
 > **Why both steps are required**: The hooks (Step 1) trigger a sync so the cache is fresh. The SKILL.md amendments (Step 2) instruct the agent to read `knowledge-index.md` before generating output. Without Step 2, the sync runs correctly but context never flows into spec or plan output.
 
-> **No-op when not configured**: If `.specify/extensions/shared-knowledge/shared-knowledge.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
+> **No-op when not configured**: If `.specify/extensions/knowledge/knowledge.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
 
 ## Configuration Reference
 
@@ -199,12 +205,12 @@ Key fields:
 Add the following to your project's `.gitignore`:
 
 ```gitignore
-# shared-knowledge cache (local only; do not commit)
-.specify/extensions/shared-knowledge/cache/
-.specify/extensions/shared-knowledge/knowledge-index.md
+# knowledge extension cache (local only; do not commit)
+.specify/extensions/knowledge/cache/
+.specify/extensions/knowledge/knowledge-index.md
 ```
 
-The `shared-knowledge.yml` config file **should** be committed — it declares your team's knowledge sources and is shared across all developers.
+The `knowledge.yml` config file **should** be committed — it declares your team's knowledge sources and is shared across all developers.
 
 ## Troubleshooting
 
@@ -214,4 +220,20 @@ The `shared-knowledge.yml` config file **should** be committed — it declares y
 
 **More than 10 sources**: A soft warning is emitted before the sync loop. The command continues normally — the warning is informational only. Use `path_filter` to reduce per-source clone size.
 
-**Context not appearing in spec output**: Verify both setup steps above are complete. Run `/speckit-xrepo-status` to confirm sources are reachable and `knowledge-index.md` exists.
+**Context not appearing in spec output**: Verify both setup steps above are complete. Run `/speckit-knowledge-status` to confirm sources are reachable and `knowledge-index.md` exists.
+
+## Contributing
+
+Contributions are welcome. To propose a change:
+
+1. Open an issue describing the bug or enhancement before sending a PR for non-trivial changes
+2. Fork the repo and create a feature branch (`feat/<short-name>` or `fix/<short-name>`)
+3. Update `CHANGELOG.md` under `[Unreleased]` with your change
+4. Test the change with `bash scripts/install-local.sh /path/to/test-project` against a real spec-kit project
+5. Open a pull request and reference the issue
+
+For larger architectural changes, please file a discussion first. See `specs/` for the reverse-engineered specs that document the current behavior.
+
+## License
+
+[MIT](LICENSE) © Raúl Noa Pedroso

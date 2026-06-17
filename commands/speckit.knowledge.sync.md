@@ -2,7 +2,7 @@
 description: "Refresh local cache for all configured knowledge sources"
 ---
 
-## speckit.xrepo.sync
+## speckit.knowledge.sync
 
 **Purpose**: Refresh the local cache for all configured, enabled knowledge sources.
 
@@ -11,7 +11,7 @@ description: "Refresh local cache for all configured knowledge sources"
 
 ---
 
-## Algorithm Reference (shared with speckit.xrepo.status)
+## Algorithm Reference (shared with speckit.knowledge.status)
 
 ### Source Slug Generation
 
@@ -37,7 +37,7 @@ fi
 - Input: `https://GitHub.com/org/payment-service.git`
 - Normalized: `https://github.com/org/payment-service`
 - Slug: first 12 hex chars of SHA-256 → `abc123def456`
-- Cache dir: `.specify/extensions/shared-knowledge/cache/abc123def456/`
+- Cache dir: `.specify/extensions/knowledge/cache/abc123def456/`
 
 ### Cache Integrity Check (`.manifest.json`)
 
@@ -51,12 +51,12 @@ Run this check before using an existing cache as fallback:
 
 ### `knowledge-index.md` Format
 
-Written to `.specify/extensions/shared-knowledge/knowledge-index.md`. This is the **only file** that `speckit-specify` and `speckit-plan` read directly.
+Written to `.specify/extensions/knowledge/knowledge-index.md`. This is the **only file** that `speckit-specify` and `speckit-plan` read directly.
 
 ```markdown
-<!-- shared-knowledge-index: schema_version=1.0 generated_at=<ISO8601> sources=<N> items=<N> -->
+<!-- knowledge-index-meta: schema_version=1.0 generated_at=<ISO8601> sources=<N> items=<N> -->
 
-## Cross-Repo Knowledge Index
+## Shared Knowledge Index
 
 > Generated: <ISO8601> | Sources: <N> | Items: <N>
 
@@ -79,12 +79,12 @@ The machine-readable HTML comment on line 1 allows scripts to detect the index w
 
 ### 1. Read and validate configuration
 
-Read `.specify/extensions/shared-knowledge/shared-knowledge.yml`.
+Read `.specify/extensions/knowledge/knowledge.yml`.
 
-- If file absent: print `❌ Error: shared-knowledge.yml not found. Run /speckit-xrepo-configure to initialize.` and exit 0.
-- If YAML invalid: print `❌ Error: shared-knowledge.yml contains invalid YAML: <parse error>` and exit 0.
+- If file absent: print `❌ Error: knowledge.yml not found. Run /speckit-knowledge-configure to initialize.` and exit 0.
+- If YAML invalid: print `❌ Error: knowledge.yml contains invalid YAML: <parse error>` and exit 0.
 - If `schema_version` missing or unknown: print `❌ Error: Unrecognized schema_version. Expected "1.0".` and exit 0.
-- If `sources` key missing: print `❌ Error: shared-knowledge.yml is missing the required "sources" key.` and exit 0.
+- If `sources` key missing: print `❌ Error: knowledge.yml is missing the required "sources" key.` and exit 0.
 
 ### 2. Source-count warning
 
@@ -119,29 +119,29 @@ For each enabled source, compute the slug using the Source Slug Generation algor
 
 **Remote URL**:
 ```bash
-mkdir -p .specify/extensions/shared-knowledge/cache/<slug>
+mkdir -p .specify/extensions/knowledge/cache/<slug>
 
 timeout 10 git clone \
   --filter=blob:none \
   --no-checkout \
   --depth=1 \
   <url> \
-  .specify/extensions/shared-knowledge/cache/<slug>
+  .specify/extensions/knowledge/cache/<slug>
 ```
 
 **Local path** (no network flags needed — clone is instant):
 ```bash
-mkdir -p .specify/extensions/shared-knowledge/cache/<slug>
+mkdir -p .specify/extensions/knowledge/cache/<slug>
 
 git clone \
   --no-checkout \
   <expanded-path> \
-  .specify/extensions/shared-knowledge/cache/<slug>
+  .specify/extensions/knowledge/cache/<slug>
 ```
 
 After clone (both remote and local), apply sparse-checkout if `path_filter` is set:
 ```bash
-cd .specify/extensions/shared-knowledge/cache/<slug>
+cd .specify/extensions/knowledge/cache/<slug>
 git sparse-checkout init --cone
 git sparse-checkout set <path_filter>
 git checkout
@@ -149,7 +149,7 @@ git checkout
 
 If no `path_filter`:
 ```bash
-cd .specify/extensions/shared-knowledge/cache/<slug>
+cd .specify/extensions/knowledge/cache/<slug>
 git checkout HEAD -- .
 ```
 
@@ -157,14 +157,14 @@ git checkout HEAD -- .
 
 **Remote URL**:
 ```bash
-cd .specify/extensions/shared-knowledge/cache/<slug>
+cd .specify/extensions/knowledge/cache/<slug>
 timeout 10 git fetch --depth=1 origin
 git checkout origin/HEAD -- .
 ```
 
 **Local path** (fetch from local remote — also instant, no timeout needed):
 ```bash
-cd .specify/extensions/shared-knowledge/cache/<slug>
+cd .specify/extensions/knowledge/cache/<slug>
 git fetch origin
 git checkout origin/HEAD -- .
 ```
@@ -185,7 +185,7 @@ After a successful sync (cold or warm), recursively find all `.md` files under t
 
 ### 6. Write `.manifest.json` (last step)
 
-Write `.specify/extensions/shared-knowledge/cache/<slug>/.manifest.json` **as the final step** after all `.md` files are written:
+Write `.specify/extensions/knowledge/cache/<slug>/.manifest.json` **as the final step** after all `.md` files are written:
 
 ```json
 {
@@ -216,7 +216,7 @@ For each path that appears in two or more sources:
 
 Assemble `knowledge-index.md` using the format defined in the Algorithm Reference above.
 
-Write to `.specify/extensions/shared-knowledge/knowledge-index.md`.
+Write to `.specify/extensions/knowledge/knowledge-index.md`.
 
 Include a conflict section footer if any conflicts were detected.
 
@@ -243,7 +243,7 @@ Unreachable with no cache:
 Final summary line:
 ```
 ✅ Knowledge index updated: 20 items from 2 sources.
-   → .specify/extensions/shared-knowledge/knowledge-index.md
+   → .specify/extensions/knowledge/knowledge-index.md
 ```
 
 ---
@@ -283,5 +283,5 @@ decisions/retry-policy.md
 - Creates `cache/<slug>/` directories with sparse-checkout git state
 - Writes `cache/<slug>/.manifest.json` per source
 - Writes/updates `knowledge-index.md`
-- Does **not** modify `shared-knowledge.yml`
+- Does **not** modify `knowledge.yml`
 - Does **not** modify `.specify/extensions.yml`

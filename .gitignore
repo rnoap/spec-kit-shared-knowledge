@@ -1,6 +1,11 @@
-# shared-knowledge cache (local only; do not commit)
-.specify/extensions/shared-knowledge/cache/
-.specify/extensions/shared-knowledge/knowledge-index.md
+# knowledge extension cache (local only; do not commit)
+.specify/extensions/knowledge/cache/
+.specify/extensions/knowledge/knowledge-index.md
+
+# Local spec-kit tooling state (per-developer, not part of the extension)
+.specify/extensions/companion/
+.specify/presets/
+.wibey/
 
 # OS / editor artifacts
 .DS_Store
@@ -10,4 +15,3 @@ Thumbs.db
 .idea/
 .vscode/
 .claude/
-.wibey/

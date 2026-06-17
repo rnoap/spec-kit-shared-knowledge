@@ -1,4 +1,4 @@
-<!-- WIBEY-GRAPH-PRIORITY START -->
+<!-- CODE-GRAPH-PRIORITY START -->
 ## ⚠️ CRITICAL: Codebase Exploration
 
 **ALWAYS explore the codebase with the code-review-graph MCP tools BEFORE `grep_search` / `file_search` / `read_file`.**
@@ -12,7 +12,7 @@
 Before any `grep_search`, ask: "Could the knowledge graph answer this?" If yes, use the graph first. `grep_search` is only for exact literal strings the graph doesn't index. See the "code-review-graph MCP" section below for full details.
 
 > If `code-review-graph` is not yet installed, run `/speckit-setup` first.
-<!-- WIBEY-GRAPH-PRIORITY END -->
+<!-- CODE-GRAPH-PRIORITY END -->
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,

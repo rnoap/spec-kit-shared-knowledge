@@ -1,0 +1,30 @@
+# .extensionignore — patterns excluded when `specify extension add` copies
+# this extension into a consumer project. Format follows .gitignore syntax.
+
+# Spec Kit dev artifacts (specs for this extension itself)
+specs/
+AGENTS.md
+CHANGELOG.md
+
+# Code knowledge graph (local dev tool state)
+.code-review-graph/
+
+# Local tool / editor state
+.specify/
+.claude/
+.vscode/
+.idea/
+
+# Version control
+.git/
+.gitignore
+
+# OS junk
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Local-install helper script (not needed once the extension is installed
+# via `specify extension add`)
+scripts/

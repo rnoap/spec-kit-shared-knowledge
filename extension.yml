@@ -1,12 +1,13 @@
 schema_version: "1.0"
 
 extension:
-  id: shared-knowledge
-  name: "Cross-Repository Shared Knowledge"
+  id: knowledge
+  name: "Shared Knowledge"
   version: "1.0.0"
-  description: "Inject architectural decisions, API contracts, and conventions from other Git repositories into your spec-kit workflow"
-  author: walmart-developer-experience
-  repository: https://github.com/walmart-developer-experience/spec-kit-shared-knowledge
+  description: "Inject cross-repo decisions, contracts, and conventions into your spec-kit workflow"
+  author: "Raúl Noa Pedroso"
+  # repository: ""  # TODO: set after publishing, e.g. https://github.com/<owner>/spec-kit-shared-knowledge
+  # homepage: ""    # TODO: set after publishing (usually same as repository)
   license: MIT
 
 requires:
@@ -19,33 +20,33 @@ requires:
 
 provides:
   commands:
-    - name: speckit.xrepo.configure
-      file: commands/speckit.xrepo.configure.md
+    - name: speckit.knowledge.configure
+      file: commands/speckit.knowledge.configure.md
       description: "Initialize or edit the knowledge source configuration for the current project"
-    - name: speckit.xrepo.sync
-      file: commands/speckit.xrepo.sync.md
+    - name: speckit.knowledge.sync
+      file: commands/speckit.knowledge.sync.md
       description: "Refresh local cache for all configured knowledge sources"
-    - name: speckit.xrepo.search
-      file: commands/speckit.xrepo.search.md
+    - name: speckit.knowledge.search
+      file: commands/speckit.knowledge.search.md
       description: "Browse and search the knowledge corpus across all configured sources"
-    - name: speckit.xrepo.status
-      file: commands/speckit.xrepo.status.md
+    - name: speckit.knowledge.status
+      file: commands/speckit.knowledge.status.md
       description: "Show reachability, last-sync timestamp, item count, and cache age per source"
 
   config:
-    - name: "shared-knowledge.yml"
+    - name: "knowledge.yml"
       template: "config-template.yml"
-      location: ".specify/extensions/shared-knowledge/"
+      location: ".specify/extensions/knowledge/"
       required: false
 
 hooks:
   before_specify:
-    command: speckit.xrepo.sync
+    command: speckit.knowledge.sync
     optional: true
     prompt: "Sync cross-repo knowledge sources before specifying?"
     description: "Refresh knowledge cache before spec generation so context is current"
   before_plan:
-    command: speckit.xrepo.sync
+    command: speckit.knowledge.sync
     optional: true
     prompt: "Sync cross-repo knowledge sources before planning?"
     description: "Refresh knowledge cache before implementation planning"
@@ -54,6 +55,5 @@ tags:
   - "cross-repo"
   - "knowledge"
   - "context"
-  - "multi-repo"
   - "shared-decisions"
   - "contracts"

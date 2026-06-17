@@ -17,7 +17,7 @@ feature: extension-core
 
 **Purpose**: Create extension manifest and config schema
 
-- [x] T001 Create `extension.yml` with `id: shared-knowledge`, `version: 1.0.0`, 4 commands under `provides.commands`, 2 hooks (`before_specify`, `before_plan`), `requires.speckit_version >= 0.10.0`
+- [x] T001 Create `extension.yml` with `id: knowledge`, `version: 1.0.0`, 4 commands under `provides.commands`, 2 hooks (`before_specify`, `before_plan`), `requires.speckit_version >= 0.10.0`
 - [x] T002 Create `config-template.yml` with `schema_version: "1.0"` and empty `sources: []`; include commented example entry with all supported fields (`url`, `label`, `path_filter`, `enabled`)
 
 ---
@@ -28,13 +28,13 @@ feature: extension-core
 
 - [x] T003 Create `scripts/install-local.sh` skeleton with `set -euo pipefail`, variable declarations (`EXTENSION_ID`, `PROJECT_DIR`, `REGISTRY`, `EXT_DIR`), and optional positional argument for target path
 - [x] T004 [P] Add spec-kit project validation (check `.specify/extensions` exists, exit 1 if absent)
-- [x] T005 [US1] Implement command file copy loop (`for src in commands/speckit.xrepo.*.md`) → `EXT_DIR/commands/`; report count
+- [x] T005 [US1] Implement command file copy loop (`for src in commands/speckit.knowledge.*.md`) → `EXT_DIR/commands/`; report count
 - [x] T006 [US1] Implement `extension.yml` copy to `EXT_DIR/extension.yml`
-- [x] T007 [US1] Implement no-clobber config copy: skip if `shared-knowledge.yml` already exists in consumer project
+- [x] T007 [US1] Implement no-clobber config copy: skip if `knowledge.yml` already exists in consumer project
 - [x] T008 [US1] Implement registry update via inline Python 3 heredoc: read existing `.registry` JSON, upsert extension entry with `version`, `source: local`, `manifest_hash`, `registered_commands`, `installed_at`
 - [x] T009 [US1] Add SHA-256 dual implementation: `sha256sum` (Linux) with `shasum -a 256` (macOS) fallback
 
-**Checkpoint**: Install installs files and registers extension. `specify extension list` shows `shared-knowledge`.
+**Checkpoint**: Install installs files and registers extension. `specify extension list` shows `knowledge`.
 
 ---
 
@@ -51,15 +51,15 @@ feature: extension-core
 
 ## Phase 4: User Story 3 — SKILL.md Wrappers (Priority: P2)
 
-**Goal**: Generate discoverable SKILL.md files for Wibey and Claude Code
+**Goal**: Generate discoverable SKILL.md files for Claude Code
 
 - [x] T012 [US3] Implement `generate_skill()` function: accepts `cmd_file` and `target_dir`; derives skill name via `sed 's/\./-/g'`; extracts description from frontmatter via `grep '^description:'`
 - [x] T013 [US3] Implement body extraction using `awk` to skip YAML frontmatter block (lines between first and second `---` delimiters)
 - [x] T014 [US3] Write `SKILL.md` with YAML frontmatter (`name`, `description`, `compatibility`, `metadata.author`, `metadata.source`) + extracted body
-- [x] T015 [US3] Call `generate_skill` for both `.wibey/skills/` and `.claude/skills/` targets for each installed command
+- [x] T015 [US3] Call `generate_skill` for `.claude/skills/` target for each installed command
 - [x] T016 [US3] Print `.gitignore` reminder for cache and knowledge-index files at end of install
 
-**Checkpoint**: After install, `.wibey/skills/speckit-xrepo-*/SKILL.md` and `.claude/skills/speckit-xrepo-*/SKILL.md` exist with correct content.
+**Checkpoint**: After install, `.claude/skills/speckit-knowledge-*/SKILL.md` exists with correct content.
 
 ---
 

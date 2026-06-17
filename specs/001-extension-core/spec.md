@@ -21,17 +21,17 @@ migrated_at: 2026-06-17
 
 ### User Story 1 — Install Extension into a spec-kit Project (Priority: P1)
 
-A developer working on a spec-kit project wants to use cross-repo knowledge injection. They run the install script to make the 4 xrepo commands available in their project without publishing to a registry.
+A developer working on a spec-kit project wants to use cross-repo knowledge injection. They run the install script to make the 4 knowledge extension commands available in their project without publishing to a registry.
 
 **Why this priority**: Core distribution mechanism — nothing works without this.
 
-**Independent Test**: Run `bash scripts/install-local.sh /path/to/project` against a clean spec-kit project; verify `specify extension list` shows `shared-knowledge` and all 4 commands are available.
+**Independent Test**: Run `bash scripts/install-local.sh /path/to/project` against a clean spec-kit project; verify `specify extension list` shows `knowledge` and all 4 commands are available.
 
 **Acceptance Scenarios**:
 
-1. **Given** a valid spec-kit project (`.specify/extensions` exists), **When** `bash scripts/install-local.sh` is run, **Then** all 4 command files are copied to `.specify/extensions/shared-knowledge/commands/`, `extension.yml` is copied, and the extension appears in `specify extension list`
-2. **Given** the target project has no existing `shared-knowledge.yml`, **When** install runs, **Then** `config-template.yml` is copied as `shared-knowledge.yml` (initial config with empty sources)
-3. **Given** the target project already has a `shared-knowledge.yml`, **When** install runs again, **Then** the existing config is preserved (no-clobber) and the script prints `ℹ️  shared-knowledge.yml already exists — not overwriting`
+1. **Given** a valid spec-kit project (`.specify/extensions` exists), **When** `bash scripts/install-local.sh` is run, **Then** all 4 command files are copied to `.specify/extensions/knowledge/commands/`, `extension.yml` is copied, and the extension appears in `specify extension list`
+2. **Given** the target project has no existing `knowledge.yml`, **When** install runs, **Then** `config-template.yml` is copied as `knowledge.yml` (initial config with empty sources)
+3. **Given** the target project already has a `knowledge.yml`, **When** install runs again, **Then** the existing config is preserved (no-clobber) and the script prints `ℹ️  knowledge.yml already exists — not overwriting`
 4. **Given** the target directory is not a spec-kit project (no `.specify/extensions`), **When** install runs, **Then** the script prints `❌ Error: ... does not look like a spec-kit project` and exits with code 1
 
 ---
@@ -42,7 +42,7 @@ A developer upgrades the extension after new commands or fixes have been release
 
 **Why this priority**: Idempotent installs are critical for maintenance without destroying config.
 
-**Independent Test**: Run `bash scripts/install-local.sh` twice on the same project; verify the second run updates commands and registry without errors, and the existing `shared-knowledge.yml` is unchanged.
+**Independent Test**: Run `bash scripts/install-local.sh` twice on the same project; verify the second run updates commands and registry without errors, and the existing `knowledge.yml` is unchanged.
 
 **Acceptance Scenarios**:
 
@@ -51,18 +51,18 @@ A developer upgrades the extension after new commands or fixes have been release
 
 ---
 
-### User Story 3 — SKILL.md Wrappers for Wibey and Claude (Priority: P2)
+### User Story 3 — SKILL.md Wrappers for AI Agents (Priority: P2)
 
-After installation, the 4 xrepo commands must be discoverable as skills in both `.wibey/skills/` and `.claude/skills/`, following the same pattern as built-in extensions.
+After installation, the 4 knowledge extension commands must be discoverable as skills in `.claude/skills/`, following the same pattern as built-in Claude Code skills.
 
-**Why this priority**: Without SKILL.md wrappers, Wibey and Claude Code agents cannot invoke the commands via the `/` autocomplete.
+**Why this priority**: Without SKILL.md wrappers, AI agents that consume `.claude/skills/` cannot invoke the commands via the `/` autocomplete.
 
-**Independent Test**: After `bash scripts/install-local.sh`, verify `.wibey/skills/speckit-xrepo-configure/SKILL.md` exists with correct frontmatter and body extracted from the command file.
+**Independent Test**: After `bash scripts/install-local.sh`, verify `.claude/skills/speckit-knowledge-configure/SKILL.md` exists with correct frontmatter and body extracted from the command file.
 
 **Acceptance Scenarios**:
 
-1. **Given** install completes successfully, **When** `.wibey/skills/speckit-xrepo-*/SKILL.md` is read, **Then** it contains valid YAML frontmatter (`name`, `description`, `compatibility`, `metadata`) and the command body (everything after the second `---` in the source command file)
-2. **Given** install completes, **When** `.claude/skills/speckit-xrepo-*/SKILL.md` is read, **Then** it is identical to the corresponding `.wibey/skills/` entry
+1. **Given** install completes successfully, **When** `.claude/skills/speckit-knowledge-*/SKILL.md` is read, **Then** it contains valid YAML frontmatter (`name`, `description`, `compatibility`, `metadata`) and the command body (everything after the second `---` in the source command file)
+2. **Given** install completes, **When** `.claude/skills/speckit-knowledge-*/SKILL.md` is read, **Then** the body is identical to the markdown body of the corresponding source command file
 
 ---
 
@@ -79,15 +79,15 @@ After installation, the 4 xrepo commands must be discoverable as skills in both 
 
 ### Functional Requirements
 
-- **FR-001**: Install script MUST copy all `commands/speckit.xrepo.*.md` files to `.specify/extensions/shared-knowledge/commands/`
-- **FR-002**: Install script MUST copy `extension.yml` to `.specify/extensions/shared-knowledge/extension.yml`
-- **FR-003**: Install script MUST copy `config-template.yml` as `shared-knowledge.yml` ONLY if no config file already exists (no-clobber)
+- **FR-001**: Install script MUST copy all `commands/speckit.knowledge.*.md` files to `.specify/extensions/knowledge/commands/`
+- **FR-002**: Install script MUST copy `extension.yml` to `.specify/extensions/knowledge/extension.yml`
+- **FR-003**: Install script MUST copy `config-template.yml` as `knowledge.yml` ONLY if no config file already exists (no-clobber)
 - **FR-004**: Install script MUST register the extension in `.specify/extensions/.registry` (JSON), computing `manifest_hash` via SHA-256 of the installed `extension.yml`
-- **FR-005**: Install script MUST generate SKILL.md wrappers in both `.wibey/skills/<skill-name>/SKILL.md` AND `.claude/skills/<skill-name>/SKILL.md` for each installed command
-- **FR-006**: SKILL.md wrappers MUST use the command's dot-notation filename converted to kebab-case as the skill name (e.g., `speckit.xrepo.configure` → `speckit-xrepo-configure`)
+- **FR-005**: Install script MUST generate SKILL.md wrappers in `.claude/skills/<skill-name>/SKILL.md` for each installed command
+- **FR-006**: SKILL.md wrappers MUST use the command's dot-notation filename converted to kebab-case as the skill name (e.g., `speckit.knowledge.configure` → `speckit-knowledge-configure`)
 - **FR-007**: Install script MUST accept an optional positional argument as the target project path; default to `$(pwd)`
 - **FR-008**: Install script MUST validate the target is a spec-kit project before proceeding
-- **FR-009**: `extension.yml` MUST declare `id: shared-knowledge`, `version: 1.0.0`, all 4 commands under `provides.commands`, and two hooks (`before_specify`, `before_plan`)
+- **FR-009**: `extension.yml` MUST declare `id: knowledge`, `version: 1.0.0`, all 4 commands under `provides.commands`, and two hooks (`before_specify`, `before_plan`)
 - **FR-010**: `config-template.yml` MUST declare `schema_version: "1.0"` and `sources: []` as the default empty config
 
 ### Key Entities
@@ -95,7 +95,7 @@ After installation, the 4 xrepo commands must be discoverable as skills in both 
 - **Extension Manifest** (`extension.yml`): Declares the package identity, version, commands, hooks, and requirements. Source of truth for registry registration.
 - **Config Template** (`config-template.yml`): User-facing YAML schema with schema_version and sources list. No-clobber installed to consumer project.
 - **Registry Entry** (`.specify/extensions/.registry`): JSON record per extension: version, source, manifest_hash, enabled, priority, registered_commands.
-- **SKILL.md Wrapper**: Generated Markdown file in `.wibey/skills/` and `.claude/skills/` per command; contains YAML frontmatter + command body extracted from source.
+- **SKILL.md Wrapper**: Generated Markdown file in `.claude/skills/` per command; contains YAML frontmatter + command body extracted from source.
 
 ---
 
@@ -104,8 +104,8 @@ After installation, the 4 xrepo commands must be discoverable as skills in both 
 ### Measurable Outcomes
 
 - **SC-001**: `bash scripts/install-local.sh` completes with exit code 0 on a clean spec-kit project in under 5 seconds
-- **SC-002**: `specify extension list` shows `shared-knowledge` with all 4 commands after install
-- **SC-003**: Re-running install on a project with existing config preserves `shared-knowledge.yml` (md5 of config file unchanged)
+- **SC-002**: `specify extension list` shows `knowledge` with all 4 commands after install
+- **SC-003**: Re-running install on a project with existing config preserves `knowledge.yml` (md5 of config file unchanged)
 - **SC-004**: Generated SKILL.md files contain valid YAML frontmatter (parseable by any YAML parser)
 
 ---

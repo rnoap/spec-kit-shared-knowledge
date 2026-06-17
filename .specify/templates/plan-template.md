@@ -61,7 +61,7 @@ specs/[###-feature]/
 ```text
 # Extension package layout (no src/ — files are the deliverable)
 commands/
-└── speckit.xrepo.<verb>.md              # agent prompt for each command (namespace: xrepo)
+└── speckit.knowledge.<verb>.md              # agent prompt for each command (namespace: knowledge)
 
 scripts/
 └── install-local.sh                     # install tooling (only script allowed)

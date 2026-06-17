@@ -165,7 +165,7 @@ For each `commands/*.md` file being added or changed:
 
 | Command file | Command ID | Trigger | What it does |
 |-------------|-----------|---------|-------------|
-| `commands/speckit.xrepo.[verb].md` | `speckit.xrepo.[verb]` | `/speckit.xrepo.[verb]` | [One-line description] |
+| `commands/speckit.knowledge.[verb].md` | `speckit.knowledge.[verb]` | `/speckit.knowledge.[verb]` | [One-line description] |
 
 ### Install Script Impact
 

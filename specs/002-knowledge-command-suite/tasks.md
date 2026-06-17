@@ -1,11 +1,11 @@
 ---
 status: migrated
-feature: xrepo-command-suite
+feature: knowledge-command-suite
 ---
 
-# Tasks: xrepo Command Suite
+# Tasks: Knowledge Command Suite
 
-**Input**: `specs/002-xrepo-command-suite/spec.md`, `specs/002-xrepo-command-suite/plan.md`
+**Input**: `specs/002-knowledge-command-suite/spec.md`, `specs/002-knowledge-command-suite/plan.md`
 
 **Note**: All tasks marked `[x]` — implementation is complete. Migrated on 2026-06-17.
 
@@ -17,10 +17,10 @@ feature: xrepo-command-suite
 
 **Purpose**: Scaffold 4 command files with frontmatter and section headers
 
-- [x] T001 Create `commands/speckit.xrepo.configure.md` with YAML frontmatter and section headings (Behavior, Error Cases, Side Effects, Exit Codes)
-- [x] T002 [P] Create `commands/speckit.xrepo.sync.md` with YAML frontmatter, Algorithm Reference section, Behavior section, Error Cases Summary, Side Effects
-- [x] T003 [P] Create `commands/speckit.xrepo.search.md` with YAML frontmatter and section headings
-- [x] T004 [P] Create `commands/speckit.xrepo.status.md` with YAML frontmatter and Algorithm Reference cross-reference
+- [x] T001 Create `commands/speckit.knowledge.configure.md` with YAML frontmatter and section headings (Behavior, Error Cases, Side Effects, Exit Codes)
+- [x] T002 [P] Create `commands/speckit.knowledge.sync.md` with YAML frontmatter, Algorithm Reference section, Behavior section, Error Cases Summary, Side Effects
+- [x] T003 [P] Create `commands/speckit.knowledge.search.md` with YAML frontmatter and section headings
+- [x] T004 [P] Create `commands/speckit.knowledge.status.md` with YAML frontmatter and Algorithm Reference cross-reference
 
 ---
 
@@ -28,8 +28,8 @@ feature: xrepo-command-suite
 
 **Purpose**: Define the shared algorithms used by sync and status before implementing either
 
-- [x] T005 Implement **Source Slug Generation** algorithm in `speckit.xrepo.sync.md`: normalize URL (strip `.git`, trailing slash, lowercase) → SHA-256 → first 12 hex chars; Bash pseudocode with macOS fallback
-- [x] T006 Implement **Cache Integrity Check** algorithm in `speckit.xrepo.sync.md`: verify `.manifest.json` exists + valid JSON + `item_count` matches file count + per-file SHA-256 matches; 5-step pass/fail logic
+- [x] T005 Implement **Source Slug Generation** algorithm in `speckit.knowledge.sync.md`: normalize URL (strip `.git`, trailing slash, lowercase) → SHA-256 → first 12 hex chars; Bash pseudocode with macOS fallback
+- [x] T006 Implement **Cache Integrity Check** algorithm in `speckit.knowledge.sync.md`: verify `.manifest.json` exists + valid JSON + `item_count` matches file count + per-file SHA-256 matches; 5-step pass/fail logic
 - [x] T007 Define **`knowledge-index.md` format** in sync Algorithm Reference: HTML comment header, source section per entry, status line, conflict footer
 
 **Checkpoint**: Shared algorithms documented and stable. Both sync and status can now be implemented.
@@ -38,9 +38,9 @@ feature: xrepo-command-suite
 
 ## Phase 3: User Story 1 — configure (Priority: P1)
 
-**Goal**: Developer can add, update, and view knowledge sources in `shared-knowledge.yml`
+**Goal**: Developer can add, update, and view knowledge sources in `knowledge.yml`
 
-- [x] T008 [US1] Implement config file creation: check for `shared-knowledge.yml`, create with `schema_version: "1.0"` + `sources: []` if absent (copy from extension `config-template.yml`)
+- [x] T008 [US1] Implement config file creation: check for `knowledge.yml`, create with `schema_version: "1.0"` + `sources: []` if absent (copy from extension `config-template.yml`)
 - [x] T009 [US1] Implement argument parsing: first token = URL or local path, second token = `path_filter`, remaining = flags
 - [x] T010 [US1] Implement URL type detection (local path vs remote URL) and `~` expansion
 - [x] T011 [US1] Implement label derivation: local path → last component; remote URL → strip `.git` + last 3 path components (`<host>/<org>/<repo>`)
@@ -51,7 +51,7 @@ feature: xrepo-command-suite
 - [x] T016 [US1] Implement `--verbose` flag (print full YAML after write)
 - [x] T017 [US1] Document all error cases table (invalid path_filter, local path absent, invalid YAML, missing schema_version)
 
-**Checkpoint**: `speckit.xrepo.configure` fully implemented. Developer can configure both remote and local sources.
+**Checkpoint**: `speckit.knowledge.configure` fully implemented. Developer can configure both remote and local sources.
 
 ---
 
@@ -73,7 +73,7 @@ feature: xrepo-command-suite
 - [x] T029 [US2] Implement per-source status output lines (fresh/cached/unreachable) and final summary line
 - [x] T030 [US2] Implement `--verbose` flag (list files loaded per source)
 
-**Checkpoint**: `speckit.xrepo.sync` fully implemented. Cache + index populated. Both `search` and `status` can be implemented.
+**Checkpoint**: `speckit.knowledge.sync` fully implemented. Cache + index populated. Both `search` and `status` can be implemented.
 
 ---
 
@@ -89,7 +89,7 @@ feature: xrepo-command-suite
 - [x] T036 [US3] Implement `--verbose` flag (full file content instead of excerpt)
 - [x] T037 [US3] Implement "no results" message with sync suggestion
 
-**Checkpoint**: `speckit.xrepo.search` fully implemented. All filter/flag combinations work.
+**Checkpoint**: `speckit.knowledge.search` fully implemented. All filter/flag combinations work.
 
 ---
 
@@ -125,6 +125,6 @@ feature: xrepo-command-suite
 | No automated tests for any command | High | Create `tests/` directory; write integration tests that configure a local git repo as source and verify sync/search/status output |
 | No CI/CD pipeline | High | Add Looper or GitHub Actions workflow; run tests on push to main |
 | No timeout test coverage for sync | Medium | Integration test: mock a slow remote (or use `git daemon` with firewall) to verify `cached` fallback behavior |
-| `speckit.xrepo.search` reads first 500 chars of each file for matching — O(N×M) for large corpora | Low | Document performance limit in README; consider index pre-built text excerpts in knowledge-index.md |
+| `speckit.knowledge.search` reads first 500 chars of each file for matching — O(N×M) for large corpora | Low | Document performance limit in README; consider index pre-built text excerpts in knowledge-index.md |
 | No support for SSH key authentication in configure/sync (relies on system git config) | Low | Document SSH key setup requirement in README |
-| ~~`knowledge-index.md` format is not versioned (no schema_version)~~ | ~~Low~~ | ✅ Fixed — `schema_version=1.0` added to the HTML comment header in `speckit.xrepo.sync.md` |
+| ~~`knowledge-index.md` format is not versioned (no schema_version)~~ | ~~Low~~ | ✅ Fixed — `schema_version=1.0` added to the HTML comment header in `speckit.knowledge.sync.md` |

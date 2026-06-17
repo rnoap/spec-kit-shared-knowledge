@@ -49,9 +49,9 @@ Types: feat | fix | refactor | docs | chore | test | style
 
 ## Naming Conventions
 
-- **Extension ID**: `shared-knowledge` (kebab-case, no version suffix)
-- **Command IDs**: dot-notation `speckit.<namespace>.<verb>` where the namespace is `xrepo` (short for "cross-repo"), NOT the extension ID. Examples: `speckit.xrepo.sync`, `speckit.xrepo.search`
-- **Command files**: kebab-case, mirror the command ID with dots replaced by periods: `speckit.xrepo.sync.md`. The extension ID (`shared-knowledge`) and the command namespace (`xrepo`) are intentionally different.
+- **Extension ID**: `knowledge` (kebab-compatible, no version suffix). Repository name is `spec-kit-shared-knowledge` (descriptive); display name in the manifest is `Shared Knowledge`.
+- **Command IDs**: dot-notation `speckit.<ext-id>.<verb>` where `<ext-id>` matches the extension id. Examples: `speckit.knowledge.sync`, `speckit.knowledge.search`. The pattern `^speckit\.{ext-id}\.{command}$` is enforced by spec-kit validation.
+- **Command files**: dot-notation matching the command ID, with `.md` suffix: `speckit.knowledge.sync.md`. Skill wrappers in `.claude/skills/` use kebab-case (`speckit-knowledge-sync/SKILL.md`).
 - **Script files**: kebab-case with `.sh` extension (e.g., `install-local.sh`)
 - **Config keys**: snake_case in YAML
 - **Spec directories**: `NNN-kebab-case` under `specs/` where `NNN` is a zero-padded three-digit sequential number (e.g., `001-auth-flow`, `002-sync-command`). Both `speckit-specify` and `speckit-brownfield-migrate` assign numbers automatically.

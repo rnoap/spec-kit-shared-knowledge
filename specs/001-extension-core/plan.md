@@ -13,7 +13,7 @@ feature: extension-core
 
 ## Summary
 
-Implements the distribution and installation infrastructure for the `shared-knowledge` spec-kit extension. Provides a self-contained Bash install script that copies command files, registers the extension in the spec-kit registry, and generates SKILL.md wrappers for Wibey and Claude Code.
+Implements the distribution and installation infrastructure for the `knowledge` spec-kit extension. Provides a self-contained Bash install script that copies command files, registers the extension in the spec-kit registry, and generates SKILL.md wrappers for Claude Code.
 
 ---
 
@@ -23,7 +23,7 @@ Implements the distribution and installation infrastructure for the `shared-know
 
 **Primary Dependencies**: spec-kit `>= 0.10.0`, git `>= 2.25`, Python 3 (stdlib only — `json` module), `sha256sum` (GNU coreutils) or `shasum -a 256` (macOS fallback)
 
-**Storage**: Files only — copies from extension source into consumer's `.specify/extensions/shared-knowledge/`; generates `.wibey/skills/` and `.claude/skills/` wrappers; updates `.specify/extensions/.registry` JSON
+**Storage**: Files only — copies from extension source into consumer's `.specify/extensions/knowledge/`; generates `.claude/skills/` wrappers; updates `.specify/extensions/.registry` JSON
 
 **Testing**: Manual smoke test — run `bash scripts/install-local.sh` against clean spec-kit project. No automated test harness.
 
@@ -34,12 +34,12 @@ Implements the distribution and installation infrastructure for the `shared-know
 **Performance Goals**: Install completes in < 5 seconds on local filesystem
 
 **Constraints**:
-- No-clobber: must not overwrite existing `shared-knowledge.yml`
+- No-clobber: must not overwrite existing `knowledge.yml`
 - Idempotent: safe to re-run
 - Must work with bash 3.2 (macOS system bash): no `declare -A`, no `mapfile`, no `[[ =~ ]]` with capture groups
 - Python 3 inline script avoids external JSON tools (`jq` not guaranteed)
 
-**Scale/Scope**: 4 commands, 1 config template, 1 registry entry, 8 SKILL.md files (4 commands × 2 targets)
+**Scale/Scope**: 4 commands, 1 config template, 1 registry entry, 4 SKILL.md files (4 commands × 1 target)
 
 ---
 
@@ -76,18 +76,17 @@ scripts/
 **Consumer-side artifacts produced by install:**
 
 ```text
-<project>/.specify/extensions/shared-knowledge/
+<project>/.specify/extensions/knowledge/
 ├── commands/
-│   ├── speckit.xrepo.configure.md
-│   ├── speckit.xrepo.sync.md
-│   ├── speckit.xrepo.search.md
-│   └── speckit.xrepo.status.md
+│   ├── speckit.knowledge.configure.md
+│   ├── speckit.knowledge.sync.md
+│   ├── speckit.knowledge.search.md
+│   └── speckit.knowledge.status.md
 ├── extension.yml
-└── shared-knowledge.yml              # config (no-clobber from config-template.yml)
+└── knowledge.yml                          # config (no-clobber from config-template.yml)
 
 <project>/.specify/extensions/.registry        # JSON, extension entry appended/updated
-<project>/.wibey/skills/speckit-xrepo-*/SKILL.md   # 4 wrappers
-<project>/.claude/skills/speckit-xrepo-*/SKILL.md  # 4 wrappers
+<project>/.claude/skills/speckit-knowledge-*/SKILL.md  # 4 wrappers
 ```
 
 ---
@@ -104,11 +103,11 @@ Body extraction uses `awk` to find the second `---` YAML fence and print everyth
 
 ### Decision 3: SHA-256 Dual Implementation
 
-`sha256sum` (GNU) vs `shasum -a 256` (macOS BSD) — both produce identical hex digests. The script detects which is available via `command -v` and branches accordingly. This pattern is also used in the xrepo sync command.
+`sha256sum` (GNU) vs `shasum -a 256` (macOS BSD) — both produce identical hex digests. The script detects which is available via `command -v` and branches accordingly. This pattern is also used in the knowledge sync command.
 
 ### Decision 4: Skill Name Derivation
 
-Command dot-notation (e.g., `speckit.xrepo.configure`) → kebab-case skill name (`speckit-xrepo-configure`) via `sed 's/\./-/g'`. Consistent with how the brownfield extension's skills are named.
+Command dot-notation (e.g., `speckit.knowledge.configure`) → kebab-case skill name (`speckit-knowledge-configure`) via `sed 's/\./-/g'`. Consistent with how the brownfield extension's skills are named.
 
 ---
 

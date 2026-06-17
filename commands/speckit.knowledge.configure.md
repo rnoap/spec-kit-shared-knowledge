@@ -2,14 +2,14 @@
 description: "Initialize or edit the knowledge source configuration for the current project"
 ---
 
-## speckit.xrepo.configure
+## speckit.knowledge.configure
 
 **Purpose**: Initialize or edit the knowledge source configuration for the current project.
 
 **Arguments**: `$ARGUMENTS` — optional. May contain:
-- A Git repository URL (SSH or HTTPS), e.g. `https://gecgithub01.walmart.com/org/repo`
+- A Git repository URL (SSH or HTTPS), e.g. `https://github.com/your-org/your-repo`
 - A local filesystem path to a Git repository, e.g. `/Users/me/repos/payment-service` or `~/repos/payment-service`
-- An optional path filter after the URL/path, e.g. `https://gecgithub01.walmart.com/org/repo specs/`
+- An optional path filter after the URL/path, e.g. `https://github.com/your-org/your-repo specs/`
 - The flag `--verbose` to print full YAML after write
 
 ---
@@ -18,9 +18,9 @@ description: "Initialize or edit the knowledge source configuration for the curr
 
 ### 1. Locate or create configuration file
 
-Check for `.specify/extensions/shared-knowledge/shared-knowledge.yml` in the project root.
+Check for `.specify/extensions/knowledge/knowledge.yml` in the project root.
 
-- **If absent**: create the directory `.specify/extensions/shared-knowledge/` and copy the extension's `config-template.yml` to that location, producing a file with `schema_version: "1.0"` and `sources: []`.
+- **If absent**: create the directory `.specify/extensions/knowledge/` and copy the extension's `config-template.yml` to that location, producing a file with `schema_version: "1.0"` and `sources: []`.
 - **If present**: read the existing file and parse its `sources` list.
 
 ### 2. Parse arguments (if provided)
@@ -44,8 +44,8 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
      - Strip trailing `.git` and trailing `/`
      - Extract the last three path components: `<host>/<org>/<repo>`
      - Examples:
-       - `https://gecgithub01.walmart.com/payment-platform/payment-service.git` → `gecgithub01.walmart.com/payment-platform/payment-service`
-       - `git@gecgithub01.walmart.com:identity/identity-service` → `gecgithub01.walmart.com/identity/identity-service`
+       - `https://github.com/your-org/payment-service.git` → `github.com/your-org/payment-service`
+       - `git@github.com:your-org/identity-service` → `github.com/your-org/identity-service`
 5. Append a new source entry to `sources`:
    ```yaml
    - url: <url>
@@ -60,47 +60,47 @@ Print the numbered sources list:
 
 ```
 Configured sources:
-  1. payment-service  →  https://gecgithub01.walmart.com/org/payment-service  (path: specs/)
-  2. identity-service →  https://gecgithub01.walmart.com/org/identity-service  (path: all .md files)
+  1. payment-service  →  https://github.com/your-org/payment-service  (path: specs/)
+  2. identity-service →  https://github.com/your-org/identity-service  (path: all .md files)
 ```
 
 Prompt the developer to confirm or edit the displayed configuration before writing.
 
 ### 4. Write configuration
 
-On confirmation, write the updated `shared-knowledge.yml` back to disk, preserving `schema_version: "1.0"` at the top and all existing source entries.
+On confirmation, write the updated `knowledge.yml` back to disk, preserving `schema_version: "1.0"` at the top and all existing source entries.
 
 ### 5. Emit success output
 
 ```
-✅ shared-knowledge.yml updated.
+✅ knowledge.yml updated.
 
 Configured sources:
-  1. payment-service  →  https://gecgithub01.walmart.com/org/payment-service  (path: specs/)
-  2. identity-service →  https://gecgithub01.walmart.com/org/identity-service  (path: all .md files)
+  1. payment-service  →  https://github.com/your-org/payment-service  (path: specs/)
+  2. identity-service →  https://github.com/your-org/identity-service  (path: all .md files)
 
-Run /speckit-xrepo-sync to refresh the cache.
+Run /speckit-knowledge-sync to refresh the cache.
 ```
 
 If no sources are configured (empty list):
 ```
-✅ shared-knowledge.yml initialized with empty sources list.
+✅ knowledge.yml initialized with empty sources list.
 
-Run /speckit-xrepo-configure <url> to add a knowledge source.
+Run /speckit-knowledge-configure <url> to add a knowledge source.
 ```
 
 ---
 
 ## --verbose flag
 
-When `--verbose` is present in `$ARGUMENTS`, additionally print the full YAML content of `shared-knowledge.yml` after the success message:
+When `--verbose` is present in `$ARGUMENTS`, additionally print the full YAML content of `knowledge.yml` after the success message:
 
 ```
---- VERBOSE: shared-knowledge.yml ---
+--- VERBOSE: knowledge.yml ---
 schema_version: "1.0"
 
 sources:
-  - url: https://gecgithub01.walmart.com/org/payment-service
+  - url: https://github.com/your-org/payment-service
     label: payment-service
     path_filter: specs/
 --- END VERBOSE ---
@@ -116,18 +116,18 @@ sources:
 | `path_filter` contains `..` | `❌ Error: path_filter must not contain .. (directory traversal not allowed)` |
 | Local path does not exist | `❌ Error: Local path "<path>" does not exist.` |
 | Local path is not a git repo | `❌ Error: Local path "<path>" is not a Git repository (no .git directory found).` |
-| Invalid YAML in existing config | `❌ Error: shared-knowledge.yml contains invalid YAML: <parse error>. Fix the file manually and re-run.` |
-| `schema_version` missing | `❌ Error: shared-knowledge.yml is missing schema_version. Expected "1.0".` |
+| Invalid YAML in existing config | `❌ Error: knowledge.yml contains invalid YAML: <parse error>. Fix the file manually and re-run.` |
+| `schema_version` missing | `❌ Error: knowledge.yml is missing schema_version. Expected "1.0".` |
 | `schema_version` unknown | `⚠️ Warning: Unknown schema_version "<value>". Proceeding with caution.` |
 
 ---
 
 ## Side effects
 
-- Creates `.specify/extensions/shared-knowledge/` directory if absent
-- Creates or modifies `.specify/extensions/shared-knowledge/shared-knowledge.yml`
+- Creates `.specify/extensions/knowledge/` directory if absent
+- Creates or modifies `.specify/extensions/knowledge/knowledge.yml`
 - Does **not** modify `.specify/extensions.yml` (hook registration is a separate manual step)
-- Does **not** run sync (prompt developer to run `/speckit-xrepo-sync` afterwards)
+- Does **not** run sync (prompt developer to run `/speckit-knowledge-sync` afterwards)
 
 ---
 

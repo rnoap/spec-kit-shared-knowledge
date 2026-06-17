@@ -2,7 +2,7 @@
 description: "Show reachability, last-sync timestamp, item count, and cache age per source"
 ---
 
-## speckit.xrepo.status
+## speckit.knowledge.status
 
 **Purpose**: Display current state of all configured knowledge sources — reachability, last-sync timestamp, item count, and cache age.
 
@@ -13,7 +13,7 @@ description: "Show reachability, last-sync timestamp, item count, and cache age 
 
 ## Algorithm Reference
 
-Uses the same **Source Slug Generation** and **Cache Integrity Check** algorithms defined in `speckit.xrepo.sync.md` § Algorithm Reference.
+Uses the same **Source Slug Generation** and **Cache Integrity Check** algorithms defined in `speckit.knowledge.sync.md` § Algorithm Reference.
 
 ---
 
@@ -21,12 +21,12 @@ Uses the same **Source Slug Generation** and **Cache Integrity Check** algorithm
 
 ### 1. Read configuration
 
-Read `.specify/extensions/shared-knowledge/shared-knowledge.yml`.
+Read `.specify/extensions/knowledge/knowledge.yml`.
 
 - If absent: print:
   ```
-  ℹ️  shared-knowledge is not configured for this project.
-  Run /speckit-xrepo-configure to add knowledge sources.
+  ℹ️  knowledge extension is not configured for this project.
+  Run /speckit-knowledge-configure to add knowledge sources.
   ```
   Exit 0.
 - If YAML invalid: print error and exit 0.
@@ -66,9 +66,9 @@ Disabled sources: show `— disabled` without a reachability check.
 ### 4. Print status table
 
 ```
-📊 Cross-Repo Knowledge Status
-   Config: .specify/extensions/shared-knowledge/shared-knowledge.yml
-   Index:  .specify/extensions/shared-knowledge/knowledge-index.md
+📊 Shared Knowledge Status
+   Config: .specify/extensions/knowledge/knowledge.yml
+   Index:  .specify/extensions/knowledge/knowledge-index.md
 
 ┌──────────────────────┬──────────────┬──────────┬───────┬────────────┐
 │ Source               │ Reachability │ Status   │ Items │ Cache Age  │
@@ -90,7 +90,7 @@ Status values:
 
 Indicate if `knowledge-index.md` is absent:
 ```
-⚠️  knowledge-index.md not found — run /speckit-xrepo-sync to generate it.
+⚠️  knowledge-index.md not found — run /speckit-knowledge-sync to generate it.
 ```
 
 ### 5. --verbose flag

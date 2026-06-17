@@ -49,7 +49,7 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Scaffold any new files/directories; no consumer-facing changes yet
 
-- [ ] T001 Create new command file `commands/speckit.xrepo.<verb>.md` (empty skeleton, namespace is `xrepo` not `shared-knowledge`)
+- [ ] T001 Create new command file `commands/speckit.knowledge.<verb>.md` (empty skeleton, namespace matches the extension id (`knowledge`) not `shared-knowledge`)
 - [ ] T002 Add command entry to `extension.yml` under `provides.commands`
 - [ ] T003 [P] Update `CHANGELOG.md` with `[Unreleased]` entry describing the change
 

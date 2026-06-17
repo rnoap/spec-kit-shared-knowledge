@@ -1,11 +1,11 @@
 ---
 status: migrated
-feature: xrepo-command-suite
+feature: knowledge-command-suite
 ---
 
-# Implementation Plan: xrepo Command Suite
+# Implementation Plan: Knowledge Command Suite
 
-**Branch**: `main` | **Date**: 2026-06-17 (migrated) | **Spec**: `specs/002-xrepo-command-suite/spec.md`
+**Branch**: `main` | **Date**: 2026-06-17 (migrated) | **Spec**: `specs/002-knowledge-command-suite/spec.md`
 
 **Note**: Reverse-engineered from existing command files. All phases complete. Status is `migrated`.
 
@@ -13,7 +13,7 @@ feature: xrepo-command-suite
 
 ## Summary
 
-Four agent-prompt Markdown files that implement the cross-repo knowledge workflow: configure sources → sync cache → search/browse → check status. Each file is a self-contained spec-kit command prompt executed by the AI agent. The commands share two reusable algorithms (Source Slug Generation, Cache Integrity Check) defined in `speckit.xrepo.sync.md` and referenced by `speckit.xrepo.status.md`.
+Four agent-prompt Markdown files that implement the cross-repo knowledge workflow: configure sources → sync cache → search/browse → check status. Each file is a self-contained spec-kit command prompt executed by the AI agent. The commands share two reusable algorithms (Source Slug Generation, Cache Integrity Check) defined in `speckit.knowledge.sync.md` and referenced by `speckit.knowledge.status.md`.
 
 ---
 
@@ -24,9 +24,9 @@ Four agent-prompt Markdown files that implement the cross-repo knowledge workflo
 **Primary Dependencies**: spec-kit `>= 0.10.0` (command dispatch), git `>= 2.25` (sparse-checkout, ls-remote), `sha256sum` / `shasum -a 256` (slug + integrity)
 
 **Storage**:
-- Reads: `.specify/extensions/shared-knowledge/shared-knowledge.yml` (config), `cache/<slug>/.manifest.json` (integrity), `cache/<slug>/<path>` (file content)
-- Writes: `cache/<slug>/` (git clone), `cache/<slug>/.manifest.json`, `.specify/extensions/shared-knowledge/knowledge-index.md`
-- Does not modify: `shared-knowledge.yml` (sync/search/status are read-only for config)
+- Reads: `.specify/extensions/knowledge/knowledge.yml` (config), `cache/<slug>/.manifest.json` (integrity), `cache/<slug>/<path>` (file content)
+- Writes: `cache/<slug>/` (git clone), `cache/<slug>/.manifest.json`, `.specify/extensions/knowledge/knowledge-index.md`
+- Does not modify: `knowledge.yml` (sync/search/status are read-only for config)
 
 **Testing**: No automated tests. Manual verification by running commands against a real spec-kit project with a known source repo.
 
@@ -59,7 +59,7 @@ Four agent-prompt Markdown files that implement the cross-repo knowledge workflo
 ### Documentation (this feature)
 
 ```text
-specs/002-xrepo-command-suite/
+specs/002-knowledge-command-suite/
 ├── spec.md      # This spec (migrated)
 ├── plan.md      # This file (migrated)
 └── tasks.md     # Task list (migrated)
@@ -69,10 +69,10 @@ specs/002-xrepo-command-suite/
 
 ```text
 commands/
-├── speckit.xrepo.configure.md   # 136 lines
-├── speckit.xrepo.sync.md        # 287 lines — includes shared Algorithm Reference
-├── speckit.xrepo.search.md      # 110 lines
-└── speckit.xrepo.status.md      # 113 lines
+├── speckit.knowledge.configure.md   # 136 lines
+├── speckit.knowledge.sync.md        # 287 lines — includes shared Algorithm Reference
+├── speckit.knowledge.search.md      # 110 lines
+└── speckit.knowledge.status.md      # 113 lines
 ```
 
 ---
@@ -89,7 +89,7 @@ The manifest is written as the final step of sync, after all `.md` files are in 
 
 ### Decision 3: Algorithm Reference in sync.md, Referenced by status.md
 
-Source Slug Generation and Cache Integrity Check are defined once in `speckit.xrepo.sync.md § Algorithm Reference` and referenced by `speckit.xrepo.status.md`. This avoids duplication across prompts while keeping each prompt self-contained for execution (the agent reads sync.md's algorithm section when executing status).
+Source Slug Generation and Cache Integrity Check are defined once in `speckit.knowledge.sync.md § Algorithm Reference` and referenced by `speckit.knowledge.status.md`. This avoids duplication across prompts while keeping each prompt self-contained for execution (the agent reads sync.md's algorithm section when executing status).
 
 ### Decision 4: Conflict Preservation (no silent winner)
 
@@ -97,7 +97,7 @@ When the same relative path appears in multiple sources, both items are included
 
 ### Decision 5: Auto-Sync in Search
 
-`speckit.xrepo.search` automatically triggers `speckit.xrepo.sync` if `knowledge-index.md` is absent. This removes a manual prerequisite for new users who forget to sync before searching.
+`speckit.knowledge.search` automatically triggers `speckit.knowledge.sync` if `knowledge-index.md` is absent. This removes a manual prerequisite for new users who forget to sync before searching.
 
 ### Decision 6: Local Path Support
 

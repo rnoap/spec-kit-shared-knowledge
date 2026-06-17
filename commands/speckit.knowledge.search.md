@@ -2,7 +2,7 @@
 description: "Browse and search the knowledge corpus across all configured sources"
 ---
 
-## speckit.xrepo.search
+## speckit.knowledge.search
 
 **Purpose**: Browse and search the knowledge corpus across all configured sources without triggering a full spec workflow.
 
@@ -17,16 +17,16 @@ description: "Browse and search the knowledge corpus across all configured sourc
 
 ### 1. Load knowledge index
 
-Read `.specify/extensions/shared-knowledge/knowledge-index.md`.
+Read `.specify/extensions/knowledge/knowledge-index.md`.
 
 - If absent: print the following and run sync first:
   ```
   ℹ️  knowledge-index.md not found — running sync first...
   ```
-  Execute `speckit.xrepo.sync` (i.e., invoke `/speckit-xrepo-sync`), then re-read the index.
+  Execute `speckit.knowledge.sync` (i.e., invoke `/speckit-knowledge-sync`), then re-read the index.
   If sync also fails or index is still absent after sync, print:
   ```
-  ❌ Unable to build knowledge index. Check that shared-knowledge.yml is configured and at least one source is reachable.
+  ❌ Unable to build knowledge index. Check that knowledge.yml is configured and at least one source is reachable.
   ```
   Exit 0.
 
@@ -84,7 +84,7 @@ Found <N> items across <M> sources:
 🔍 Search: "<query>"
 
 No matching items found across <M> sources.
-Tip: Run /speckit-xrepo-sync to refresh the cache, then try again.
+Tip: Run /speckit-knowledge-sync to refresh the cache, then try again.
 ```
 
 ---

@@ -6,17 +6,19 @@
 #   bash scripts/install-local.sh /path/to/project       # installs into a specific project
 #
 # What this does:
-#   1. Copies command files → .specify/extensions/shared-knowledge/commands/
-#   2. Copies extension.yml + config-template → .specify/extensions/shared-knowledge/
+#   1. Copies command files → .specify/extensions/knowledge/commands/
+#   2. Copies extension.yml + config-template → .specify/extensions/knowledge/
 #   3. Registers in .specify/extensions/.registry
-#   4. Generates SKILL.md wrappers in .wibey/skills/ AND .claude/skills/
-#      (same pattern as built-in extensions like git and brownfield)
+#   4. Generates SKILL.md wrappers in .claude/skills/
+#
+# Note: This is a convenience helper. The officially supported way to test an
+# extension locally is `specify extension add --dev /path/to/extension`.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXTENSION_ROOT="$(dirname "$SCRIPT_DIR")"
-EXTENSION_ID="shared-knowledge"
+EXTENSION_ID="knowledge"
 PROJECT_DIR="${1:-$(pwd)}"
 REGISTRY="${PROJECT_DIR}/.specify/extensions/.registry"
 EXT_DIR="${PROJECT_DIR}/.specify/extensions/${EXTENSION_ID}"
@@ -32,7 +34,7 @@ fi
 # --- Copy command files to extension dir ---
 mkdir -p "${EXT_DIR}/commands"
 INSTALLED=0
-for src in "${EXTENSION_ROOT}/commands/"speckit.xrepo.*.md; do
+for src in "${EXTENSION_ROOT}/commands/"speckit.knowledge.*.md; do
   [ -f "$src" ] || continue
   cp "$src" "${EXT_DIR}/commands/$(basename "$src")"
   echo "  ✓ commands/$(basename "$src")"
@@ -45,12 +47,12 @@ cp "${EXTENSION_ROOT}/extension.yml" "${EXT_DIR}/extension.yml"
 echo "  ✓ extension.yml"
 
 # --- Copy config template (skip if config already exists) ---
-CONFIG_FILE="${EXT_DIR}/shared-knowledge.yml"
+CONFIG_FILE="${EXT_DIR}/knowledge.yml"
 if [ -f "$CONFIG_FILE" ]; then
-  echo "  ℹ️  shared-knowledge.yml already exists — not overwriting"
+  echo "  ℹ️  knowledge.yml already exists — not overwriting"
 else
   cp "${EXTENSION_ROOT}/config-template.yml" "$CONFIG_FILE"
-  echo "  ✓ shared-knowledge.yml (from config-template)"
+  echo "  ✓ knowledge.yml (from config-template)"
 fi
 
 # --- Register in .registry ---
@@ -82,10 +84,10 @@ ext["${EXTENSION_ID}"] = {
     "priority": 10,
     "registered_commands": {
         "claude": [
-            "speckit.xrepo.configure",
-            "speckit.xrepo.sync",
-            "speckit.xrepo.search",
-            "speckit.xrepo.status"
+            "speckit.knowledge.configure",
+            "speckit.knowledge.sync",
+            "speckit.knowledge.search",
+            "speckit.knowledge.status"
         ]
     },
     "registered_skills": [],
@@ -97,18 +99,19 @@ with open(registry_path, "w") as f:
 print("  ✓ registered in .registry")
 PYEOF
 
-# --- Generate SKILL.md wrappers in .wibey/skills/ and .claude/skills/ ---
-# Same pattern as git/brownfield extensions: frontmatter wrapper + command body
+# --- Generate SKILL.md wrappers in .claude/skills/ ---
+# Generates Claude Code skill wrappers (frontmatter + command body) so AI
+# agents that consume `.claude/skills/` can discover these commands directly.
 echo ""
-echo "Generating Wibey/Claude skill wrappers..."
+echo "Generating Claude skill wrappers..."
 
 generate_skill() {
   local cmd_file="$1"
   local target_dir="$2"
   local cmd_base
-  cmd_base="$(basename "$cmd_file" .md)"               # speckit.xrepo.configure
+  cmd_base="$(basename "$cmd_file" .md)"               # speckit.knowledge.configure
   local skill_name
-  skill_name="$(echo "$cmd_base" | sed 's/\./-/g')"   # speckit-xrepo-configure
+  skill_name="$(echo "$cmd_base" | sed 's/\./-/g')"   # speckit-knowledge-configure
 
   # Extract description from frontmatter (line starting with "description:")
   local description
@@ -127,8 +130,8 @@ name: ${skill_name}
 description: ${description}
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
-  author: walmart-developer-experience
-  source: shared-knowledge:commands/${cmd_base}.md
+  author: Raúl Noa Pedroso
+  source: knowledge:commands/${cmd_base}.md
 ---
 ${body}
 SKILL
@@ -136,20 +139,19 @@ SKILL
   echo "  ✓ ${skill_name}"
 }
 
-for src in "${EXT_DIR}/commands/"speckit.xrepo.*.md; do
+for src in "${EXT_DIR}/commands/"speckit.knowledge.*.md; do
   [ -f "$src" ] || continue
-  generate_skill "$src" "${PROJECT_DIR}/.wibey/skills"
   generate_skill "$src" "${PROJECT_DIR}/.claude/skills"
 done
 
 # --- .gitignore: idempotent auto-append ---
 GITIGNORE="${PROJECT_DIR}/.gitignore"
-CACHE_ENTRY=".specify/extensions/shared-knowledge/cache/"
-INDEX_ENTRY=".specify/extensions/shared-knowledge/knowledge-index.md"
+CACHE_ENTRY=".specify/extensions/knowledge/cache/"
+INDEX_ENTRY=".specify/extensions/knowledge/knowledge-index.md"
 
 touch "$GITIGNORE"
 if ! grep -qF "$CACHE_ENTRY" "$GITIGNORE"; then
-  printf "\n# shared-knowledge cache (local only; do not commit)\n%s\n%s\n" \
+  printf "\n# knowledge extension cache (local only; do not commit)\n%s\n%s\n" \
     "$CACHE_ENTRY" "$INDEX_ENTRY" >> "$GITIGNORE"
   echo "  → Added .gitignore entries for cache/ and knowledge-index.md"
 elif ! grep -qF "$INDEX_ENTRY" "$GITIGNORE"; then
@@ -160,4 +162,4 @@ else
 fi
 
 echo ""
-echo "Done. Reload Wibey (Ctrl+Shift+P → 'Wibey: Reload') to pick up the new commands."
+echo "Done. Reload your editor / AI agent to pick up the new commands."

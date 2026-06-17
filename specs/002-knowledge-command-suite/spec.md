@@ -1,11 +1,11 @@
 ---
 status: migrated
-feature: xrepo-command-suite
-migrated_from: commands/speckit.xrepo.configure.md, commands/speckit.xrepo.sync.md, commands/speckit.xrepo.search.md, commands/speckit.xrepo.status.md
+feature: knowledge-command-suite
+migrated_from: commands/speckit.knowledge.configure.md, commands/speckit.knowledge.sync.md, commands/speckit.knowledge.search.md, commands/speckit.knowledge.status.md
 migrated_at: 2026-06-17
 ---
 
-# Feature Specification: xrepo Command Suite
+# Feature Specification: Knowledge Command Suite
 
 **Feature Branch**: `main`
 
@@ -13,7 +13,7 @@ migrated_at: 2026-06-17
 
 **Status**: migrated
 
-**Input**: Reverse-engineered from the 4 xrepo command Markdown files in `commands/`
+**Input**: Reverse-engineered from the 4 command Markdown files in `commands/`
 
 ---
 
@@ -25,16 +25,16 @@ A developer points the extension at one or more Git repositories (remote or loca
 
 **Why this priority**: Configure is the entry point — no other command works without at least one source configured.
 
-**Independent Test**: Run `speckit.xrepo.configure https://github.com/org/repo specs/` with no existing config; verify `shared-knowledge.yml` is created with the correct source entry; run again with the same URL; verify no duplicate entry is added.
+**Independent Test**: Run `speckit.knowledge.configure https://github.com/org/repo specs/` with no existing config; verify `knowledge.yml` is created with the correct source entry; run again with the same URL; verify no duplicate entry is added.
 
 **Acceptance Scenarios**:
 
-1. **Given** no `shared-knowledge.yml` exists, **When** configure is run with a valid URL, **Then** the config file is created at `.specify/extensions/shared-knowledge/shared-knowledge.yml` with `schema_version: "1.0"` and a single source entry
+1. **Given** no `knowledge.yml` exists, **When** configure is run with a valid URL, **Then** the config file is created at `.specify/extensions/knowledge/knowledge.yml` with `schema_version: "1.0"` and a single source entry
 2. **Given** a source with the same URL already exists, **When** configure is run with that URL again, **Then** the existing entry is updated (not duplicated)
 3. **Given** a local path argument (starts with `/`, `~/`, `./`), **When** configure is run, **Then** `~` is expanded to `$HOME` before writing; the entry uses `url: <expanded-path>` (not `url:`)
 4. **Given** an invalid `path_filter` (starts with `/` or contains `..`), **When** configure is run, **Then** an error is printed and no file is written
 5. **Given** a local path that does not exist or is not a git repo, **When** configure is run, **Then** the corresponding error is printed and no file is written
-6. **Given** `--verbose` flag is present, **When** configure completes, **Then** the full YAML content of `shared-knowledge.yml` is printed after the success message
+6. **Given** `--verbose` flag is present, **When** configure completes, **Then** the full YAML content of `knowledge.yml` is printed after the success message
 
 ---
 
@@ -48,7 +48,7 @@ A developer runs sync to fetch the latest `.md` files from all configured source
 
 **Acceptance Scenarios**:
 
-1. **Given** a valid `shared-knowledge.yml` with one enabled remote source, **When** sync runs, **Then** a sparse-checkout clone is created at `cache/<slug>/`, `.manifest.json` is written last, and `knowledge-index.md` is updated
+1. **Given** a valid `knowledge.yml` with one enabled remote source, **When** sync runs, **Then** a sparse-checkout clone is created at `cache/<slug>/`, `.manifest.json` is written last, and `knowledge-index.md` is updated
 2. **Given** a `path_filter` is set, **When** sync clones the repo, **Then** only `.md` files under that path are checked out (git sparse-checkout)
 3. **Given** the cache already exists (warm path), **When** sync runs again, **Then** `git fetch --depth=1 origin` is used instead of a fresh clone
 4. **Given** a git clone times out (> 10s), **When** the cache is intact (manifest passes integrity check), **Then** sync falls back to `cached` status and continues without error (exit 0)
@@ -65,7 +65,7 @@ A developer searches across all synced sources for specs, ADRs, or contracts rel
 
 **Why this priority**: Search is the primary consumer-facing read operation for the knowledge corpus.
 
-**Independent Test**: Sync a source, run `speckit.xrepo.search "payment"` — verify results show matching file paths with excerpts; run with `--source <label>` — verify only that source's items appear.
+**Independent Test**: Sync a source, run `speckit.knowledge.search "payment"` — verify results show matching file paths with excerpts; run with `--source <label>` — verify only that source's items appear.
 
 **Acceptance Scenarios**:
 
@@ -99,7 +99,7 @@ A developer checks which knowledge sources are reachable, how stale the cache is
 
 ### Edge Cases
 
-- What happens when `shared-knowledge.yml` has invalid YAML? → All 4 commands print a parse error and exit 0 (degraded operation)
+- What happens when `knowledge.yml` has invalid YAML? → All 4 commands print a parse error and exit 0 (degraded operation)
 - What happens when `schema_version` is missing or unknown? → Error printed, operation aborted, exit 0
 - What happens when the cache `<slug>/` directory exists but `.manifest.json` is absent (interrupted sync)? → Integrity check fails; cache is discarded; fresh sync attempted
 - What happens when conflict detection finds the same path in 3+ sources? → All are included; `⚠️ CONFLICT` shows all source labels
@@ -111,7 +111,7 @@ A developer checks which knowledge sources are reachable, how stale the cache is
 ### Functional Requirements
 
 **configure:**
-- **FR-001**: MUST create `shared-knowledge.yml` with `schema_version: "1.0"` and empty `sources: []` if absent
+- **FR-001**: MUST create `knowledge.yml` with `schema_version: "1.0"` and empty `sources: []` if absent
 - **FR-002**: MUST support both remote Git URLs (`https://...`, `git@...`) and local paths (`/`, `~/`, `./`)
 - **FR-003**: MUST expand `~` to `$HOME` for local paths before writing
 - **FR-004**: MUST validate `path_filter` (no absolute paths, no `..`)
@@ -138,11 +138,11 @@ A developer checks which knowledge sources are reachable, how stale the cache is
 
 ### Key Entities
 
-- **Knowledge Source** (`shared-knowledge.yml` entry): `url` (remote or local), `label` (display name), `path_filter` (subdirectory restriction), `enabled` (default true)
+- **Knowledge Source** (`knowledge.yml` entry): `url` (remote or local), `label` (display name), `path_filter` (subdirectory restriction), `enabled` (default true)
 - **Source Slug**: Stable 12-hex-char directory name derived from normalized URL SHA-256
-- **Cache** (`.specify/extensions/shared-knowledge/cache/<slug>/`): Sparse-checkout git clone of source repo
+- **Cache** (`.specify/extensions/knowledge/cache/<slug>/`): Sparse-checkout git clone of source repo
 - **Manifest** (`cache/<slug>/.manifest.json`): JSON integrity record: `schema_version`, `source_url`, `synced_at`, `item_count`, `items[]` with per-file SHA-256
-- **Knowledge Index** (`.specify/extensions/shared-knowledge/knowledge-index.md`): Aggregated Markdown index of all cached items; entry point for `speckit-specify` and `speckit-plan`
+- **Knowledge Index** (`.specify/extensions/knowledge/knowledge-index.md`): Aggregated Markdown index of all cached items; entry point for `speckit-specify` and `speckit-plan`
 - **Knowledge Conflict**: Same relative `.md` path present in 2+ sources; both included in index with warning annotation
 
 ---
@@ -151,10 +151,10 @@ A developer checks which knowledge sources are reachable, how stale the cache is
 
 ### Measurable Outcomes
 
-- **SC-001**: `speckit.xrepo.sync` completes for a single remote source (small repo, `specs/` path_filter) in under 30 seconds on a corporate network
-- **SC-002**: `speckit.xrepo.search "<query>"` returns results in under 1 second for an index with ≤ 50 items
-- **SC-003**: Re-running `speckit.xrepo.sync` with an intact cache (warm path) takes < 5 seconds
-- **SC-004**: All 4 commands exit 0 when `shared-knowledge.yml` is absent or malformed (degraded operation, no crashes)
+- **SC-001**: `speckit.knowledge.sync` completes for a single remote source (small repo, `specs/` path_filter) in under 30 seconds on a corporate network
+- **SC-002**: `speckit.knowledge.search "<query>"` returns results in under 1 second for an index with ≤ 50 items
+- **SC-003**: Re-running `speckit.knowledge.sync` with an intact cache (warm path) takes < 5 seconds
+- **SC-004**: All 4 commands exit 0 when `knowledge.yml` is absent or malformed (degraded operation, no crashes)
 
 ---
 
