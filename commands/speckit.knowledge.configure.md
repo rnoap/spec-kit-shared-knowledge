@@ -70,10 +70,25 @@ Prompt the developer to confirm or edit the displayed configuration before writi
 
 On confirmation, write the updated `knowledge.yml` back to disk, preserving `schema_version: "1.0"` at the top and all existing source entries.
 
-### 5. Emit success output
+### 5. Update .gitignore
+
+After writing `knowledge.yml`, check the project root `.gitignore` (create it if absent) for the two knowledge-cache entries. For each entry that is **not already present**, append it:
+
+```
+# knowledge extension cache (local only; do not commit)
+.specify/extensions/knowledge/cache/
+.specify/extensions/knowledge/knowledge-index.md
+```
+
+- If both lines are already in `.gitignore` → silently skip (idempotent).
+- If `.gitignore` does not exist → create it with only those two lines + comment.
+- Always exit 0; this step must never block the configure workflow.
+
+### 6. Emit success output
 
 ```
 ✅ knowledge.yml updated.
+✅ .gitignore updated with cache exclusion entries.
 
 Configured sources:
   1. payment-service  →  https://github.com/your-org/payment-service  (path: specs/)
@@ -85,6 +100,7 @@ Run /speckit-knowledge-sync to refresh the cache.
 If no sources are configured (empty list):
 ```
 ✅ knowledge.yml initialized with empty sources list.
+✅ .gitignore updated with cache exclusion entries.
 
 Run /speckit-knowledge-configure <url> to add a knowledge source.
 ```
