@@ -1,50 +1,97 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# spec-kit-shared-knowledge Constitution
+
+> **What this project is**: A spec-kit extension package that injects shared/cross-repo knowledge into any SDD workspace. It is a distribution artifact (Bash scripts + YAML manifests + Markdown agent prompts), not a compiled application.
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Extension-Package Discipline
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+This project IS a spec-kit extension, so every change must remain installable by consumers:
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- `extension.yml` is the single source of truth for the package manifest (id, version, commands, hooks, requirements).
+- `config-template.yml` is the canonical user-facing config schema. Its `schema_version` must be bumped on any breaking schema change.
+- Commands (`commands/*.md`) are **agent prompts**; they must be self-contained Markdown documents — no hidden runtime dependencies outside of what `extension.yml` declares.
+- Install logic lives exclusively in `scripts/install-local.sh`. No other script may mutate a consumer's `.specify/` directory.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Source-of-Truth Hierarchy
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+When any two artifacts conflict, resolve using this order (highest → lowest authority):
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+1. `extension.yml` — package contract and version
+2. `config-template.yml` — config schema
+3. `commands/*.md` — agent behavior
+4. `scripts/install-local.sh` — install mechanics
+5. `README.md` — user documentation (must stay in sync with 1–4)
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Simplicity (YAGNI)
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+- No compiled code. Bash + YAML + Markdown only.
+- No test framework required for the extension package itself (agent prompts cannot be unit-tested in the traditional sense).
+- No CI/CD pipeline exists yet; quality gates are manual (install and smoke-test before tagging a release).
+- If a feature can be expressed as a Markdown addition to a command file, it MUST NOT become a Bash script.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### IV. Conventional Commits (NON-NEGOTIABLE)
+
+Every commit **must** follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>[optional scope]: <description>
+
+Types: feat | fix | refactor | docs | chore | test | style
+```
+
+- `feat:` — new command, new config key, or new hook
+- `fix:` — corrects incorrect behavior in an existing command or script
+- `refactor:` — restructures without changing external behavior
+- `docs:` — README, CHANGELOG, or inline comment updates only
+- `chore:` — CHANGELOG housekeeping, version bump, dependency update
+- **Breaking changes**: append `!` after type (e.g., `feat!:`) and describe in commit body
+
+## Naming Conventions
+
+- **Extension ID**: `shared-knowledge` (kebab-case, no version suffix)
+- **Command IDs**: dot-notation `speckit.<namespace>.<verb>` where the namespace is `xrepo` (short for "cross-repo"), NOT the extension ID. Examples: `speckit.xrepo.sync`, `speckit.xrepo.search`
+- **Command files**: kebab-case, mirror the command ID with dots replaced by periods: `speckit.xrepo.sync.md`. The extension ID (`shared-knowledge`) and the command namespace (`xrepo`) are intentionally different.
+- **Script files**: kebab-case with `.sh` extension (e.g., `install-local.sh`)
+- **Config keys**: snake_case in YAML
+- **Spec directories**: `NNN-kebab-case` under `specs/` where `NNN` is a zero-padded three-digit sequential number (e.g., `001-auth-flow`, `002-sync-command`). Both `speckit-specify` and `speckit-brownfield-migrate` assign numbers automatically.
+
+## Code Boundaries
+
+| Directory / File | Purpose | Who touches it |
+|-----------------|---------|---------------|
+| `commands/` | Agent prompt Markdown files (the extension's deliverable) | Extension authors |
+| `scripts/` | Install tooling only (`install-local.sh`) | Extension authors |
+| `extension.yml` | Package manifest | Extension authors; bump `version` on every release |
+| `config-template.yml` | User-facing config schema (no-clobber install) | Extension authors; bump `schema_version` on breaking changes |
+| `README.md` | User documentation | Extension authors; must mirror `extension.yml` commands list |
+| `CHANGELOG.md` | Release history (Keep a Changelog format) | Extension authors; update before every version tag |
+| `.specify/` | Spec-kit workspace for THIS project's own features | SDD tooling; do not hand-edit |
+| `specs/` | Feature specs for THIS project | Extension authors via `/speckit-specify` |
+
+**Never** commit `node_modules/`, `__pycache__/`, `.venv/`, or consumer `.specify/` directories.
+
+## Requirements & Compatibility
+
+- **spec-kit**: `>= 0.10.0`
+- **git**: `>= 2.25`
+- **Shell**: POSIX-compatible `bash` (scripts must not require `zsh` or `fish` features)
+- **License**: MIT
+
+## Quality Gates (Manual — no CI)
+
+Before tagging a release:
+
+1. `bash scripts/install-local.sh` runs to completion without errors in a clean consumer project.
+2. All four commands are registered and visible via `specify extension list`.
+3. `extension.yml` `version` matches the intended git tag.
+4. `CHANGELOG.md` has an entry for the new version.
+5. `README.md` command table matches `extension.yml` `provides.commands`.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- This constitution supersedes all other practices when conflicts arise.
+- Amendments require a `docs:` commit updating this file with a rationale comment.
+- There is no automated enforcement yet; compliance is verified during code review and pre-release checklist.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-06-17

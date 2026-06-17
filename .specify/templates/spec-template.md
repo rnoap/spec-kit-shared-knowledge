@@ -129,3 +129,47 @@
 - [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
 - [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
 - [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+
+---
+
+## Extension Impact *(include if feature touches extension.yml, config-template.yml, or commands/)*
+
+<!--
+  Fill this section when the feature adds, removes, or modifies any part of the
+  extension package contract. Leave the section out (or mark N/A) for pure
+  documentation / spec-only changes.
+-->
+
+### extension.yml Changes
+
+| Field | Current Value | Proposed Value | Reason |
+|-------|--------------|----------------|--------|
+| `version` | `x.y.z` | `x.y.z+1` | [Why bump?] |
+| `provides.commands` | — | `speckit.shared-knowledge.<verb>` | [New command] |
+| `hooks` | — | `[hook name]` | [N/A if no hook change] |
+
+### config-template.yml Changes
+
+```yaml
+# New or modified config keys (include only deltas, not the full file):
+sources:
+  - type: [new-type]     # describe the new source type
+    [key]: [value]
+```
+
+**`schema_version` bump required?** [ ] Yes — breaking change &nbsp;&nbsp; [ ] No — additive only
+
+### New / Modified Commands
+
+For each `commands/*.md` file being added or changed:
+
+| Command file | Command ID | Trigger | What it does |
+|-------------|-----------|---------|-------------|
+| `commands/speckit.xrepo.[verb].md` | `speckit.xrepo.[verb]` | `/speckit.xrepo.[verb]` | [One-line description] |
+
+### Install Script Impact
+
+Does `scripts/install-local.sh` need changes?
+
+- [ ] Yes — describe: [what changes and why]
+- [ ] No — existing logic handles this feature
