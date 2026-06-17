@@ -137,54 +137,9 @@ Display current state of all configured sources.
 
 ## Integration with /speckit-specify and /speckit-plan
 
-After installing the extension, consuming teams must perform two manual setup steps:
+The `before_specify` and `before_plan` hooks declared in [`extension.yml`](extension.yml) are **auto-registered by spec-kit** when the extension is installed via `specify extension add` — no manual edits to `.specify/extensions.yml` are required. See the [spec-kit Extension Development Guide](https://github.com/github/spec-kit/blob/main/extensions/EXTENSION-DEVELOPMENT-GUIDE.md) for the underlying mechanism. The AI agent's knowledge-reading behavior is driven by the **Context Output block** emitted at the end of every successful or degraded sync (see [`commands/speckit.knowledge.sync.md`](commands/speckit.knowledge.sync.md) § "10. Emit Context Output for AI Agents block").
 
-### Step 1: Register the sync hooks in `.specify/extensions.yml`
-
-Add the following entries to your project's `.specify/extensions.yml`:
-
-```yaml
-hooks:
-  before_specify:
-    - extension: knowledge
-      command: speckit.knowledge.sync
-      optional: true
-      prompt: "Sync cross-repo knowledge sources before specifying?"
-      description: "Refresh knowledge cache before spec generation so context is current"
-
-  before_plan:
-    - extension: knowledge
-      command: speckit.knowledge.sync
-      optional: true
-      prompt: "Sync cross-repo knowledge sources before planning?"
-      description: "Refresh knowledge cache before implementation planning"
-```
-
-### Step 2: Amend your SKILL.md files
-
-Add the following preamble to `.claude/skills/speckit-specify/SKILL.md` immediately before the `## Outline` section:
-
-```markdown
-**Cross-repo knowledge check**: If the file
-`.specify/extensions/knowledge/knowledge-index.md` exists in the
-project root, read it and all `.md` files it references from the cache
-directories BEFORE drafting the specification. Surface relevant knowledge
-from those files as context — cite the source (label + path) for each
-piece of referenced information.
-```
-
-Add the equivalent preamble to `.claude/skills/speckit-plan/SKILL.md` immediately before the `## Outline` section:
-
-```markdown
-**Cross-repo knowledge check**: If the file
-`.specify/extensions/knowledge/knowledge-index.md` exists in the
-project root, read it and all `.md` files it references from the cache
-directories BEFORE drafting the implementation plan. Surface relevant knowledge
-from those files as context — cite the source (label + path) for each
-piece of referenced information.
-```
-
-> **Why both steps are required**: The hooks (Step 1) trigger a sync so the cache is fresh. The SKILL.md amendments (Step 2) instruct the agent to read `knowledge-index.md` before generating output. Without Step 2, the sync runs correctly but context never flows into spec or plan output.
+> **Migration note**: If you previously followed the prior README and added `knowledge` entries to your project's `.specify/extensions.yml`, you may safely remove them — auto-registration handles them now.
 
 > **No-op when not configured**: If `.specify/extensions/knowledge/knowledge.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
 
