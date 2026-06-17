@@ -24,7 +24,6 @@ When working in a microservices or multi-repo environment, architectural decisio
 ## Prerequisites
 
 - `git >= 2.25` (sparse-checkout support required)
-- `python3` (stdlib only — used by the install script for JSON registry update)
 - spec-kit `>= 0.10.0`
 
 ## Installation
@@ -43,33 +42,24 @@ specify extension add knowledge --from /path/to/spec-kit-shared-knowledge.zip
 
 ### Local / Development Install
 
-The officially supported way to test an extension locally is:
+Install directly from a local checkout:
 
 ```bash
 cd /path/to/your/spec-kit-project
-specify extension add --dev /path/to/spec-kit-shared-knowledge
+specify extension add knowledge --dev /path/to/spec-kit-shared-knowledge
 ```
 
-Alternatively, this repo ships a small helper script that performs the same
-copy + register flow and additionally generates `SKILL.md` wrappers for AI
-agents that consume them (e.g. Claude Code skills):
+This copies the four command files, the manifest, and `config-template.yml`
+into `.specify/extensions/knowledge/`, registers the extension, and
+auto-registers the `before_specify` / `before_plan` hooks. After install,
+add these two lines to your project's `.gitignore`:
 
-```bash
-# Install into the current project
-bash /path/to/spec-kit-shared-knowledge/scripts/install-local.sh
-
-# Install into a specific project
-bash scripts/install-local.sh /path/to/your-project
+```gitignore
+.specify/extensions/knowledge/cache/
+.specify/extensions/knowledge/knowledge-index.md
 ```
 
-The script:
-1. Copies the 4 command files to `.specify/extensions/knowledge/commands/` and generates `SKILL.md` wrappers under `.claude/skills/`
-2. Copies `config-template.yml` to `.specify/extensions/knowledge/knowledge.yml` (skips if already present)
-3. Auto-appends `.gitignore` entries for `cache/` and `knowledge-index.md` (idempotent)
-
-After install, reload your editor / AI agent so it picks up the new commands.
-
-This copies `config-template.yml` to `.specify/extensions/knowledge/knowledge.yml` with an empty `sources: []`.
+Then reload your editor / AI agent so it picks up the new commands.
 
 ## Quick Start
 
@@ -237,7 +227,7 @@ Contributions are welcome. To propose a change:
 1. Open an issue describing the bug or enhancement before sending a PR for non-trivial changes
 2. Fork the repo and create a feature branch (`feat/<short-name>` or `fix/<short-name>`)
 3. Update `CHANGELOG.md` under `[Unreleased]` with your change
-4. Test the change with `bash scripts/install-local.sh /path/to/test-project` against a real spec-kit project
+4. Test the change with `specify extension add knowledge --dev /path/to/spec-kit-shared-knowledge` against a real spec-kit project
 5. Open a pull request and reference the issue
 
 For larger architectural changes, please file a discussion first. See `specs/` for the reverse-engineered specs that document the current behavior.

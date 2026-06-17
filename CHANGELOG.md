@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- `scripts/install-local.sh` and the `scripts/` directory — superseded by `specify extension add --dev <path>` from the official Spec Kit CLI, which covers file copy, registry registration, and (uniquely) hook auto-registration. The local helper script duplicated three of those tasks, missed hook auto-registration, and shipped Claude-specific `SKILL.md` wrappers that became redundant after switching to the GitHub Copilot integration surface. Users now install with `specify extension add knowledge --dev /path/to/spec-kit-shared-knowledge` and add the two `cache/` + `knowledge-index.md` lines to their project `.gitignore` manually (documented in README).
+- `python3` from `extension.yml#requires.tools` — only the removed install script depended on it; the four agent-prompt commands have no Python dependency.
+
+### Changed
+
+- `.specify/memory/constitution.md` Principle I rewritten: install logic is no longer owned by `scripts/install-local.sh`; the spec-kit CLI is now the canonical install mechanism. Source-of-Truth hierarchy collapsed from 5 to 4 levels (script tier removed). Quality gate #1 updated to use `specify extension add --dev` for the pre-tag smoke test.
+- README § "Local / Development Install" simplified to a single `specify extension add --dev` invocation plus a 2-line `.gitignore` snippet.
+
 ## [1.0.0] - TBD
 
 ### Added

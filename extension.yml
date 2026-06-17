@@ -15,8 +15,6 @@ requires:
   tools:
     - name: git
       required: true
-    - name: python3
-      required: true
 
 provides:
   commands:
