@@ -8,6 +8,7 @@ description: "Refresh local cache for all configured knowledge sources"
 
 **Arguments**: `$ARGUMENTS` — optional flags only:
 - `--verbose` — print list of files loaded from each source and items written to index
+- `--no-context-output` — suppress the trailing Context Output for AI Agents block (diagnostic use only)
 
 ---
 
@@ -139,13 +140,22 @@ git clone \
   .specify/extensions/knowledge/cache/<slug>
 ```
 
-After clone (both remote and local), apply sparse-checkout if `path_filter` is set:
+After clone (both remote and local), apply sparse-checkout if `path_filter` is set. The `path_filter` field may be either a single string (`specs/`) or a YAML list (`[specs/, docs/decisions/]`); normalize to a space-separated argument list for `git sparse-checkout set`:
+
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
-git sparse-checkout init --cone
-git sparse-checkout set <path_filter>
+# Use --no-cone so each pattern restricts checkout to ONLY those folders.
+# Cone mode always includes root-level files (package.json, Dockerfile, etc.)
+# regardless of the pattern, which violates the path_filter contract.
+git sparse-checkout init --no-cone
+# Normalize each pattern: ensure trailing slash so git treats it as a directory match.
+# For a single string  → one arg:    git sparse-checkout set "specs/"
+# For a YAML list      → multi-arg:  git sparse-checkout set "specs/" "docs/decisions/"
+git sparse-checkout set <pattern1> [<pattern2> ...]
 git checkout
 ```
+
+> **Pattern semantics**: in `--no-cone` mode, git uses gitignore-style patterns. A bare directory name like `specs/` matches every file recursively under `specs/` and **nothing else**. Root-level files at the cache root are excluded. This matches user expectations: `path_filter: specs/` means "only `specs/` content"; `path_filter: [specs/, docs/decisions/]` means "only those two trees".
 
 If no `path_filter`:
 ```bash
@@ -154,6 +164,20 @@ git checkout HEAD -- .
 ```
 
 #### Warm path (update)
+
+Before pulling new content, **re-apply the sparse-checkout configuration in `--no-cone` mode** if `path_filter` is set. This is idempotent and self-heals caches that were originally cloned with the buggy `--cone` configuration (which always included root-level files). Pass each pattern in the (possibly list-form) `path_filter` as a separate argument:
+
+```bash
+cd .specify/extensions/knowledge/cache/<slug>
+if [ -n "<path_filter>" ]; then
+  git sparse-checkout init --no-cone
+  # one or more patterns — same normalization as the cold path
+  git sparse-checkout set <pattern1> [<pattern2> ...]
+  # Remove any stray files outside the path_filter that an older --cone
+  # checkout may have left behind in the working tree.
+  git sparse-checkout reapply
+fi
+```
 
 **Remote URL**:
 ```bash
@@ -246,6 +270,51 @@ Final summary line:
    → .specify/extensions/knowledge/knowledge-index.md
 ```
 
+### 10. Emit Context Output for AI Agents block (conditional)
+
+This is the LAST thing printed on stdout. Nothing follows it.
+
+**Emission ordering**: status lines (step 9) → summary line → pointer line → one blank line → the block.
+
+**Emit the block when** (`suppress_context_output` is false AND one of):
+- ≥ 1 source returned status `fresh`, OR
+- All sources are `cached` but ≥ 1 has a usable cache (i.e., `knowledge-index.md` exists), OR
+- Mix of `cached` + `unreachable`, ≥ 1 source has a usable cache.
+
+**Do NOT emit the block when** any of:
+- `suppress_context_output = true` (flag `--no-context-output` was passed), OR
+- An early-exit error was printed in step 1 (config absent, invalid YAML, unknown schema_version, missing sources key) — there is no `knowledge-index.md` to point to on these paths, OR
+- All sources are `unreachable` AND no prior `knowledge-index.md` exists — instead print the soft warning below.
+
+**Soft warning (all unreachable + no cache, FR-013a)**:
+
+```
+⚠️  No knowledge-index.md found yet. Run /speckit-knowledge-sync once when sources are reachable.
+```
+
+Then exit 0.
+
+**The block (literal — no substitution)**:
+
+```
+══════════════════════════════════════════════════════════════════════
+📚 SHARED KNOWLEDGE CONTEXT (for the AI agent)
+
+You are about to draft a spec or plan in this project. Before you do:
+
+1. Read `.specify/extensions/knowledge/knowledge-index.md` in full.
+2. Open every `.md` file referenced by that index from
+   `.specify/extensions/knowledge/cache/<slug>/...`.
+3. When you cite borrowed information, use the format
+   `<source-label> › <relative-path>` (example:
+   `payment-service › specs/events/payment-completed.md`).
+4. When the index annotates an item with `⚠️ CONFLICT`, surface every
+   version present and flag the conflict to the human user.
+══════════════════════════════════════════════════════════════════════
+```
+
+The top and bottom rules are exactly 70 × U+2550 (`═`), on their own lines with no trailing whitespace. Exit code remains 0 on all emission paths.
+
 ---
 
 ## --verbose flag
@@ -261,6 +330,12 @@ decisions/retry-policy.md
 --- END VERBOSE ---
 ```
 
+## --no-context-output flag
+
+When `--no-context-output` is present in `$ARGUMENTS`, set `suppress_context_output = true` and skip emitting the trailing Context Output for AI Agents block (step 10). All other output — per-source status lines, summary line, pointer line — prints identically. Exit code remains 0.
+
+This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose`. It composes orthogonally with `--verbose` (both may be present simultaneously). The auto-trigger paths (`before_specify`, `before_plan`) declare no arguments in `extension.yml`, so `--no-context-output` is structurally unreachable from those hooks — the block always emits on auto-trigger.
+
 ---
 
 ## Error cases summary
@@ -275,6 +350,8 @@ decisions/retry-policy.md
 | Git timeout on warm sync | `cached` or `unreachable` | 0 |
 | Manifest corrupted | Discard + retry or `unreachable` | 0 |
 | Conflict detected | `⚠️ CONFLICT` in index | 0 |
+| All sources unreachable, no prior index | Soft warning, no context block | 0 |
+| `--no-context-output` flag present | Context block suppressed | 0 |
 
 ---
 

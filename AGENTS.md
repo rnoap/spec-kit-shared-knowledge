@@ -16,5 +16,12 @@ Before any `grep_search`, ask: "Could the knowledge graph answer this?" If yes, 
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan
+shell commands, and other important information, read the current plan:
+
+- Active feature: `003-auto-integration`
+- Plan: [specs/003-auto-integration/plan.md](specs/003-auto-integration/plan.md)
+- Spec: [specs/003-auto-integration/spec.md](specs/003-auto-integration/spec.md)
+- Research: [specs/003-auto-integration/research.md](specs/003-auto-integration/research.md)
+- Data model: [specs/003-auto-integration/data-model.md](specs/003-auto-integration/data-model.md)
+- Quickstart: [specs/003-auto-integration/quickstart.md](specs/003-auto-integration/quickstart.md)
 <!-- SPECKIT END -->

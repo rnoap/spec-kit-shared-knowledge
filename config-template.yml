@@ -6,8 +6,17 @@
 # The cache/ directory and knowledge-index.md are local only — add them to .gitignore.
 #
 # Usage:
-#   specify extension run speckit.knowledge.configure https://github.com/org/repo specs/
-#   specify extension run speckit.knowledge.sync
+#   /speckit-knowledge-configure <url-or-local-path> [path_filter1] [path_filter2] ...
+#   /speckit-knowledge-sync
+#
+# A "knowledge source" can be either:
+#   1. A remote Git URL (HTTPS or SSH)
+#   2. A LOCAL path to a Git repository on your machine — useful when you have
+#      the repo cloned and updated locally and want to avoid network roundtrips,
+#      or when the repo is on a private network and not yet pushed.
+#
+# Path filters are optional. With zero filters, every .md file in the repository
+# is indexed. With one or more filters, indexing is scoped to ONLY those folders.
 #
 # See: README.md in the spec-kit-shared-knowledge repository for full documentation.
 
@@ -15,10 +24,40 @@ schema_version: "1.0"   # required; must be exactly "1.0"
 
 sources:                 # required; may be empty list []
 
-  # Example entry (remove or replace):
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 1 — Remote Git URL, single folder filter
+  # ────────────────────────────────────────────────────────────────────────────
   # - url: https://github.com/your-org/your-repo            # required; SSH or HTTPS Git URL
-  #   label: my-service                                     # optional; human-readable name for attribution
-  #                                                         # default: derived as <host>/<org>/<repo> from URL
-  #   path_filter: specs/                                   # optional; only index .md files under this path
-  #                                                         # default: all .md files in the repository
-  #   enabled: true                                         # optional; default true; set false to skip without removing
+  #   label: my-service                                     # optional; default: <host>/<org>/<repo>
+  #   path_filter: specs/                                   # optional single folder
+  #   enabled: true                                         # optional; default true
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 2 — Remote URL, NO filter (indexes every .md in the repo)
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: git@github.com:your-org/architecture-decisions.git
+  #   label: adr-repo
+  #   # path_filter omitted → all .md files indexed
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 3 — LOCAL absolute path
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: /Users/devuser/repos/payment-service             # absolute filesystem path
+  #   label: payment-service
+  #   path_filter: specs/
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 4 — LOCAL path with tilde (~ expanded to $HOME)
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: ~/repos/identity-service                         # tilde-prefixed path
+  #   label: identity-service
+  #   path_filter: docs/decisions/
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 5 — MULTIPLE folders (YAML list form)
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: ~/repos/shared-contracts
+  #   label: shared-contracts
+  #   path_filter:                                          # list form indexes BOTH trees, nothing else
+  #     - specs/
+  #     - docs/decisions/

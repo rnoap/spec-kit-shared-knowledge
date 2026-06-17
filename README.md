@@ -24,7 +24,6 @@ When working in a microservices or multi-repo environment, architectural decisio
 ## Prerequisites
 
 - `git >= 2.25` (sparse-checkout support required)
-- `python3` (stdlib only — used by the install script for JSON registry update)
 - spec-kit `>= 0.10.0`
 
 ## Installation
@@ -43,39 +42,39 @@ specify extension add knowledge --from /path/to/spec-kit-shared-knowledge.zip
 
 ### Local / Development Install
 
-The officially supported way to test an extension locally is:
+Install directly from a local checkout:
 
 ```bash
 cd /path/to/your/spec-kit-project
-specify extension add --dev /path/to/spec-kit-shared-knowledge
+specify extension add knowledge --dev /path/to/spec-kit-shared-knowledge
 ```
 
-Alternatively, this repo ships a small helper script that performs the same
-copy + register flow and additionally generates `SKILL.md` wrappers for AI
-agents that consume them (e.g. Claude Code skills):
+This copies the four command files, the manifest, and `config-template.yml`
+into `.specify/extensions/knowledge/`, registers the extension, and
+auto-registers the `before_specify` / `before_plan` hooks. After install,
+add these two lines to your project's `.gitignore`:
 
-```bash
-# Install into the current project
-bash /path/to/spec-kit-shared-knowledge/scripts/install-local.sh
-
-# Install into a specific project
-bash scripts/install-local.sh /path/to/your-project
+```gitignore
+.specify/extensions/knowledge/cache/
+.specify/extensions/knowledge/knowledge-index.md
 ```
 
-The script:
-1. Copies the 4 command files to `.specify/extensions/knowledge/commands/` and generates `SKILL.md` wrappers under `.claude/skills/`
-2. Copies `config-template.yml` to `.specify/extensions/knowledge/knowledge.yml` (skips if already present)
-3. Auto-appends `.gitignore` entries for `cache/` and `knowledge-index.md` (idempotent)
-
-After install, reload your editor / AI agent so it picks up the new commands.
-
-This copies `config-template.yml` to `.specify/extensions/knowledge/knowledge.yml` with an empty `sources: []`.
+Then reload your editor / AI agent so it picks up the new commands.
 
 ## Quick Start
 
 ```bash
-# 1. Add a knowledge source
+# 1a. Add a knowledge source from a REMOTE repository (single folder filter)
 /speckit-knowledge-configure https://github.com/your-org/payment-service specs/
+
+# 1b. … or from a LOCAL repository on your machine
+/speckit-knowledge-configure ~/repos/payment-service specs/
+
+# 1c. … or with NO filter (indexes every .md file in the repo)
+/speckit-knowledge-configure git@github.com:your-org/architecture-decisions.git
+
+# 1d. … or scoped to MULTIPLE folders
+/speckit-knowledge-configure ~/repos/shared-contracts specs/ docs/decisions/
 
 # 2. Sync (fetch & cache)
 /speckit-knowledge-sync
@@ -85,15 +84,43 @@ This copies `config-template.yml` to `.specify/extensions/knowledge/knowledge.ym
 
 ## Commands
 
-### `/speckit-knowledge-configure [url] [path_filter]`
+### `/speckit-knowledge-configure [url-or-path] [path_filter1] [path_filter2] ...`
 
-Initialize or edit the knowledge source configuration for the current project.
+Initialize or edit the knowledge source configuration for the current project. Accepts:
+
+- **A remote Git URL** — HTTPS (`https://github.com/your-org/your-repo`) or SSH (`git@github.com:your-org/your-repo`).
+- **A local filesystem path to a Git repository** — use this when the repo is already cloned on your machine and you want to avoid network roundtrips, or when it lives on a private network. Both **absolute** paths and **`~`-prefixed** paths are supported (the tilde is expanded to `$HOME`).
+- **Zero or more path filters** after the URL/path. With zero filters every `.md` file in the repo is indexed; with one or more filters, indexing is restricted to those folders only.
+
+**Examples**:
+
+```bash
+# Remote URL, single folder filter
+/speckit-knowledge-configure https://github.com/your-org/payment-service specs/
+
+# Local absolute path, single folder filter
+/speckit-knowledge-configure /Users/devuser/repos/payment-service specs/
+
+# Local path with tilde, NO filter (indexes every .md in the repo)
+/speckit-knowledge-configure ~/repos/architecture-decisions
+
+# Local path, MULTIPLE folder filters
+/speckit-knowledge-configure ~/repos/shared-contracts specs/ docs/decisions/
+
+# Absolute path, multiple folders
+/speckit-knowledge-configure /opt/repos/team-platform specs/ docs/contracts/ docs/runbooks/
+```
+
+**Output**:
 
 ```
 ✅ knowledge.yml updated.
+✅ .gitignore updated with cache exclusion entries.
 
 Configured sources:
-  1. payment-service  →  https://github.com/your-org/payment-service  (path: specs/)
+  1. payment-service     →  https://github.com/your-org/payment-service  (path: specs/)
+  2. architecture-decisions → ~/repos/architecture-decisions             (path: all .md files)
+  3. shared-contracts    →  ~/repos/shared-contracts                     (paths: specs/, docs/decisions/)
 ```
 
 **Flags**: `--verbose` — print full YAML after write
@@ -147,54 +174,9 @@ Display current state of all configured sources.
 
 ## Integration with /speckit-specify and /speckit-plan
 
-After installing the extension, consuming teams must perform two manual setup steps:
+The `before_specify` and `before_plan` hooks declared in [`extension.yml`](extension.yml) are **auto-registered by spec-kit** when the extension is installed via `specify extension add` — no manual edits to `.specify/extensions.yml` are required. See the [spec-kit Extension Development Guide](https://github.com/github/spec-kit/blob/main/extensions/EXTENSION-DEVELOPMENT-GUIDE.md) for the underlying mechanism. The AI agent's knowledge-reading behavior is driven by the **Context Output block** emitted at the end of every successful or degraded sync (see [`commands/speckit.knowledge.sync.md`](commands/speckit.knowledge.sync.md) § "10. Emit Context Output for AI Agents block").
 
-### Step 1: Register the sync hooks in `.specify/extensions.yml`
-
-Add the following entries to your project's `.specify/extensions.yml`:
-
-```yaml
-hooks:
-  before_specify:
-    - extension: knowledge
-      command: speckit.knowledge.sync
-      optional: true
-      prompt: "Sync cross-repo knowledge sources before specifying?"
-      description: "Refresh knowledge cache before spec generation so context is current"
-
-  before_plan:
-    - extension: knowledge
-      command: speckit.knowledge.sync
-      optional: true
-      prompt: "Sync cross-repo knowledge sources before planning?"
-      description: "Refresh knowledge cache before implementation planning"
-```
-
-### Step 2: Amend your SKILL.md files
-
-Add the following preamble to `.claude/skills/speckit-specify/SKILL.md` immediately before the `## Outline` section:
-
-```markdown
-**Cross-repo knowledge check**: If the file
-`.specify/extensions/knowledge/knowledge-index.md` exists in the
-project root, read it and all `.md` files it references from the cache
-directories BEFORE drafting the specification. Surface relevant knowledge
-from those files as context — cite the source (label + path) for each
-piece of referenced information.
-```
-
-Add the equivalent preamble to `.claude/skills/speckit-plan/SKILL.md` immediately before the `## Outline` section:
-
-```markdown
-**Cross-repo knowledge check**: If the file
-`.specify/extensions/knowledge/knowledge-index.md` exists in the
-project root, read it and all `.md` files it references from the cache
-directories BEFORE drafting the implementation plan. Surface relevant knowledge
-from those files as context — cite the source (label + path) for each
-piece of referenced information.
-```
-
-> **Why both steps are required**: The hooks (Step 1) trigger a sync so the cache is fresh. The SKILL.md amendments (Step 2) instruct the agent to read `knowledge-index.md` before generating output. Without Step 2, the sync runs correctly but context never flows into spec or plan output.
+> **Migration note**: If you previously followed the prior README and added `knowledge` entries to your project's `.specify/extensions.yml`, you may safely remove them — auto-registration handles them now.
 
 > **No-op when not configured**: If `.specify/extensions/knowledge/knowledge.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
 
@@ -202,15 +184,25 @@ piece of referenced information.
 
 See [`config-template.yml`](config-template.yml) for the full annotated configuration schema.
 
-Key fields:
-- `sources[*].url` — required; SSH or HTTPS Git URL
-- `sources[*].label` — optional; defaults to `<host>/<org>/<repo>` derived from URL
-- `sources[*].path_filter` — optional; scope to a subdirectory (e.g., `specs/`)
-- `sources[*].enabled` — optional; default `true`; set `false` to skip without removing
+Key fields per source entry:
 
-## .gitignore Requirements
+- `sources[*].url` — **required**. One of:
+  - HTTPS Git URL: `https://github.com/your-org/your-repo`
+  - SSH Git URL: `git@github.com:your-org/your-repo`
+  - **Local absolute path** to a Git repository: `/Users/devuser/repos/your-repo`
+  - **Local tilde path** (expanded to `$HOME`): `~/repos/your-repo`
+- `sources[*].label` — optional; human-readable name used for attribution. Defaults: for remote URLs, `<host>/<org>/<repo>` derived from the URL; for local paths, the last path component (e.g. `~/repos/payment-service` → `payment-service`).
+- `sources[*].path_filter` — optional. Three forms:
+  - **Omitted** → every `.md` file in the repo is indexed.
+  - **Single string** → `path_filter: specs/` indexes only files under `specs/`.
+  - **YAML list** → `path_filter: [specs/, docs/decisions/]` indexes those two trees and nothing else.
+- `sources[*].enabled` — optional; default `true`; set `false` to skip a source without removing it from the file.
 
-Add the following to your project's `.gitignore`:
+## .gitignore
+
+The `/speckit-knowledge-configure` command **automatically adds** the required cache exclusion entries to your project's `.gitignore` when you first configure a source — no manual step needed.
+
+If you need to add them by hand (e.g. before running configure for the first time):
 
 ```gitignore
 # knowledge extension cache (local only; do not commit)
@@ -237,7 +229,7 @@ Contributions are welcome. To propose a change:
 1. Open an issue describing the bug or enhancement before sending a PR for non-trivial changes
 2. Fork the repo and create a feature branch (`feat/<short-name>` or `fix/<short-name>`)
 3. Update `CHANGELOG.md` under `[Unreleased]` with your change
-4. Test the change with `bash scripts/install-local.sh /path/to/test-project` against a real spec-kit project
+4. Test the change with `specify extension add knowledge --dev /path/to/spec-kit-shared-knowledge` against a real spec-kit project
 5. Open a pull request and reference the issue
 
 For larger architectural changes, please file a discussion first. See `specs/` for the reverse-engineered specs that document the current behavior.

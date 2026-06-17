@@ -3,8 +3,8 @@ schema_version: "1.0"
 extension:
   id: knowledge
   name: "Shared Knowledge"
-  version: "1.0.0"
-  description: "Inject cross-repo decisions, contracts, and conventions into your spec-kit workflow"
+  version: "1.1.0"
+  description: "Inject cross-repo decisions, contracts, and conventions into your spec-kit workflow."
   author: "Raúl Noa Pedroso"
   repository: "https://github.com/rnoap/spec-kit-shared-knowledge"
   homepage: "https://github.com/rnoap/spec-kit-shared-knowledge"
@@ -14,8 +14,6 @@ requires:
   speckit_version: ">=0.10.0"
   tools:
     - name: git
-      required: true
-    - name: python3
       required: true
 
 provides:
