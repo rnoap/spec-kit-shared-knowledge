@@ -153,9 +153,11 @@ Key fields:
 - `sources[*].path_filter` — optional; scope to a subdirectory (e.g., `specs/`)
 - `sources[*].enabled` — optional; default `true`; set `false` to skip without removing
 
-## .gitignore Requirements
+## .gitignore
 
-Add the following to your project's `.gitignore`:
+The `/speckit-knowledge-configure` command **automatically adds** the required cache exclusion entries to your project's `.gitignore` when you first configure a source — no manual step needed.
+
+If you need to add them by hand (e.g. before running configure for the first time):
 
 ```gitignore
 # knowledge extension cache (local only; do not commit)
