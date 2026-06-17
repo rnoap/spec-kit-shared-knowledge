@@ -143,10 +143,17 @@ git clone \
 After clone (both remote and local), apply sparse-checkout if `path_filter` is set:
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
-git sparse-checkout init --cone
-git sparse-checkout set <path_filter>
+# Use --no-cone so the pattern restricts checkout to ONLY <path_filter>.
+# Cone mode always includes root-level files (package.json, Dockerfile, etc.)
+# regardless of the pattern, which violates the path_filter contract.
+git sparse-checkout init --no-cone
+# Normalize the pattern: ensure it ends with a slash so git treats it as
+# a directory match (e.g. "specs" → "specs/", "specs/" stays "specs/").
+git sparse-checkout set "<path_filter>"
 git checkout
 ```
+
+> **Pattern semantics**: in `--no-cone` mode, git uses gitignore-style patterns. A bare directory name like `specs/` matches every file recursively under `specs/` and **nothing else**. Root-level files at the cache root are excluded. This matches user expectations: `path_filter: specs/` means "only `specs/` content".
 
 If no `path_filter`:
 ```bash
@@ -155,6 +162,19 @@ git checkout HEAD -- .
 ```
 
 #### Warm path (update)
+
+Before pulling new content, **re-apply the sparse-checkout configuration in `--no-cone` mode** if `path_filter` is set. This is idempotent and self-heals caches that were originally cloned with the buggy `--cone` configuration (which always included root-level files):
+
+```bash
+cd .specify/extensions/knowledge/cache/<slug>
+if [ -n "<path_filter>" ]; then
+  git sparse-checkout init --no-cone
+  git sparse-checkout set "<path_filter>"
+  # Remove any stray files outside the path_filter that an older --cone
+  # checkout may have left behind in the working tree.
+  git sparse-checkout reapply
+fi
+```
 
 **Remote URL**:
 ```bash
