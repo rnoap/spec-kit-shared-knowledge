@@ -1,12 +1,12 @@
 schema_version: "1.0"
 
 extension:
-  id: cross-repo-knowledge
+  id: shared-knowledge
   name: "Cross-Repository Shared Knowledge"
   version: "1.0.0"
   description: "Inject architectural decisions, API contracts, and conventions from other Git repositories into your spec-kit workflow"
   author: walmart-developer-experience
-  repository: https://github.com/walmart-developer-experience/spec-kit-cross-repo-knowledge
+  repository: https://github.com/walmart-developer-experience/spec-kit-shared-knowledge
   license: MIT
 
 requires:
@@ -31,9 +31,9 @@ provides:
       description: "Show reachability, last-sync timestamp, item count, and cache age per source"
 
   config:
-    - name: "cross-repo-knowledge.yml"
+    - name: "shared-knowledge.yml"
       template: "config-template.yml"
-      location: ".specify/extensions/cross-repo-knowledge/"
+      location: ".specify/extensions/shared-knowledge/"
       required: false
 
 hooks:

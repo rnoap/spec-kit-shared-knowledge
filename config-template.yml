@@ -1,4 +1,4 @@
-# cross-repo-knowledge.yml
+# shared-knowledge.yml
 # Schema version: 1.0
 #
 # This file declares which Git repositories are knowledge sources for this project.
@@ -9,7 +9,7 @@
 #   specify extension run speckit.xrepo.configure https://github.com/org/repo specs/
 #   specify extension run speckit.xrepo.sync
 #
-# See: https://github.com/walmart-developer-experience/spec-kit-cross-repo-knowledge
+# See: https://github.com/walmart-developer-experience/spec-kit-shared-knowledge
 
 schema_version: "1.0"   # required; must be exactly "1.0"
 

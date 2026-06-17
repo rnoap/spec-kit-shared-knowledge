@@ -20,5 +20,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Source-count soft warning when more than 10 sources are configured
 - `--verbose` flag on all four commands
 
-[Unreleased]: https://github.com/walmart-developer-experience/spec-kit-cross-repo-knowledge/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/walmart-developer-experience/spec-kit-cross-repo-knowledge/releases/tag/v1.0.0
+[Unreleased]: https://github.com/walmart-developer-experience/spec-kit-shared-knowledge/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/walmart-developer-experience/spec-kit-shared-knowledge/releases/tag/v1.0.0
