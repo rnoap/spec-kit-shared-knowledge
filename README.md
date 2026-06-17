@@ -1,6 +1,14 @@
-# spec-kit-shared-knowledge
+<h1 align="center">Shared Knowledge</h1>
 
-> A spec-kit extension that injects architectural decisions, API contracts, and shared conventions from other Git repositories into your spec-kit workflow.
+<p align="center">
+  <em>A spec-kit extension that injects architectural decisions, API contracts, and shared conventions from other Git repositories into your spec-kit workflow.</em>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.10.0-7d4cdb">
+  <img alt="Status" src="https://img.shields.io/badge/status-v1.0.0-success">
+</p>
 
 ## Overview
 
