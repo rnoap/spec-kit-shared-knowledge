@@ -3,7 +3,7 @@ schema_version: "1.0"
 extension:
   id: knowledge
   name: "Shared Knowledge"
-  version: "1.2.0"
+  version: "1.4.0"
   description: "Inject cross-repo decisions, contracts, and conventions into your spec-kit workflow."
   author: "Raúl Noa Pedroso"
   repository: "https://github.com/rnoap/spec-kit-shared-knowledge"
@@ -30,6 +30,9 @@ provides:
     - name: speckit.knowledge.status
       file: commands/speckit.knowledge.status.md
       description: "Show reachability, last-sync timestamp, item count, and cache age per source"
+    - name: speckit.knowledge.remove
+      file: commands/speckit.knowledge.remove.md
+      description: "Remove, disable, or re-enable a configured knowledge source"
 
   # `name` must end in `-config.yml` — spec-kit only preserves that pattern across
   # `extension add --force` / `remove --keep-config`.
@@ -39,17 +42,35 @@ provides:
       description: "Knowledge source configuration for this project"
       required: false
 
+# Ordered by SDD lifecycle. All four are optional so the user can decline a sync
+# they don't need.
+#
+# NONE of these entries may declare arguments. That is what makes `--force`
+# structurally unreachable from an automatic trigger, which is how FR-022 is
+# satisfied — by construction rather than by a runtime check. Adding an argument
+# here would let a hook bypass the cache freshness policy. Same mechanism that
+# keeps `--no-context-output` hook-unreachable (spec 003, FR-016).
 hooks:
   before_specify:
     command: speckit.knowledge.sync
     optional: true
     prompt: "Sync cross-repo knowledge sources before specifying?"
     description: "Refresh knowledge cache before spec generation so context is current"
+  before_clarify:
+    command: speckit.knowledge.sync
+    optional: true
+    prompt: "Sync cross-repo knowledge sources before clarifying?"
+    description: "Refresh knowledge cache before spec clarification so answers reflect current contracts"
   before_plan:
     command: speckit.knowledge.sync
     optional: true
     prompt: "Sync cross-repo knowledge sources before planning?"
     description: "Refresh knowledge cache before implementation planning"
+  before_tasks:
+    command: speckit.knowledge.sync
+    optional: true
+    prompt: "Sync cross-repo knowledge sources before task generation?"
+    description: "Refresh knowledge cache before task breakdown so tasks reflect current contracts"
 
 tags:
   - "cross-repo"

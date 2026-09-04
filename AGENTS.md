@@ -59,12 +59,15 @@ extension's arguments here, and skip any extension that is not in
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
 
-- Active feature: `003-auto-integration`
-- Plan: [specs/003-auto-integration/plan.md](specs/003-auto-integration/plan.md)
-- Spec: [specs/003-auto-integration/spec.md](specs/003-auto-integration/spec.md)
-- Research: [specs/003-auto-integration/research.md](specs/003-auto-integration/research.md)
-- Data model: [specs/003-auto-integration/data-model.md](specs/003-auto-integration/data-model.md)
-- Quickstart: [specs/003-auto-integration/quickstart.md](specs/003-auto-integration/quickstart.md)
+- Active feature: `004-source-lifecycle-cache`
+- **Plan: [specs/004-source-lifecycle-cache/plan.md](specs/004-source-lifecycle-cache/plan.md)**
+- Spec: [specs/004-source-lifecycle-cache/spec.md](specs/004-source-lifecycle-cache/spec.md)
+- Research: [specs/004-source-lifecycle-cache/research.md](specs/004-source-lifecycle-cache/research.md)
+- Data model: [specs/004-source-lifecycle-cache/data-model.md](specs/004-source-lifecycle-cache/data-model.md)
+- Contracts: [config schema](specs/004-source-lifecycle-cache/contracts/knowledge-config.schema.md) · [command surface](specs/004-source-lifecycle-cache/contracts/commands.md)
+- Verification: [specs/004-source-lifecycle-cache/quickstart.md](specs/004-source-lifecycle-cache/quickstart.md)
+
+Status: planned. `tasks.md` does not exist yet — run `/speckit.tasks` next.
 <!-- SPECKIT END -->
 
 <!-- CODE-GRAPH-GUIDE START -->

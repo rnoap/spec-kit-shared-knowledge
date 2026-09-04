@@ -24,11 +24,27 @@ Read `.specify/extensions/knowledge/knowledge-index.md`.
   ℹ️  knowledge-index.md not found — running sync first...
   ```
   Execute the sync command (`__SPECKIT_COMMAND_KNOWLEDGE_SYNC__`), then re-read the index.
-  If sync also fails or index is still absent after sync, print:
+
+  If the index is still absent after sync, the cause determines the message.
+  Distinguish the two — they call for different actions, and conflating them sends
+  the user to debug a network problem that does not exist:
+
+  **No enabled sources are configured.** Sync deletes the index in this state
+  (FR-031), so it is reachable by ordinary use — removing or disabling the last
+  source produces it.
   ```
-  ❌ Unable to build knowledge index. Check that knowledge-config.yml is configured and at least one source is reachable.
+  ℹ️  No enabled knowledge sources are configured for this project — nothing to search.
+     Add one with __SPECKIT_COMMAND_KNOWLEDGE_CONFIGURE__ <url>, or re-enable a
+     disabled source with __SPECKIT_COMMAND_KNOWLEDGE_REMOVE__ <label> --enable.
   ```
-  Exit 0.
+
+  **Sources are configured but none could be reached and none has a usable cache.**
+  ```
+  ❌ Unable to build knowledge index. Sources are configured but none is reachable
+     and none has an intact cache. Run __SPECKIT_COMMAND_KNOWLEDGE_STATUS__ to see why.
+  ```
+
+  Exit 0 on both paths.
 
 ### 2. Parse arguments
 

@@ -1,0 +1,17 @@
+{
+  "workflow": "speckit",
+  "specName": "Tiny",
+  "branch": "",
+  "currentStep": "specify",
+  "status": "completed",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-09-04T15:41:02.060Z"
+    }
+  ],
+  "telemetryInstanceId": "fb63b93b-6f86-4248-aaac-1fae3ff5658c"
+}
