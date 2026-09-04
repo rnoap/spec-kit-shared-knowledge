@@ -4,7 +4,7 @@
 
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
-**Note**: This template is filled in by the `/speckit-plan` command. See `.specify/templates/plan-template.md` for the execution workflow.
+**Note**: This template is filled in by the `/speckit.plan` command; its definition describes the execution workflow.
 
 ## Summary
 
@@ -12,23 +12,29 @@
 
 ## Technical Context
 
-**Language/Version**: Bash (POSIX-compatible), YAML 1.2, Markdown (CommonMark)
+<!--
+  ACTION REQUIRED: Replace the content in this section with the technical details
+  for the project. The structure here is presented in advisory capacity to guide
+  the iteration process.
+-->
 
-**Primary Dependencies**: spec-kit `>= 0.10.0`, git `>= 2.25` — no compiled runtime, no package manager lock file
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
 
-**Storage**: Files only — `commands/*.md`, `scripts/*.sh`, `extension.yml`, `config-template.yml`; consumer state written to their `.specify/` directory by `install-local.sh`
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 
-**Testing**: Manual smoke test — run `bash scripts/install-local.sh` in a clean consumer project; verify via `specify extension list` and per-command invocation. No automated test framework.
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
 
-**Target Platform**: Any POSIX shell environment where spec-kit and git are installed (macOS, Linux)
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
 
-**Project Type**: spec-kit extension package (distribution artifact — not a compiled binary or web service)
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
 
-**Performance Goals**: `install-local.sh` completes in < 5 seconds on a warm filesystem; N/A for command prompts (agent execution time is outside this project's scope)
+**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
 
-**Constraints**: No external network calls at install time; `config-template.yml` must not clobber an existing consumer config (no-clobber install); extension must remain backwards-compatible with spec-kit `0.10.x`
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
 
-**Scale/Scope**: Small package — 4 commands, 1 install script, 1 config template; changes are additive; breaking changes require a `MAJOR` version bump in `extension.yml`
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
+
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
@@ -42,12 +48,12 @@
 
 ```text
 specs/[###-feature]/
-├── plan.md              # This file (/speckit-plan command output)
-├── research.md          # Phase 0 output (/speckit-plan command)
-├── data-model.md        # Phase 1 output (/speckit-plan command)
-├── quickstart.md        # Phase 1 output (/speckit-plan command)
-├── contracts/           # Phase 1 output (/speckit-plan command)
-└── tasks.md             # Phase 2 output (/speckit-tasks command - NOT created by /speckit-plan)
+├── plan.md              # This file (/speckit.plan command output)
+├── research.md          # Phase 0 output (/speckit.plan command)
+├── data-model.md        # Phase 1 output (/speckit.plan command)
+├── quickstart.md        # Phase 1 output (/speckit.plan command)
+├── contracts/           # Phase 1 output (/speckit.plan command)
+└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 
 ### Source Code (repository root)
@@ -59,25 +65,43 @@ specs/[###-feature]/
 -->
 
 ```text
-# Extension package layout (no src/ — files are the deliverable)
-commands/
-└── speckit.knowledge.<verb>.md              # agent prompt for each command (namespace: knowledge)
+# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
 
-scripts/
-└── install-local.sh                     # install tooling (only script allowed)
+tests/
+├── contract/
+├── integration/
+└── unit/
 
-extension.yml                            # package manifest
-config-template.yml                      # user-facing config schema
-README.md
-CHANGELOG.md
+# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+backend/
+├── src/
+│   ├── models/
+│   ├── services/
+│   └── api/
+└── tests/
 
-specs/NNN-<feature-name>/               # this feature's SDD docs
-├── spec.md
-├── plan.md
-└── tasks.md
+frontend/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   └── services/
+└── tests/
+
+# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: This project has no compiled source. The deliverable is the files themselves. New features add or modify files in `commands/`, `scripts/`, or the root manifests. No `src/`, `tests/`, `frontend/`, or `backend/` directories exist or are needed.
+**Structure Decision**: [Document the selected structure and reference the real
+directories captured above]
 
 ## Complexity Tracking
 

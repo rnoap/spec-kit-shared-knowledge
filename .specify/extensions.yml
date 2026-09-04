@@ -1,28 +1,15 @@
 installed:
 - agent-context
+- assess
 - brownfield
+- bug
 - companion
 - git
+- tinyspec
 settings:
   auto_execute_hooks: true
 hooks:
   after_specify:
-  - extension: agent-context
-    command: speckit.agent-context.update
-    enabled: false
-    optional: true
-    priority: 10
-    prompt: Execute speckit.agent-context.update?
-    description: Refresh agent context after specification
-    condition: null
-  - extension: git
-    command: speckit.git.commit
-    enabled: true
-    optional: true
-    priority: 10
-    prompt: Commit specification changes?
-    description: Auto-commit after specification
-    condition: null
   - extension: companion
     command: speckit.companion.capture
     enabled: true
@@ -32,14 +19,30 @@ hooks:
     description: Record specify completion (currentStep=specify, status=specified)
       into .spec-context.json
     condition: null
-  after_plan:
-  - extension: agent-context
-    command: speckit.agent-context.update
-    enabled: false
+  - extension: git
+    command: speckit.git.commit
+    enabled: true
     optional: true
     priority: 10
+    prompt: Commit specification changes?
+    description: Auto-commit after specification
+    condition: null
+  - extension: agent-context
+    command: speckit.agent-context.update
+    enabled: true
+    optional: false
+    priority: 10
     prompt: Execute speckit.agent-context.update?
-    description: Refresh agent context after planning
+    description: Refresh agent context after specification
+    condition: null
+  after_plan:
+  - extension: companion
+    command: speckit.companion.capture-plan
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.companion.capture-plan?
+    description: Record plan completion (currentStep=plan, status=planned) into .spec-context.json
     condition: null
   - extension: git
     command: speckit.git.commit
@@ -49,22 +52,49 @@ hooks:
     prompt: Commit plan changes?
     description: Auto-commit after implementation planning
     condition: null
-  - extension: companion
-    command: speckit.companion.capture-plan
+  - extension: agent-context
+    command: speckit.agent-context.update
     enabled: true
     optional: false
     priority: 10
-    prompt: Execute speckit.companion.capture-plan?
-    description: Record plan completion (currentStep=plan, status=planned) into .spec-context.json
+    prompt: Execute speckit.agent-context.update?
+    description: Refresh agent context after planning
     condition: null
-  before_constitution:
-  - extension: git
-    command: speckit.git.initialize
+  after_tasks:
+  - extension: companion
+    command: speckit.companion.capture-tasks
     enabled: true
     optional: false
     priority: 10
-    prompt: Execute speckit.git.initialize?
-    description: Initialize Git repository before constitution setup
+    prompt: Execute speckit.companion.capture-tasks?
+    description: Record tasks completion (currentStep=tasks, status=ready-to-implement)
+      into .spec-context.json
+    condition: null
+  - extension: git
+    command: speckit.git.commit
+    enabled: true
+    optional: true
+    priority: 10
+    prompt: Commit task changes?
+    description: Auto-commit after task generation
+    condition: null
+  after_implement:
+  - extension: companion
+    command: speckit.companion.capture-implement
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.companion.capture-implement?
+    description: Per-task journaling on implement (currentStep=implement; status=implemented
+      when all tasks checked)
+    condition: null
+  - extension: git
+    command: speckit.git.commit
+    enabled: true
+    optional: true
+    priority: 10
+    prompt: Commit implementation changes?
+    description: Auto-commit after implementation
     condition: null
   before_specify:
   - extension: git
@@ -74,6 +104,23 @@ hooks:
     priority: 10
     prompt: Execute speckit.git.feature?
     description: Create feature branch before specification
+    condition: null
+  - extension: tinyspec
+    command: speckit.tinyspec.classify
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Check if this task is small enough for the lightweight tinyspec workflow?
+    description: Auto-classify task complexity before starting the full SDD workflow
+    condition: null
+  before_constitution:
+  - extension: git
+    command: speckit.git.initialize
+    enabled: true
+    optional: false
+    priority: 10
+    prompt: Execute speckit.git.initialize?
+    description: Initialize Git repository before constitution setup
     condition: null
   before_clarify:
   - extension: git
@@ -155,42 +202,6 @@ hooks:
     priority: 10
     prompt: Commit clarification changes?
     description: Auto-commit after spec clarification
-    condition: null
-  after_tasks:
-  - extension: git
-    command: speckit.git.commit
-    enabled: true
-    optional: true
-    priority: 10
-    prompt: Commit task changes?
-    description: Auto-commit after task generation
-    condition: null
-  - extension: companion
-    command: speckit.companion.capture-tasks
-    enabled: true
-    optional: false
-    priority: 10
-    prompt: Execute speckit.companion.capture-tasks?
-    description: Record tasks completion (currentStep=tasks, status=ready-to-implement)
-      into .spec-context.json
-    condition: null
-  after_implement:
-  - extension: git
-    command: speckit.git.commit
-    enabled: true
-    optional: true
-    priority: 10
-    prompt: Commit implementation changes?
-    description: Auto-commit after implementation
-    condition: null
-  - extension: companion
-    command: speckit.companion.capture-implement
-    enabled: true
-    optional: false
-    priority: 10
-    prompt: Execute speckit.companion.capture-implement?
-    description: Per-task journaling on implement (currentStep=implement; status=implemented
-      when all tasks checked)
     condition: null
   after_checklist:
   - extension: git

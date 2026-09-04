@@ -1,6 +1,5 @@
 ---
-description: Companion turbo specify — spec.md with no user-story section (per-spec
-  opt-in)
+description: Companion turbo specify — spec.md with no user-story section (per-spec opt-in)
 ---
 
 

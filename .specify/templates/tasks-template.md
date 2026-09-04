@@ -30,7 +30,7 @@ description: "Task list template for feature implementation"
   ============================================================================
   IMPORTANT: The tasks below are SAMPLE TASKS for illustration purposes only.
 
-  The /speckit-tasks command MUST replace these with actual tasks based on:
+  The /speckit.tasks command MUST replace these with actual tasks based on:
   - User stories from spec.md (with their priorities P1, P2, P3...)
   - Feature requirements from plan.md
   - Entities from data-model.md
@@ -47,11 +47,11 @@ description: "Task list template for feature implementation"
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Scaffold any new files/directories; no consumer-facing changes yet
+**Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create new command file `commands/speckit.knowledge.<verb>.md` (empty skeleton, namespace matches the extension id (`knowledge`) not `shared-knowledge`)
-- [ ] T002 Add command entry to `extension.yml` under `provides.commands`
-- [ ] T003 [P] Update `CHANGELOG.md` with `[Unreleased]` entry describing the change
+- [ ] T001 Create project structure per implementation plan
+- [ ] T002 Initialize [language] project with [framework] dependencies
+- [ ] T003 [P] Configure linting and formatting tools
 
 ---
 
@@ -61,14 +61,14 @@ description: "Task list template for feature implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-Examples of foundational tasks for this extension package (adjust per feature):
+Examples of foundational tasks (adjust based on your project):
 
-- [ ] T004 Finalize `extension.yml` changes (version, hooks, requirements) — blocks install testing
-- [ ] T005 [P] Update `config-template.yml` schema if new config keys introduced; bump `schema_version` if breaking
-- [ ] T006 [P] Draft `commands/*.md` prompt content (can be drafted in parallel with T004/T005)
-- [ ] T007 Verify `scripts/install-local.sh` handles new files correctly (dry-run in temp dir)
-- [ ] T008 Run `bash scripts/install-local.sh` in a clean consumer project — confirm no errors
-- [ ] T009 Verify `specify extension list` shows updated command list
+- [ ] T004 Setup database schema and migrations framework
+- [ ] T005 [P] Implement authentication/authorization framework
+- [ ] T006 [P] Setup API routing and middleware structure
+- [ ] T007 Create base models/entities that all stories depend on
+- [ ] T008 Configure error handling and logging infrastructure
+- [ ] T009 Setup environment configuration management
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -151,11 +151,12 @@ Examples of foundational tasks for this extension package (adjust per feature):
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] TXXX [P] Sync README.md command table with `extension.yml provides.commands`
-- [ ] TXXX Bump `version` in `extension.yml` (semver: patch/minor/major per change impact)
-- [ ] TXXX Move `CHANGELOG.md [Unreleased]` entry to the new version with today's date
-- [ ] TXXX [P] Run full smoke test: `bash scripts/install-local.sh` in clean consumer project
-- [ ] TXXX Tag the release: `git tag v<version>` after all checks pass
+- [ ] TXXX [P] Documentation updates in docs/
+- [ ] TXXX Code cleanup and refactoring
+- [ ] TXXX Performance optimization across all stories
+- [ ] TXXX [P] Additional unit tests (if requested) in tests/unit/
+- [ ] TXXX Security hardening
+- [ ] TXXX Run quickstart.md validation
 
 ---
 
