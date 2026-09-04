@@ -20,8 +20,10 @@ la instalación y el artefacto publicado. No la conducta de los comandos — ver
 
 | File | Role |
 |------|------|
-| [.github/workflows/validate.yml](../../.github/workflows/validate.yml) | Nuevo — 2 jobs, en cada PR y en push a `main` |
+| [.github/workflows/validate.yml](../../.github/workflows/validate.yml) | Nuevo — 2 jobs, en cada PR y en push a `main`. **Bloqueante** |
+| [.github/workflows/upstream-compat.yml](../../.github/workflows/upstream-compat.yml) | Nuevo — mismo smoke test contra spec-kit `main`, semanal. **Advisory** |
 | [.github/scripts/validate-extension.sh](../../.github/scripts/validate-extension.sh) | Nuevo — 13 checks estáticos, ejecutable también en local |
+| [.github/scripts/assert-install.sh](../../.github/scripts/assert-install.sh) | Nuevo — aserciones del smoke, compartidas por los dos workflows |
 | [.specify/memory/constitution.md](../../.specify/memory/constitution.md) | Modificar — §III, § Quality Gates, § Code Boundaries, § Governance |
 
 `.github/` ya está en `.gitattributes` (`export-ignore`) y en `.extensionignore`,
@@ -60,17 +62,27 @@ entradas en `git archive`.
 
 ## Decisiones
 
-**spec-kit fijado a `v1.0.4`, no a `main`.** Sin fijar, un cambio incompatible de
-upstream aterriza como rojo en un PR que no tiene nada que ver, y el autor pierde
-el tiempo depurando su propio cambio. No es hipotético: durante el desarrollo de
-1.4.0, `specify init --ai` pasó a ser `--integration`, y el primer smoke test
-falló por eso. El coste aceptado es que ya no te enteras solo de que upstream te
-rompió — te enteras al subir esa línea a propósito, y entonces sabes exactamente
-qué fue. Si se quiere lo uno y lo otro, un job programado semanal contra `main`
-puede ponerse rojo sin bloquear PRs.
+**spec-kit fijado a `v1.0.4`, no a `main` — y un job aparte que sí mira `main`.**
+Sin fijar, un cambio incompatible de upstream aterriza como rojo en un PR que no
+tiene nada que ver, y el autor pierde el tiempo depurando su propio cambio. No es
+hipotético: durante el desarrollo de 1.4.0, `specify init --ai` pasó a ser
+`--integration`, y el primer smoke test falló por eso.
 
-**Los `[P]` no aplican.** Los dos jobs son independientes y GitHub ya los corre
-en paralelo.
+Pero fijar tiene su propio modo de fallo: dejas de enterarte de que upstream te
+rompió, hasta el día que subes el pin y heredas todo el destrozo de golpe. Por eso
+`upstream-compat.yml` corre el **mismo** smoke test contra `main` semanalmente.
+Puede ponerse rojo sin molestar a nadie: no se dispara en `pull_request` y no es
+un check requerido. Un rojo ahí significa una sola cosa — upstream cambió algo del
+que esta extensión depende; decide, y sube `SPEC_KIT_REF` a propósito.
+
+**Las aserciones del smoke viven en un solo archivo.** `assert-install.sh` lo usan
+los dos workflows. Si se duplicaran, el job de compatibilidad podría pasar un
+check que el bloqueante ya no hace — peor que no tenerlo. Aquí sí se extrae,
+porque son scripts de CI: la prohibición de §I aplica al paquete instalado, no a
+esto.
+
+**Los `[P]` no aplican.** Los dos jobs de `validate.yml` son independientes y
+GitHub ya los corre en paralelo.
 
 **Duplicar las reglas de validación sigue siendo correcto.** El check 13 no
 sugiere refactorizar hacia un archivo común: spec-kit no lo instalaría y todos
@@ -86,6 +98,8 @@ los comandos romperían en runtime. Lo que hace es hacer segura la duplicación.
 - [x] T6 PR abierto; workflow verde sobre sí mismo (validate 4s, smoke 10s)
 - [x] T7 Subir actions a v5/v6 y desactivar la caché de uv (inservible aquí)
 - [x] T8 Branch protection: los dos checks pasan a **required**
+- [x] T9 Extraer `assert-install.sh` — una sola copia para los dos workflows
+- [x] T10 `upstream-compat.yml` — smoke semanal contra spec-kit `main`, advisory
 
 ## Done When
 
@@ -94,6 +108,8 @@ los comandos romperían en runtime. Lo que hace es hacer segura la duplicación.
 - [x] `git archive` sigue sin contener `.github/`
 - [x] La constitución ya no dice que no hay CI
 - [x] Los checks son **bloqueantes**, no solo informativos
+- [x] `upstream-compat` no se dispara en `pull_request` — verificado, no puede
+      bloquear a nadie
 
 ## Lo que encontró probar el propio test
 
@@ -123,3 +139,5 @@ que nadie confunda un build verde con una feature que funciona.
 - `strict: true` en la protección exige que la rama esté al día antes de mergear.
   Con un solo mantenedor es fricción menor; protege del caso "PR verde que rompe
   al mergear".
+- `upstream-compat` aún no ha corrido en su horario — se dispara el primer lunes
+  a las 06:00 UTC. Se puede forzar antes con `gh workflow run upstream-compat.yml`.
