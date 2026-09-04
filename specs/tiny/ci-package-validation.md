@@ -81,6 +81,15 @@ check que el bloqueante ya no hace — peor que no tenerlo. Aquí sí se extrae,
 porque son scripts de CI: la prohibición de §I aplica al paquete instalado, no a
 esto.
 
+**El runtime de una action no se elige desde el workflow.** Lo declara ella en su
+`action.yml` (`runs.using`), y `actions/setup-node` no lo cambia — eso prepara
+Node para *tu* código, no para el runtime de las actions de terceros. La primera
+versión de este CI fijó `setup-uv@v6`, que declara `node20`, y se documentó el
+warning resultante como "se irá cuando upstream publique un build node24". Era
+falso: `v7.0.0` se titula *"node24 and a lot of bugfixes"* y ya existía. El
+warning era nuestra versión vieja, cuatro majors atrás. Ahora `v10`; los cambios
+de v9/v10 solo tocan defaults de caché, irrelevantes con `enable-cache: false`.
+
 **Los `[P]` no aplican.** Los dos jobs de `validate.yml` son independientes y
 GitHub ya los corre en paralelo.
 
@@ -133,9 +142,6 @@ que nadie confunda un build verde con una feature que funciona.
 
 ## Pendiente
 
-- La anotación *"Node.js 20 is deprecated"* viene de `astral-sh/setup-uv`, que
-  aún declara `node20` en su propio `action.yml`. No se puede cambiar desde este
-  workflow. Es warning, no fallo; se va cuando upstream publique un build Node 24.
 - `strict: true` en la protección exige que la rama esté al día antes de mergear.
   Con un solo mantenedor es fricción menor; protege del caso "PR verde que rompe
   al mergear".
