@@ -1,0 +1,381 @@
+{
+  "workflow": "speckit",
+  "specName": "[FEATURE NAME]",
+  "branch": "005-context-budget-trust",
+  "currentStep": "implement",
+  "status": "implemented",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-09-04T18:40:51.897Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-09-04T18:50:24.357Z"
+    },
+    {
+      "step": "clarify",
+      "substep": null,
+      "kind": "start",
+      "by": "ai",
+      "at": "2026-09-04T19:03:07.702Z"
+    },
+    {
+      "step": "clarify",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:03:15.020Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "start",
+      "by": "ai",
+      "at": "2026-09-04T19:06:17.737Z"
+    },
+    {
+      "step": "plan",
+      "substep": "research",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:09:28Z"
+    },
+    {
+      "step": "plan",
+      "substep": "design",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:15:00Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:15:08.794Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "start",
+      "by": "ai",
+      "at": "2026-09-04T19:17:00.590Z"
+    },
+    {
+      "step": "tasks",
+      "substep": "generate",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:21:03Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:21:03.150Z"
+    },
+    {
+      "step": "analyze",
+      "substep": null,
+      "kind": "start",
+      "by": "ai",
+      "at": "2026-09-04T19:34:25Z"
+    },
+    {
+      "step": "analyze",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:34:25Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-09-04T19:35:21.372Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T001",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:35:48.751Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T002",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:36:23.234Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T003",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:37:19.213Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T004",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:37:19.424Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T005",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:37:40.362Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T006",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:38:13.292Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T007",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:38:20.805Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T008",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:39:02.056Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T009",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:39:11.438Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T010",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:39:11.660Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T011",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T19:39:36.253Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T012",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:49:54.934Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T013",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:50:42.015Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T014",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:51:09.860Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T015",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:51:51.815Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T016",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:52:17.414Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T017",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:52:42.867Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T018",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:53:02.312Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T019",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:53:49.662Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T020",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:54:37.945Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T021",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:55:11.709Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T022",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:55:11.888Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T023",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:55:12.085Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T024",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:55:44.984Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T025",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:55:45.210Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T026",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:56:28.723Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T027",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:56:39.111Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T028",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:57:49.337Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T029",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:58:34.223Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T030",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T20:58:55.340Z"
+    }
+  ],
+  "telemetryInstanceId": "976c74dd-647a-420e-aca4-93ab74d270bd",
+  "task_summaries": {
+    "T001": "Baseline validate-extension.sh run on the unmodified tree: 13/13 checks pass at version 1.4.0. Any later gate failure is attributable to this feature.",
+    "T002": "config-template.yml documents max_items/max_bytes at project level and a new Example 7 for per-source. States plainly that the per-source value is a sub-ceiling (lowers only) unlike max_cache_age which replaces, that absent means no limit with no default applied, and that the budget bounds the index only. schema_version stays 1.0; file still parses.",
+    "T003": "Added max_items and max_bytes rows to the Configuration Validation Rules table in all three copies (configure, sync, status) as one atomic change, plus a shared subsection explaining why a ceiling of 0 is rejected and why the leading-dash ban does not extend to these two fields.",
+    "T004": "Verified the three validation blocks remain byte-identical using the same awk range and shasum the CI gate uses: 1 unique hash across all three files. Constitution Quality Gate 11 satisfied.",
+    "T005": "sync step 1 now distinguishes project-wide from per-source validation failure: a per-source malformed ceiling skips only its source (FR-020), a project-wide one is reported and treated as unconfigured (FR-021) so one typo cannot empty the corpus. Recorded that failing open matches the existing over-age-cache reasoning.",
+    "T006": "Added Corpus Measurement to sync Algorithm Reference: wc -c via redirection, with du and stat explicitly forbidden and the GNU/BSD divergence for each spelled out, because either would break FR-007 determinism. Size measured over agent-read content, not the index.",
+    "T007": "Added Context Budget Allocation to sync Algorithm Reference: effective limit as the LOWER of the source's own ceiling and its share, four-step progressive fill run per dimension with ascending-label tiebreak, and an explicit callout that step 2 (releasing unused share) is what fills the ceiling - with the 102-vs-120 counterexample, since omitting it is the exact defect analysis A9 caught in the contract example.",
+    "T008": "Inserted step 7a 'Apply the context budget' between conflict detection and index writing. Selection is the longest ascending-path prefix fitting both effective limits, with the path-order-over-smallest-first rationale recorded. States it runs on the assembled corpus regardless of provenance (FR-011) and is skipped entirely when no budget is in effect (FR-004).",
+    "T009": "Added conflict reconciliation as step 7a.3: all versions of a conflicting path are withheld unless every version fits, freed capacity is explicitly NOT reallocated (reuse would make the result pass-count dependent and break FR-007b), the withdrawal is reported as one event, and a source emptied by a withdrawal is named like one that received no allocation.",
+    "T010": "Step 8 now writes only the selected subset with withholding fields omitted entirely when nothing was withheld (FR-016), and never names a withheld path (FR-014). Step 7a carries an explicit note that manifests are written before it and keep the complete item list - the separation that makes FR-012a, FR-017/FR-035 and FR-034 satisfiable together.",
+    "T011": "Added ten rows to the sync Error cases summary covering every new path: malformed ceilings per-source and project-wide, a ceiling of 0, an over-project per-source ceiling, an oversized single item, an item ceiling below the source count, an unfittable conflict pair, a non-binding budget, and the advisory warning. Exit code 0 in every row (FR-022).",
+    "T012": "configure gained step 4a: validates max_items/max_bytes before writing, and clamps a per-source ceiling that exceeds the project ceiling rather than skipping the source, with the message form and the reasoning (one safe reading, so refusing would destroy knowledge to punish a redundancy). The stored file keeps the user's number; the clamp applies at use.",
+    "T013": "README gained a Context budget section: both keys and scopes, the sub-ceiling-vs-override contrast against max_cache_age, the four-step selection rule stated so a user can reproduce it on paper (FR-007b) with the 120-item worked example and the 102-vs-120 flat-share counterexample, the reporting surfaces, the search guarantee, conflict atomicity, and the advisory threshold for unbudgeted projects.",
+    "T014": "sync step 9 gained the withholding report: per-source injected-of-total counts and sizes with the limit that produced them, plus individually named oversized items, conflict withdrawals as one event, and starved sources. Includes the explicit guard that a source empty for its own reasons must never be reported as budget-withheld - the defect analysis A9 found in the contract example.",
+    "T015": "Index format now carries withheld_items, withheld_bytes, limit_items, limit_bytes and a Partial header line, all omitted entirely when nothing was withheld so a non-binding budget is invisible (FR-016). Added the rule that no withheld path is ever named there (FR-014) and the note that two indexes are never byte-equal because of the timestamp and machine-local slugs.",
+    "T016": "Context Output block gains a fifth numbered line stating the corpus is PARTIAL, emitted only when something was withheld (FR-015), pointing the agent at search for the rest. Block otherwise literal and unchanged; rules stay 70 U+2550.",
+    "T017": "--verbose now lists withheld identities per source, derived as manifest items minus indexed items so no third record exists (FR-034). Recorded why the list is absent from the default output and, for a different reason, from the index. Added the no-bypass rule (FR-012) with a warning that Quality Gate 10 would not protect a manually invoked budget flag.",
+    "T018": "Added step 9a advisory warning for unbudgeted projects at 200 items / 2mb, one threshold per dimension since the two ceilings are independent. Names both the measured value and the threshold (FR-032a), alters nothing, exits 0, and records that the figures are calibration not contract.",
+    "T019": "search now builds its inventory from the per-source .manifest.json files instead of knowledge-index.md (FR-035), with the reasoning recorded: the index is bounded because an agent reads all of it, a search returns only matches, and binding search to the budgeted index would make a withheld item unfindable. Step 4 iterates that inventory and states the budget does not filter it. Missing-inventory messaging keeps its three-way distinction.",
+    "T020": "status gained a Budget column showing indexed-of-total per source and naming the limit applied (share, per-source, or none), plus a Context budget footer line so the numbers can be checked against config (FR-018). Column and footer are omitted entirely when no budget is configured, keeping the table identical to before.",
+    "T021": "README gained a Trust model section stating that merging a config change causes a fetch on every teammate's machine and every automated environment including via hooks the reviewer may never run (FR-025), enumerating all four exposures (FR-026) and what does NOT happen - content read as data, never executed, no build step or repo hook (FR-027).",
+    "T022": "Added the defense inventory table: all seven defenses verified present in the current sync command, each stated WITH what it does not cover (FR-028), since a defense listed without its limits reads as a guarantee the extension does not make.",
+    "T023": "Added reviewer guidance framing a knowledge-config.yml diff as security-relevant, with a five-item checklist covering url ownership, lookalike hosts, revision pinning, path_filter scope, and the consequence of merging (FR-029).",
+    "T024": "config-template.yml header now carries a SECURITY block pointing at the README Trust model (FR-030): states the file is committed and shared, that adding a url fetches on every teammate's machine including via hooks, and names the three undefended exposures. File still parses.",
+    "T025": "Audited the Trust model against the actual command files: all nine claimed defenses verified present (leading-dash rejection, -- separators, read-time validation, --no-checkout, blob filter, both timeouts, path_filter, optional hooks, sha256 integrity). Symlink following is described as currently open and not implemented yet rather than mitigated, satisfying FR-031.",
+    "T026": "Bumped extension.yml 1.4.0 to 1.5.0, README badge, and added the CHANGELOG [1.5.0] section as one change so the three gate-coupled artifacts stay consistent. CHANGELOG records the search change as a fix (it repairs a guarantee the budget would have broken) and carries a Security subsection naming symlink following as an open, unfixed exposure.",
+    "T027": "validate-extension.sh: 13/13 pass at 1.5.0. The two most at-risk gates both hold - Quality Gate 11 (three validation blocks byte-identical) and Gate 6 (README badge matches manifest).",
+    "T028": "Install smoke test into a clean consumer project: 6/6 assertions pass - no scaffolding warning, config scaffolded, all 5 commands registered, version reported as v1.5.0, 15 files installed, 4 hooks registered none carrying arguments.",
+    "T029": "Built the quickstart fixture for real and ran the documented algorithm against it. Corpus 362 items / 4.33mb exactly as the corrected quickstart claims (A3 fix confirmed empirically). huge.md is exactly 2.4 MiB and is excluded without consuming budget (FR-009). Allocation yields 60/56/4 = 120, matching the quickstart's hand-computed claim. Conflict path present in both sources and selected in both, so atomicity holds.",
+    "T030": "Verified the exit-0 invariant across all 30 rows of the sync error table: none returns non-zero, including the 9 rows this feature added (malformed ceilings per-source and project-wide, ceiling of 0, over-project per-source ceiling, oversized item, ceiling below source count, unfittable conflict pair, non-binding budget, advisory warning)."
+  },
+  "currentTask": "T030"
+}

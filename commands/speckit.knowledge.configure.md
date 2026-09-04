@@ -47,6 +47,21 @@ absent, null, and `[]` identically: the project has no configured sources.
 | `revision` | Optional. Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. |
 | `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/`**, **no `..`**, and **must not begin with `-`**. |
 | `enabled` | Optional, default `true`. Exactly `true` or `false` — `"yes"` and `1` are rejected. |
+| `max_items` (top level and per source) | Optional. Matches `^[0-9]+$` and is `>= 1`. |
+| `max_bytes` (top level and per source) | Optional. Matches `^[0-9]+(kb\|mb)$` — `512kb`, `2mb`. |
+
+### Why a budget ceiling of `0` is rejected
+
+`max_items: 0` and `max_bytes: 0kb` are refused by the rules above rather than
+honoured. A literal reading would withhold the entire corpus while reporting
+success — the silent-truncation failure this budget exists to prevent. Rejecting
+it routes the mistake through the loud paths instead: per source it skips only
+that source and names the field, and project-wide it is reported and treated as
+unconfigured.
+
+Neither `max_items` nor `max_bytes` is ever handed to `git`, so the leading-`-`
+ban below does not apply to them. Their anchored patterns reject an option-shaped
+value regardless.
 
 ### Why no value may begin with `-`
 
@@ -185,6 +200,35 @@ Prompt the developer to confirm or edit the displayed configuration before writi
 ### 4. Write configuration
 
 On confirmation, write the updated `knowledge-config.yml` back to disk, preserving `schema_version: "1.0"` at the top and all existing source entries.
+
+### 4a. Context budget ceilings
+
+`max_items` and `max_bytes` may appear at the top level and on any source. Validate
+both with § Configuration Validation Rules **before** writing, exactly as for every
+other field. A malformed per-source value skips only its own source; a malformed
+project-wide value is reported and treated as unconfigured.
+
+**A per-source ceiling larger than the project ceiling is clamped, not rejected.**
+Report the clamp and keep the source:
+
+```
+ℹ️  payments-v2: max_items 400 exceeds the project ceiling of 120; using 120.
+ℹ️  payments-v2: max_bytes 4mb exceeds the project ceiling of 1mb; using 1mb.
+```
+
+Clamping rather than skipping is deliberate. The value is well-formed and has
+exactly **one** safe reading — the project ceiling still binds — so refusing the
+source would destroy that source's knowledge to punish a redundancy. Only a value
+that cannot be interpreted at all costs a source its place.
+
+The file keeps the user's original number. The clamp applies when the budget is
+*used*, not when it is stored, so lowering the project ceiling later never
+silently rewrites a source's declared intent.
+
+> A per-source budget is a **sub-ceiling**: it can only lower what a source
+> contributes, never raise it. This is the opposite of `max_cache_age`, whose
+> per-source value *replaces* the project value despite sitting in the same
+> position in the file.
 
 ### 5. Update .gitignore
 

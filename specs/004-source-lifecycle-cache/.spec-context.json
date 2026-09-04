@@ -3,7 +3,7 @@
   "specName": "source lifecycle cache",
   "branch": "main",
   "currentStep": "implement",
-  "status": "implemented",
+  "status": "completed",
   "history": [
     {
       "step": "specify",
@@ -518,6 +518,13 @@
       "kind": "complete",
       "by": "extension",
       "at": "2026-09-04T17:21:27.957Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-09-04T19:29:05.282Z"
     }
   ],
   "telemetryInstanceId": "76267a62-db39-46d0-8930-e0cd2373399e",

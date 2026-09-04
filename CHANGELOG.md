@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-09-04
+
+A ceiling on how much the agent is told to read, and a written trust model for the
+committed configuration. Two views of one concern: what an uncontrolled corpus does
+to the agent, and what an uncontrolled configuration grants to whoever edits it.
+
+### Added
+
+- `feat(config): context budget` — optional `max_items` and `max_bytes`, project-wide and settable per source. When the corpus exceeds them the index carries only what fits. Until now every sync told the agent to read the index in full and open **every** file it referenced, with no upper bound; the corpus grows with the team and nothing pushed back.
+- `feat(sync): withholding report` — per-source injected-of-total counts and sizes with the limit that produced them, plus individually named oversized items, starved sources, and conflict withdrawals. A budget that trimmed the corpus without saying so would convert a visible context overflow into an invisible knowledge gap, so the reporting is not optional polish — it ships in the same release as the ceiling.
+- `feat(sync): partial-corpus marker` — the index header and the agent-facing context block both state when the corpus is partial, so the agent cannot present a trimmed corpus as everything the project knows.
+- `feat(sync): --verbose lists withheld identities` — derived as *manifest items − indexed items*, so no third record is maintained. Kept out of the default output because sync runs at four automatic points per feature cycle, and out of the index because that is the one document the agent reads in full.
+- `feat(sync): advisory threshold` — with **no** budget configured, a corpus past 200 items or 2 mb produces one informational line naming both the measured value and the threshold. Same standing as the existing "more than ten sources" warning: it alters nothing. Without it, an opt-in guard would never reach the projects that most need one.
+- `feat(status): budget column` — indexed-of-total per source, with the limit applied named. Mirrors the existing rule that a reported freshness state always states its threshold.
+- `docs(readme): trust model` — states that merging a config change causes a fetch on every teammate's machine and every automated environment, including via hooks the reviewer may never run. Names the defenses **with their limits**, names three exposures as undefended, and gives a reviewer checklist. No new mechanism: the exposures already existed and the defenses were already implemented; they were simply not written down anywhere a reviewer would look.
+
+### Fixed
+
+- `fix(search): read the manifests, not the index` — `search` iterated the items *in* `knowledge-index.md`. Once the index is bounded by a budget, a withheld item would have been absent from the only file search read — unfindable rather than merely un-injected, collapsing the distinction the whole feature rests on. Search now builds its inventory from the per-source `.manifest.json` files, which are written **before** the budget is applied and always hold the complete list. Found during planning research, not during implementation.
+
+### Security
+
+- **Symlink following is documented as an open exposure, not fixed.** Indexing enumerates `.md` files after checkout, and `git checkout` recreates symlinks faithfully — so a source containing `notes.md -> ~/.ssh/id_rsa` yields an index entry the agent is instructed to read into its context, and from there potentially into a committed spec. Nothing in the pipeline resolves or rejects it. Refusing to index links that escape the cache root is the intended fix and is **not** in this release; naming it is what the trust model requires, and omitting it because it is inconvenient would be the failure the trust model exists to prevent.
+
+### Changed
+
+- `extension.yml` `version` bumped from `1.4.0` to `1.5.0`. **Command count stays 5** and no hook changes, so Constitution Quality Gates §2, §5 and §10 are untouched.
+- `config-template.yml` documents both keys and carries a security block pointing at the trust model. **`schema_version` stays `"1.0"`**: both keys are optional and default to prior behaviour.
+- A per-source budget is a **sub-ceiling**, deliberately unlike `max_cache_age` — which occupies the same two positions in the file but whose per-source value *replaces* the project value. A per-source ceiling above the project ceiling is clamped and reported rather than skipping the source, since the value is well-formed and has exactly one safe reading.
+- The Configuration Validation Rules block gained two rows in all three copies at once, as Quality Gate §11 requires.
+
+### Compatibility
+
+A project that upgrades and configures no budget observes identical behaviour: same
+indexed item set, same output, same index — apart from the generation timestamp
+every sync has always written. No default budget is applied, because a default
+would have been the first break in the "upgrade and change nothing, observe nothing
+different" guarantee the last two releases made explicitly.
+
 ## [1.4.0] - 2026-09-04
 
 Source lifecycle, per-source revision pinning, and a cache freshness policy. The
