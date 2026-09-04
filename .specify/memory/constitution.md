@@ -63,7 +63,7 @@ Types: feat | fix | refactor | docs | chore | test | style
 | `config-template.yml` | User-facing config schema (no-clobber install) | Extension authors; bump `schema_version` on breaking changes |
 | `README.md` | User documentation | Extension authors; must mirror `extension.yml` commands list |
 | `CHANGELOG.md` | Release history (Keep a Changelog format) | Extension authors; update before every version tag |
-| `.specify/` | Spec-kit workspace for THIS project's own features | SDD tooling; do not hand-edit |
+| `.specify/` | Spec-kit workspace for THIS project's own features | SDD tooling; do not hand-edit — **except `.specify/memory/`**, which § Governance requires amending by hand |
 | `specs/` | Feature specs for THIS project | Extension authors via `/speckit-specify` |
 
 **Never** commit `node_modules/`, `__pycache__/`, `.venv/`, or consumer `.specify/` directories.
@@ -79,7 +79,7 @@ Types: feat | fix | refactor | docs | chore | test | style
 Before tagging a release:
 
 1. `specify extension add <path> --dev` runs to completion without errors in a clean consumer project, with no "Config templates not scaffolded" warning.
-2. All four commands are registered and visible via `specify extension list`.
+2. All five commands are registered and visible via `specify extension list`.
 3. `extension.yml` `version` matches the intended git tag.
 4. `CHANGELOG.md` has an entry for the new version.
 5. `README.md` command table matches `extension.yml` `provides.commands`.

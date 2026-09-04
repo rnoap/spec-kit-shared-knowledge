@@ -6,8 +6,10 @@
 # The cache/ directory and knowledge-index.md are local only — add them to .gitignore.
 #
 # Usage:
-#   /speckit-knowledge-configure <url-or-local-path> [path_filter1] [path_filter2] ...
-#   /speckit-knowledge-sync
+#   /speckit.knowledge.configure <url-or-local-path> [--revision <rev>] [path_filter ...]
+#   /speckit.knowledge.sync [--force]
+#   /speckit.knowledge.remove <label> [--disable | --enable]
+#   /speckit.knowledge.status
 #
 # A "knowledge source" can be either:
 #   1. A remote Git URL (HTTPS or SSH)
@@ -21,6 +23,23 @@
 # See: README.md in the spec-kit-shared-knowledge repository for full documentation.
 
 schema_version: "1.0"   # required; must be exactly "1.0"
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Optional — project-wide cache freshness policy
+# ──────────────────────────────────────────────────────────────────────────────
+# When set, a source whose cache is younger than this age is served from disk and
+# no network access happens at all. Overridable per source (see Example 6).
+#
+# Format: <N><unit> where unit is m (minutes), h (hours) or d (days).
+#   30m   4h   7d
+#
+# Omitted (the default) means NO policy: every sync fetches, exactly as in 1.3.0.
+#
+# This is a hint, not an expiry. It governs only whether a refresh is ATTEMPTED.
+# A cache older than its age is still served when the source cannot be reached —
+# configuring a policy never leaves you with less knowledge than you had before.
+#
+# max_cache_age: 4h
 
 sources:                 # required; may be empty list []
 
@@ -61,3 +80,25 @@ sources:                 # required; may be empty list []
   #   path_filter:                                          # list form indexes BOTH trees, nothing else
   #     - specs/
   #     - docs/decisions/
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 6 — PINNED REVISION and a per-source freshness override
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: https://github.com/your-org/payments
+  #   label: payments-v2
+  #   revision: v2.4.1                                      # branch, tag, or FULL commit SHA
+  #   max_cache_age: 7d                                     # overrides the project-wide value
+  #   path_filter: specs/
+  #
+  # `revision` omitted → the remote's default revision, exactly as before.
+  #
+  # A pinned source gets its own cache, so the SAME repository may be added twice
+  # at two revisions without the two contaminating each other. Because a URL then
+  # no longer identifies one source, every source carries a UNIQUE label — that
+  # label is what /speckit.knowledge.remove takes.
+  #
+  # Abbreviated SHAs (a1b2c3d) are NOT supported: they are not fetchable and a
+  # prefix that is unique today can become ambiguous as the repository grows.
+  #
+  # SSH URLs already contain "@", so pass the revision with the --revision flag
+  # rather than the <url>@<rev> shorthand.
