@@ -48,6 +48,21 @@ absent, null, and `[]` identically: the project has no configured sources.
 | `revision` | Optional. Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. |
 | `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/`**, **no `..`**, and **must not begin with `-`**. |
 | `enabled` | Optional, default `true`. Exactly `true` or `false` — `"yes"` and `1` are rejected. |
+| `max_items` (top level and per source) | Optional. Matches `^[0-9]+$` and is `>= 1`. |
+| `max_bytes` (top level and per source) | Optional. Matches `^[0-9]+(kb\|mb)$` — `512kb`, `2mb`. |
+
+### Why a budget ceiling of `0` is rejected
+
+`max_items: 0` and `max_bytes: 0kb` are refused by the rules above rather than
+honoured. A literal reading would withhold the entire corpus while reporting
+success — the silent-truncation failure this budget exists to prevent. Rejecting
+it routes the mistake through the loud paths instead: per source it skips only
+that source and names the field, and project-wide it is reported and treated as
+unconfigured.
+
+Neither `max_items` nor `max_bytes` is ever handed to `git`, so the leading-`-`
+ban below does not apply to them. Their anchored patterns reject an option-shaped
+value regardless.
 
 ### Why no value may begin with `-`
 
@@ -131,18 +146,19 @@ Disabled sources: show `— disabled` without a reachability check.
    Config: .specify/extensions/knowledge/knowledge-config.yml
    Index:  .specify/extensions/knowledge/knowledge-index.md
 
-┌──────────────────────┬──────────────┬──────────────┬──────────┬───────┬────────────┐
-│ Source               │ Reachability │ Revision     │ Status   │ Items │ Cache Age  │
-├──────────────────────┼──────────────┼──────────────┼──────────┼───────┼────────────┤
-│ payment-service      │ ✅ reachable │ default      │ fresh    │ 12    │ 14 min     │
-│ payments-v2          │ ✅ reachable │ v2.4.1       │ fresh    │ 12    │ 3d         │
-│ identity-service     │ ✅ reachable │ main         │ fresh    │ 8     │ 14 min     │
-│ shared-contracts     │ ❌ timeout   │ default      │ cached   │ 5     │ 29h        │
-│ legacy-service       │ — disabled  │ default      │ —        │ —     │ —          │
-└──────────────────────┴──────────────┴──────────────┴──────────┴───────┴────────────┘
+┌──────────────────────┬──────────────┬──────────────┬──────────┬────────────┬───────────────────┬────────────┐
+│ Source               │ Reachability │ Revision     │ Status   │ Items      │ Budget            │ Cache Age  │
+├──────────────────────┼──────────────┼──────────────┼──────────┼────────────┼───────────────────┼────────────┤
+│ payment-service      │ ✅ reachable │ default      │ fresh    │ 36 of 312  │ 36 items (share)  │ 14 min     │
+│ payments-v2          │ ✅ reachable │ v2.4.1       │ fresh    │ 36 of 55   │ 36 items (share)  │ 3d         │
+│ identity-service     │ ✅ reachable │ main         │ fresh    │ 8 of 8     │ 30 items (share)  │ 14 min     │
+│ shared-contracts     │ ❌ timeout   │ default      │ cached   │ 5 of 5     │ 40kb (per-source) │ 29h        │
+│ legacy-service       │ — disabled  │ default      │ —        │ —          │ —                 │ —          │
+└──────────────────────┴──────────────┴──────────────┴──────────┴────────────┴───────────────────┴────────────┘
 
 Freshness policy: payments-v2 7d (per-source) · others 4h (project) · legacy-service none (24h default)
-Total: 37 items from 4 sources (3 reachable, 1 cached, 1 disabled)
+Context budget: 120 items / 1mb (project) · shared-contracts 40kb (per-source)
+Total: 85 of 380 items from 4 sources (3 reachable, 1 cached, 1 disabled)
 ```
 
 The **Revision** column shows each source's effective revision, or `default` when
@@ -165,6 +181,28 @@ Without this rule a source with `max_cache_age: 7d` synced three days ago would 
 *fresh by policy* and *cached by heuristic* — two contradictory labels for one
 state. Always print the **Freshness policy** line so the threshold behind each
 label is visible, and no label is ever unexplained.
+
+### 4a. Budget column
+
+`Items` shows **indexed of total** — how many of the source's cached items the
+index actually references. `Budget` names the limit that produced that number
+(FR-018), by the same principle: a reported contribution must never be
+unexplained.
+
+| Value shown | Meaning |
+|-------------|---------|
+| `36 items (share)` | Bounded by its share of the project ceiling |
+| `40kb (per-source)` | Bounded by its own declared ceiling |
+| `— (no limit)` | No budget in effect for this source |
+| `0 items (share)` | Contributed nothing — see the sync output for why |
+
+Always print the **Context budget** line beneath the table naming the project
+ceilings and any per-source ceilings, so the numbers in the column can be checked
+against the configuration.
+
+When no budget is configured anywhere, omit the `Budget` column and the
+`Context budget` line entirely, and show `Items` as a plain count — the table is
+then exactly what it was before this feature existed.
 
 Indicate if `knowledge-index.md` is absent:
 ```
