@@ -1,0 +1,17 @@
+{
+  "workflow": "speckit",
+  "specName": "Knowledge Command Suite",
+  "branch": "",
+  "currentStep": "specify",
+  "status": "completed",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-09-04T15:41:16.285Z"
+    }
+  ],
+  "telemetryInstanceId": "9a8b4a90-71ed-447f-b42a-056fdf053e7d"
+}

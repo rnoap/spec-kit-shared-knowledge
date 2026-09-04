@@ -18,6 +18,20 @@
       "kind": "complete",
       "by": "extension",
       "at": "2026-09-04T15:33:31.239Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-09-04T15:41:18.182Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-09-04T15:42:06.832Z"
     }
   ],
   "telemetryInstanceId": "76267a62-db39-46d0-8930-e0cd2373399e"

@@ -1,0 +1,17 @@
+{
+  "workflow": "speckit",
+  "specName": "Extension Core",
+  "branch": "",
+  "currentStep": "specify",
+  "status": "completed",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-09-04T15:41:14.593Z"
+    }
+  ],
+  "telemetryInstanceId": "2b584107-d4e5-4636-9593-5e3c501fe559"
+}

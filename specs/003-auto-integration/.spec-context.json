@@ -4,7 +4,7 @@
   "branch": "003-auto-integration",
   "selectedAt": "2026-06-17T18:07:04.168Z",
   "currentStep": "tasks",
-  "status": "ready-to-implement",
+  "status": "completed",
   "history": [
     {
       "step": "tasks",
@@ -12,6 +12,14 @@
       "kind": "start",
       "by": "extension",
       "at": "2026-06-17T18:10:38.786Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-09-04T15:41:40.663Z"
     }
-  ]
+  ],
+  "telemetryInstanceId": "0da3d938-5fd9-4ff6-a4a2-d1ad96b42f63"
 }
