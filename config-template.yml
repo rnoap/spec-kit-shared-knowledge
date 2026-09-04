@@ -20,6 +20,26 @@
 # Path filters are optional. With zero filters, every .md file in the repository
 # is indexed. With one or more filters, indexing is scoped to ONLY those folders.
 #
+# ─────────────────────────────────────────────────────────────────────────────
+# SECURITY — READ BEFORE ADDING A SOURCE
+# ─────────────────────────────────────────────────────────────────────────────
+# THIS FILE IS COMMITTED AND SHARED. Adding a `url` here causes that location to
+# be fetched on every teammate's machine and every automated environment that
+# later runs a sync — including via the automatic hooks, which the person who
+# approves your change may never run themselves.
+#
+# Fetched content is read as DATA and is never executed. But the extension does
+# NOT protect you from:
+#   1. prompt injection — fetched markdown enters the agent's context unchecked
+#   2. credential exposure — your git credential helper decides what to send to
+#      whatever host is configured here
+#   3. symlink following — a fetched .md may link to a file outside the repo,
+#      which the agent is then told to read
+#
+# Read the "Trust model" section of the README before adding a source you do not
+# control, and treat a change to this file as a security review, not a config
+# tweak.
+#
 # See: README.md in the spec-kit-shared-knowledge repository for full documentation.
 
 schema_version: "1.0"   # required; must be exactly "1.0"
@@ -40,6 +60,29 @@ schema_version: "1.0"   # required; must be exactly "1.0"
 # configuring a policy never leaves you with less knowledge than you had before.
 #
 # max_cache_age: 4h
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Optional — project-wide context budget
+# ──────────────────────────────────────────────────────────────────────────────
+# A ceiling on the knowledge corpus the INDEX exposes — that is, on how much the
+# agent is instructed to read. Two independent limits; set either, both, or none.
+#
+#   max_items: <N>              a whole number, 1 or greater
+#   max_bytes: <N>kb | <N>mb    binary units — 512kb, 2mb
+#
+# Omitted (the default) means NO limit, and the index is exactly what it would
+# have been before this feature existed. No default value is applied: a project
+# that upgrades and changes nothing observes nothing new.
+#
+# The budget bounds the INDEX ONLY. Nothing is removed from the cache and nothing
+# stops being searchable — a withheld item is un-injected, not unavailable.
+#
+# When the budget binds, sync states exactly what it withheld: counts and sizes
+# per source, plus any item too large to fit on its own. `--verbose` lists every
+# withheld path. Nothing is ever dropped silently.
+#
+# max_items: 120
+# max_bytes: 1mb
 
 sources:                 # required; may be empty list []
 
@@ -102,3 +145,28 @@ sources:                 # required; may be empty list []
   #
   # SSH URLs already contain "@", so pass the revision with the --revision flag
   # rather than the <url>@<rev> shorthand.
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 7 — PER-SOURCE CONTEXT BUDGET
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: https://github.com/your-org/big-docs
+  #   label: big-docs
+  #   max_items: 40                                         # sub-ceiling for THIS source
+  #   max_bytes: 400kb                                      # sub-ceiling for THIS source
+  #
+  # NOTE THE DIFFERENCE FROM max_cache_age, which shares the same two positions
+  # in this file but NOT the same meaning:
+  #
+  #   max_cache_age   per-source value REPLACES the project value.
+  #   max_items       per-source value is a SUB-CEILING. It can only LOWER what
+  #   max_bytes       this source contributes — never raise it above the project
+  #                   value, and never above its fair share of that value.
+  #
+  # A per-source ceiling larger than the project ceiling is clamped down to the
+  # project ceiling and the clamp is reported. It does NOT invalidate the source.
+  #
+  # When a project-wide ceiling is set, it is divided into equal shares across the
+  # sources that have items; a source needing less than its share releases the
+  # remainder to the others. Within a source, items are taken in ascending path
+  # order — so you can work out your own index on paper.
+
