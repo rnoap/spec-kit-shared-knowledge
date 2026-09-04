@@ -141,6 +141,84 @@ instant `synced_at` records, without the parsing problem. If the two ever disagr
 — a file copied without preserving timestamps, say — the gate wins and the
 displayed timestamp is advisory.
 
+### Corpus Measurement
+
+Every indexed `.md` file carries a byte size, summed per source and project-wide.
+Both numbers are needed even when no budget is configured, because the advisory
+warning in step 9a reports them.
+
+```bash
+size=$(wc -c < "$file")
+```
+
+**Use `wc -c`, and read via redirection.** `wc -c < file` emits the count alone;
+`wc -c file` appends the filename and pads differently on GNU than on BSD.
+
+**`du` and `stat` are forbidden here**, for the same reason `date` was rejected in
+favour of `find -mmin` for the freshness gate:
+
+- `du` reports **disk blocks**, not bytes, and its default unit is 1 KiB on GNU
+  versus 512 B on BSD. The same corpus would measure differently on two machines.
+- `stat` needs `-c%s` on GNU and `-f%z` on BSD — mutually exclusive spellings.
+
+Either one would break FR-007: two developers with identical configuration would
+select different subsets, and the index would stop being explainable by the
+configuration alone.
+
+Size is measured over **the file content the agent is instructed to read**, never
+over `knowledge-index.md` itself (FR-010). The index is a small fraction of what
+its own instruction pulls in.
+
+### Context Budget Allocation
+
+Applies when `max_items` or `max_bytes` is in effect. Runs entirely on already
+cached content — it never influences what is fetched (FR-012a).
+
+**Effective limit** for one source, per dimension, is the **lower** of:
+
+1. its own declared ceiling, where set, and
+2. its share of the project-wide ceiling.
+
+Taking the source's own value in preference to its share would let the total
+exceed the project ceiling — with 120 items across three sources, a source
+declaring 60 against a 40 share would push the total to 140. A per-source ceiling
+above the project ceiling is clamped down to it and the clamp reported (FR-003a);
+it never costs the source its place.
+
+> This is a **sub-ceiling**, not an override. `max_cache_age` occupies the same
+> two positions in the configuration file and behaves the opposite way — its
+> per-source value *replaces* the project value. Do not carry that reading over.
+
+**Share** is computed by progressive fill, run **independently on each
+dimension**. `B` = the project ceiling for that dimension, `S` = the enabled
+sources holding at least one item:
+
+```text
+1. share = floor(B / |S|)
+2. EVERY source whose total need <= share is satisfied in full:
+   subtract each one's need from B, drop them from S, restart at 1.
+3. When a pass satisfies nobody, every source left in S receives `share`.
+4. Distribute the remainder (B - share * |S|) one unit each,
+   in ascending LABEL order.
+```
+
+**Step 2 is what makes this a fair share rather than a flat division.** Releasing
+capacity a small source cannot use back to the others is what fills the ceiling.
+With 120 items across four sources needing 312 / 55 / 88 / 12, a flat
+`floor(120/4)` injects only 30 + 30 + 30 + 12 = 102 and strands 18. Progressive
+fill gives 36 + 36 + 36 + 12 = 120. **An implementation that stops after one pass
+satisfies neither FR-006 nor FR-007a, and the shortfall is invisible unless the
+injected total is compared against the ceiling.**
+
+Terminates in at most `|S|` passes — each pass either removes a source or exits.
+Labels are unique by construction (FR-028), so step 4's tiebreak is never
+ambiguous. With no project ceiling on a dimension, every share on that dimension
+is unbounded and only the source's own value binds.
+
+No configuration value influences **which** items are chosen (FR-007a) — only how
+many. The rule is fixed and owned by this extension so that a user can reproduce
+their own index on paper (FR-007b).
+
 ### Cache Integrity Check (`.manifest.json`)
 
 Run this check before using an existing cache as fallback:
@@ -156,11 +234,14 @@ Run this check before using an existing cache as fallback:
 Written to `.specify/extensions/knowledge/knowledge-index.md`. This is the **only file** that `speckit-specify` and `speckit-plan` read directly.
 
 ```markdown
-<!-- knowledge-index-meta: schema_version=1.0 generated_at=<ISO8601> sources=<N> items=<N> -->
+<!-- knowledge-index-meta: schema_version=1.0 generated_at=<ISO8601> sources=<N> items=<N>
+     withheld_items=<N> withheld_bytes=<N> limit_items=<N> limit_bytes=<N> -->
 
 ## Shared Knowledge Index
 
 > Generated: <ISO8601> | Sources: <N> | Items: <N>
+> ⚠️ Partial: <N> items (<size>) withheld by the configured context budget
+> (<limit_items> items / <limit_bytes>). Search the corpus to reach them.
 
 ### Source: <label> (<url>)
 **Status**: <fresh|cached|unreachable> | **Synced**: <ISO8601> | **Items**: <N> | **Path filter**: <path_filter or "all .md files">
@@ -174,6 +255,20 @@ Written to `.specify/extensions/knowledge/knowledge-index.md`. This is the **onl
 ```
 
 The machine-readable HTML comment on line 1 allows scripts to detect the index without reading the full file.
+
+The four `withheld_*` / `limit_*` fields and the `⚠️ Partial` line are **omitted
+entirely** when the budget withheld nothing — including when no budget is
+configured. A non-binding budget therefore leaves the index indistinguishable from
+an unbudgeted one, apart from the generation timestamp (FR-016).
+
+**No withheld path is ever named here** (FR-014). This is the one document the
+agent is instructed to read in full; naming the excluded files would invite it to
+open exactly what the budget removed.
+
+`generated_at` and the `Generated:` line change on every run, and the `cache/<slug>/`
+link targets are derived from each machine's own source locations. **Two indexes are
+therefore never byte-equal even when they select identical items** — any check for
+sameness must compare the item list, not the file.
 
 ---
 
@@ -202,6 +297,21 @@ absent, null, and `[]` identically: the project has no configured sources.
 | `revision` | Optional. Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. |
 | `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/`**, **no `..`**, and **must not begin with `-`**. |
 | `enabled` | Optional, default `true`. Exactly `true` or `false` — `"yes"` and `1` are rejected. |
+| `max_items` (top level and per source) | Optional. Matches `^[0-9]+$` and is `>= 1`. |
+| `max_bytes` (top level and per source) | Optional. Matches `^[0-9]+(kb\|mb)$` — `512kb`, `2mb`. |
+
+### Why a budget ceiling of `0` is rejected
+
+`max_items: 0` and `max_bytes: 0kb` are refused by the rules above rather than
+honoured. A literal reading would withhold the entire corpus while reporting
+success — the silent-truncation failure this budget exists to prevent. Rejecting
+it routes the mistake through the loud paths instead: per source it skips only
+that source and names the field, and project-wide it is reported and treated as
+unconfigured.
+
+Neither `max_items` nor `max_bytes` is ever handed to `git`, so the leading-`-`
+ban below does not apply to them. Their anchored patterns reject an option-shaped
+value regardless.
 
 ### Why no value may begin with `-`
 
@@ -265,6 +375,27 @@ each entry **before using any of its values** (FR-029). Then:
 ⚠️  payments-v2: skipped — invalid `revision` value "-u" (must not begin with "-")
 ⚠️  adr-repo, adr-repo: skipped — duplicate label "adr-repo" (labels must be unique)
 ```
+
+**Project-wide validation** — the top-level `max_cache_age`, `max_items`, and
+`max_bytes` are validated by the same rules, but a failure is handled
+**differently on purpose**:
+
+- A malformed **per-source** value skips only its own source (above). Its blast
+  radius is naturally bounded.
+- A malformed **project-wide** value has no such boundary. Treating it as a
+  binding ceiling would strip every source's knowledge on the strength of one
+  typo, so it is **reported and treated as though it were not configured**
+  (FR-021). Per-source ceilings still apply.
+
+```
+⚠️  Ignoring project-wide `max_items` value "banana" (must be a whole number ≥ 1).
+    Proceeding with no project-wide item ceiling; per-source ceilings still apply.
+```
+
+Failing **open** here is the same reasoning that keeps an over-age cache readable
+when its source is unreachable: a configuration mistake must never leave the
+project with less knowledge than it had before the setting existed. Exit code
+stays 0 (FR-022).
 
 Validation runs here, on the read path, rather than only inside `configure`.
 A value that arrived by hand-edit, by pull request, or from an older version of
@@ -565,6 +696,64 @@ differ** (FR-026). Derive each identity with the Repository Identity algorithm i
 Identity ignores the access protocol, so a team where one developer configures
 HTTPS and another SSH does not see every shared file reported as conflicting.
 
+### 7a. Apply the context budget
+
+Runs **after** conflict detection, because a conflict pair must be known before
+any of its members can be selected, and **before** the index is written, because
+the index is what the budget bounds.
+
+It runs **after step 6 by requirement**: `.manifest.json` is already on disk
+holding the **complete** item list for its source. Nothing here removes a cached
+file or shortens a manifest (FR-012a). That separation is what makes three
+requirements satisfiable at once — the cache stays whole, `search` still reaches
+every item (FR-017, FR-035), and the verbose withheld list is simply
+*manifest items − indexed items* (FR-034) with no third record to maintain.
+
+Skip this step entirely when neither `max_items` nor `max_bytes` is in effect.
+With no budget the index is exactly what it was before this feature existed
+(FR-004), and nothing below runs.
+
+The budget applies to the assembled corpus **regardless of how each source's
+content was obtained** — freshly fetched, served from a policy-fresh cache
+(`current`), or served from a stale cache after an unreachable source (FR-011).
+The agent reads one index in all three cases.
+
+**1 — Resolve effective limits.** Per source, per dimension, using § Context
+Budget Allocation. Report any per-source ceiling clamped down to the project
+ceiling (FR-003a).
+
+**2 — Select per source.** Take the longest **ascending relative-path** prefix of
+the source's items that fits within **both** effective limits (FR-006).
+
+> Path order, not smallest-first. Smallest-first packs more items into the same
+> byte ceiling, but adding one large file would silently change which unrelated
+> small files survive — no user could predict their own corpus, defeating
+> FR-007b. Path order confines the effect of any change to files after it.
+
+**3 — Reconcile conflicts (FR-033).** For each path reported as a conflict in
+step 7:
+
+- If **every** version was selected, keep them all.
+- If **any** version was not selected, **withdraw all of them**. A budget that
+  keeps one team's version of a contested contract and hides the other
+  manufactures precisely the silent winner conflict reporting exists to prevent.
+- **Do not reallocate the freed capacity.** Reuse would make the result depend on
+  how many passes the selection makes, breaking the on-paper predictability
+  FR-007b requires. The slack is wasted deliberately.
+- Report the withdrawal as **one** conflict event, not as unrelated per-source
+  exclusions. A source left holding nothing by a withdrawal is named the same way
+  a source that received no allocation is named — the user cannot infer the
+  mechanism that emptied it.
+
+**4 — Assemble the withholding report** for step 9: per-source injected-vs-total
+counts and sizes with the limit applied, oversized items named individually,
+starved sources named, conflict withdrawals named.
+
+**Oversized items are removed before allocation** (FR-009). An item larger than
+the effective size ceiling on its own can never be included; it is excluded, named
+with its size, and **neither consumes nor blocks** the budget available to
+everything else.
+
 ### 8. Write knowledge-index.md
 
 Assemble `knowledge-index.md` using the format defined in the Algorithm Reference above.
@@ -572,6 +761,18 @@ Assemble `knowledge-index.md` using the format defined in the Algorithm Referenc
 Write to `.specify/extensions/knowledge/knowledge-index.md`.
 
 Include a conflict section footer if any conflicts were detected.
+
+When step 7a withheld anything, the index references **only the selected subset**
+and carries the withholding fields and the `⚠️ Partial` line from the format above.
+When nothing was withheld — including when no budget is configured — those fields
+and that line are **omitted entirely**, leaving the index indistinguishable from
+the one produced before this feature existed, apart from the generation timestamp
+every sync writes (FR-016).
+
+**No withheld path is ever named in the index** (FR-014). This is the one document
+the agent is instructed to read in full; listing the excluded files here would
+invite it to open exactly what the budget removed. The verbose output carries the
+identities instead.
 
 ### 8a. Prune orphaned caches
 
@@ -633,6 +834,80 @@ Final summary line:
    → .specify/extensions/knowledge/knowledge-index.md
 ```
 
+#### Withholding report (only when the budget withheld something)
+
+Print a second line under each affected source giving injected-of-total counts and
+sizes and **the limit that produced them** (FR-013, FR-018). A reported reduction
+must never be unexplained.
+
+```
+  payment-service    ✅ fresh    35 items  (synced 2026-09-04T14:00:00Z)
+                     ✂️  budget: 35 of 312 items (115kb of 3.4mb) — limit 36 items (equal share of 120)
+  shared-contracts   ⏭️  current  12 items  (cached 12m ago; policy 4h — no network)
+                     ✓  budget: 12 of 12 items (40kb) — within its 30-item share; 18 released
+```
+
+Then the individually named exceptions:
+
+```
+⚠️  Withheld: payment-service › specs/architecture/full-topology.md (2.4mb) exceeds the
+    1mb size ceiling on its own; excluded without consuming the budget.
+⚠️  Conflict withdrawn: specs/events/payment-completed.md — present in payment-service and
+    adr-repo, whose repository identities differ; not every version fits, so none was
+    included. The freed capacity is not reallocated.
+⚠️  design-notes contributed nothing — the item ceiling (2) is below the number of
+    sources with items (3), so some source must receive nothing. Chosen by the same
+    rule: the remainder went to the lowest labels in order.
+```
+
+The summary line then carries the totals:
+
+```
+✅ Knowledge index updated: 119 items from 4 sources (348 withheld, 3.5mb).
+```
+
+**A source that indexes nothing for its own reasons — empty, or a path filter
+matching nothing — MUST NOT be reported as withheld by the budget at all.** The
+starvation line above is authorised only when the item ceiling is genuinely below
+the number of sources holding items (FR-008a).
+
+When the budget withheld nothing, none of these lines appear and the summary keeps
+its original form (FR-016).
+
+#### 9a. Advisory threshold (only when NO budget is configured)
+
+When neither `max_items` nor `max_bytes` is in effect and the corpus exceeds either
+built-in threshold, emit one informational line (FR-032):
+
+| Dimension | Threshold |
+|-----------|-----------|
+| Items | **200** |
+| Total size | **2 mb** |
+
+```
+⚠️  This project's knowledge corpus is 340 items / 2.7mb, past the advisory
+    threshold of 200 items / 2mb. An agent instructed to read all of it may
+    exhaust its context. Consider setting `max_items` or `max_bytes` in
+    knowledge-config.yml.
+```
+
+Name **both** the measured value and the threshold, for whichever dimension
+triggered it, so the user can judge the recommendation against their own corpus
+rather than taking it on trust (FR-032a).
+
+There is one threshold per dimension because the two ceilings are independent — a
+corpus can hit either wall alone, and a single-dimension warning would stay silent
+for the other.
+
+**It alters nothing.** No item is withheld, the index is byte-for-byte what it
+would have been without the warning, and the command still exits 0. This has the
+same standing as the existing "more than ten sources" warning in step 2.
+
+The two figures are a **calibration, not a contract**: markdown of the kind this
+extension indexes runs roughly 4–8 kb per file, so 200 items ≈ 1.2 mb and the two
+thresholds describe about the same wall from two directions. They may be re-tuned
+in a later release without a schema change.
+
 ### 10. Emit Context Output for AI Agents block (conditional)
 
 This is the LAST thing printed on stdout. Nothing follows it.
@@ -685,6 +960,21 @@ You are about to draft a spec or plan in this project. Before you do:
 
 The top and bottom rules are exactly 70 × U+2550 (`═`), on their own lines with no trailing whitespace. Exit code remains 0 on all emission paths.
 
+**When the context budget withheld anything**, insert one additional numbered line
+immediately after line 4, before the closing rule (FR-015):
+
+```
+5. This corpus is PARTIAL — a context budget withheld some items. Do not
+   present it as the project's complete knowledge. Say so if asked, and
+   note that the full corpus is reachable with
+   __SPECKIT_COMMAND_KNOWLEDGE_SEARCH__.
+```
+
+The line is **absent** when nothing was withheld, so an unbudgeted or non-binding
+project sees the block exactly as before. Without it the agent would read a
+deliberately trimmed corpus and present it as everything the project knows — the
+silent failure this feature exists to prevent.
+
 ---
 
 ## --verbose flag
@@ -699,6 +989,35 @@ decisions/retry-policy.md
 [... 9 more]
 --- END VERBOSE ---
 ```
+
+When the context budget withheld anything from that source, follow it with the
+**withheld identities** (FR-034). Derive them as *manifest items − indexed items* —
+both already on disk, so no third record is maintained:
+
+```
+--- VERBOSE: items withheld from payment-service ---
+specs/architecture/full-topology.md
+specs/events/refund-issued.md
+[... 275 more]
+--- END VERBOSE ---
+```
+
+This list is deliberately **absent from the default output**: sync runs at up to
+four automatic points per feature cycle, and a list of that size would bury the
+summary it exists to support. It is **also absent from the index**, for a different
+reason — the index is the one document the agent reads in full, and naming the
+excluded files there would invite it to open them.
+
+### No flag raises or bypasses the budget
+
+`--force` overrides the **cache freshness policy** only. There is deliberately no
+flag that raises, relaxes, or disables a context ceiling (FR-012): the automatic
+sync points are exactly where a context overflow does the most damage, so an escape
+hatch reachable from them would defeat the guarantee.
+
+> Note for future changes: Constitution Quality Gate §10 keeps `--force`
+> hook-unreachable by asserting that no hook declares arguments. That gate would
+> **not** protect a budget-bypass flag invoked manually. Do not add one.
 
 ## --force flag
 
@@ -750,6 +1069,15 @@ This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose
 | All sources unreachable, no prior index | Soft warning, no context block | 0 |
 | `--force` flag present | Freshness gate bypassed | 0 |
 | `--no-context-output` flag present | Context block suppressed | 0 |
+| `max_items` / `max_bytes` malformed, per source | That source skipped, field and value named | 0 |
+| `max_items` / `max_bytes` malformed, project-wide | Reported and ignored; per-source ceilings still apply | 0 |
+| A budget ceiling of `0` | Treated as malformed, as above | 0 |
+| Per-source ceiling exceeds the project ceiling | Clamped to the project ceiling, clamp reported; source still contributes | 0 |
+| Single item exceeds the size ceiling alone | Excluded and named with its size; consumes no budget | 0 |
+| Item ceiling below the number of sources with items | Some sources get nothing; each one named | 0 |
+| Conflict pair cannot fit in full | All versions withdrawn, reported once; capacity not reused | 0 |
+| Budget configured, corpus fits inside it | Nothing withheld, nothing reported | 0 |
+| No budget configured, corpus past the advisory threshold | Warning only; index unaffected | 0 |
 
 ---
 
