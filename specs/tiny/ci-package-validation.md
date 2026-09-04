@@ -87,8 +87,20 @@ Node para *tu* código, no para el runtime de las actions de terceros. La primer
 versión de este CI fijó `setup-uv@v6`, que declara `node20`, y se documentó el
 warning resultante como "se irá cuando upstream publique un build node24". Era
 falso: `v7.0.0` se titula *"node24 and a lot of bugfixes"* y ya existía. El
-warning era nuestra versión vieja, cuatro majors atrás. Ahora `v10`; los cambios
-de v9/v10 solo tocan defaults de caché, irrelevantes con `enable-cache: false`.
+warning era nuestra versión vieja, cuatro majors atrás. Ahora `v10.0.1`; los
+cambios de v9/v10 solo tocan defaults de caché, irrelevantes con
+`enable-cache: false`.
+
+**Versión exacta, no major flotante.** `setup-uv` dejó de publicar tags mayores
+en `v8.0.0` (*"Immutable releases and secure tags"*): `v7` es la última que
+existe, y `@v10` no resuelve. El primer intento de este bump usó `@v10` y falló
+en 3 segundos — el CI cazando un error del propio CI. Fijar exacto era además lo
+correcto: en su esquema esas tags son inmutables.
+
+**Auditar todas las actions, no solo la que aviso.** Al comprobar que cada `uses:`
+resolvía de verdad, apareció una segunda con `node20` que nadie había mirado:
+`actions/upload-artifact@v5`. Sube a `v7`. La lección es que perseguir la
+anotación concreta que sale en pantalla deja atrás las que aún no han saltado.
 
 **Los `[P]` no aplican.** Los dos jobs de `validate.yml` son independientes y
 GitHub ya los corre en paralelo.
