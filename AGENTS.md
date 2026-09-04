@@ -60,11 +60,14 @@ For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
 
 - Active feature: `004-source-lifecycle-cache`
+- **Plan: [specs/004-source-lifecycle-cache/plan.md](specs/004-source-lifecycle-cache/plan.md)**
 - Spec: [specs/004-source-lifecycle-cache/spec.md](specs/004-source-lifecycle-cache/spec.md)
-- Quality checklist: [specs/004-source-lifecycle-cache/checklists/requirements.md](specs/004-source-lifecycle-cache/checklists/requirements.md)
+- Research: [specs/004-source-lifecycle-cache/research.md](specs/004-source-lifecycle-cache/research.md)
+- Data model: [specs/004-source-lifecycle-cache/data-model.md](specs/004-source-lifecycle-cache/data-model.md)
+- Contracts: [config schema](specs/004-source-lifecycle-cache/contracts/knowledge-config.schema.md) · [command surface](specs/004-source-lifecycle-cache/contracts/commands.md)
+- Verification: [specs/004-source-lifecycle-cache/quickstart.md](specs/004-source-lifecycle-cache/quickstart.md)
 
-Status: specified. `plan.md` and `tasks.md` do not exist yet — run
-`/speckit.clarify` then `/speckit.plan` next.
+Status: planned. `tasks.md` does not exist yet — run `/speckit.tasks` next.
 <!-- SPECKIT END -->
 
 <!-- CODE-GRAPH-GUIDE START -->
