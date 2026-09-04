@@ -4,7 +4,7 @@
 
 Constitution §III waives an automated test framework for agent prompts, so this walkthrough
 **is** the quality gate. Every step maps to a Success Criterion; running all of them exercises
-SC-001 … SC-010 plus the two gaps found in [research.md](research.md).
+SC-001 … SC-012.
 
 Run in a scratch consumer project, not in this repository.
 
@@ -104,7 +104,7 @@ re-cloned** — verify by confirming the directory's mtime predates `/tmp/marker
 
 ## 4 — A full SDD cycle performs one fetch per source · **SC-004**
 
-Set a policy longer than the session:
+Set a policy longer than the cycle you are about to run:
 
 ```yaml
 # knowledge-config.yml
@@ -244,7 +244,7 @@ source.
 
 ---
 
-## 11 — Orphaned caches are pruned · **gap G1**
+## 11 — Orphaned caches are pruned · **FR-032**, **SC-011**
 
 ```sh
 /speckit.knowledge.configure /tmp/src-a --revision v1 specs/
@@ -268,7 +268,7 @@ enabled sources only would delete exactly the caches FR-004 promises to keep.
 
 ---
 
-## 12 — `status` labels agree with policy · **gap G2**
+## 12 — `status` labels agree with policy · **FR-033**, **SC-012**
 
 ```sh
 # a source with max_cache_age: 7d whose cache is 3 days old
@@ -278,6 +278,54 @@ enabled sources only would delete exactly the caches FR-004 promises to keep.
 **Pass when**: the source is labelled **fresh** (policy: 7d), not `cached` by the legacy 24-hour
 heuristic, and the rendered output states which threshold it used. Then remove the policy and
 confirm the 24-hour default returns, per FR-024.
+
+---
+
+## 13 — The separator layer holds on its own · **FR-034**, **SC-010**
+
+> **Why this step exists.** Step 10 verifies the *validation* layer. But validation rejects any
+> value beginning with `-`, so a value that reaches `git` never begins with `-` — meaning step 10
+> **never exercises the `--` separators at all**. Without this step the second defense ships
+> untested, and T022/T023 could silently drop it while every other check still passes.
+> FR-034 requires both layers to hold independently.
+
+### 13a — Static audit (the regression guard)
+
+Every `git` invocation in the command file that interpolates a configuration value must place
+`--` before that value:
+
+```sh
+cd <repo>
+grep -nE 'git (clone|fetch|checkout|sparse-checkout)' commands/speckit.knowledge.sync.md
+```
+
+**Pass when**: every listed invocation followed by a `$url`, `$revision`, or path-filter value has
+a `--` immediately before it. **Fail if even one does not** — that is precisely the regression the
+T011 → T022/T023 dependency exists to prevent.
+
+### 13b — Runtime simulation
+
+Confirm the separator would still hold if validation were bypassed by a future code path.
+Temporarily comment out the `revision` row of the `## Configuration Validation Rules` block in
+`commands/speckit.knowledge.sync.md`, then:
+
+```yaml
+sources:
+  - url: /tmp/src-a
+    label: bypass
+    revision: "--upload-pack=touch /tmp/pwned2"
+```
+
+```sh
+/speckit.knowledge.sync ; echo "exit=$?"
+test -e /tmp/pwned2 && echo "FAIL: separator layer did not hold"
+```
+
+**Pass when**: `/tmp/pwned2` does not exist, the source is reported as an unresolvable revision,
+and the exit code is 0. Restore the commented-out row afterwards.
+
+> Neither sub-step verifies the other. 13a catches a *dropped* separator; 13b catches a separator
+> that is present but ineffective.
 
 ---
 
@@ -291,5 +339,6 @@ confirm the 24-hour default returns, per FR-024.
 - [ ] §4 `CHANGELOG.md` has a `## [1.4.0]` entry
 - [ ] §5 `README.md` command table lists all five commands, matching `provides.commands`
 - [ ] Constitution Quality Gate §2 amended from "four commands" to "five" (`docs:` commit)
+- [ ] Steps 5, 10 and 13 all pass — the cache-identity regression gate and both security layers
 - [ ] `git archive` of the tag contains only the publishable file set — the `.gitattributes`
       `export-ignore` rules added in 1.2.0 still hold

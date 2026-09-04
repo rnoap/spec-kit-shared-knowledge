@@ -157,7 +157,7 @@ no network access occurred (FR-018, FR-019).
 | Serve an over-age cache when the source is unreachable | FR-027 |
 | Read-time validation; a bad field skips only its own source | FR-029, FR-030 |
 | Delete `knowledge-index.md` and emit no context block when no enabled sources remain | FR-031 |
-| Prune cache directories matching no configured source (enabled **or** disabled) | gap G1 |
+| Prune cache directories matching no configured source (enabled **or** disabled) | FR-032 |
 
 **Unchanged and load-bearing**: the Context Output Block, its emission gate, its exact 70×`═`
 rules, and the exit-0 contract — all inherited from 003. The two new emission states are
@@ -172,8 +172,8 @@ resolved in [../data-model.md](../data-model.md) § 5.
 **Reconciled labels**: `status` currently hard-codes "fresh = synced within 24h". Once a policy
 exists, **the policy determines the label**; the 24-hour heuristic survives only as the default
 for sources with no policy, which FR-024 requires for projects that upgrade and change nothing.
-The threshold actually used is rendered, so a label is never unexplained. This is gap G2 in
-[../research.md](../research.md).
+The threshold actually used is rendered, so a label is never unexplained. This is **FR-033**,
+which began as gap G2 in [../research.md](../research.md).
 
 ---
 

@@ -63,3 +63,23 @@
   would perform four fetches per source rather than one. Every FR added by
   clarify maps to a Success Criterion: FR-026→SC-003, FR-027→SC-008,
   FR-028→SC-009, FR-029/030→SC-010, FR-031→SC-007.
+- **Post-analysis state (2026-09-04).** `/speckit.analyze` ran after `/speckit.tasks`
+  and reported 0 CRITICAL, 3 HIGH, 7 MEDIUM, 4 LOW. All were remediated. The
+  three HIGH were:
+  - **Three substantive tasks had no requirement authorizing them** — cache
+    pruning, policy-aware freshness labels, and the `--` argument separators.
+    Promoted to **FR-032, FR-033, FR-034**, with **SC-011** and **SC-012**
+    added and **SC-010** widened. The specification is again the complete
+    description of what ships.
+  - **A security control was scheduled to be silently overwritten.** T011 adds
+    `--` separators to sync's `git` invocations in Phase 2; T022/T023 rewrite
+    those same lines in Phase 4. The dependency is now explicit in tasks.md and
+    both tasks carry a preservation requirement.
+  - **That same control had no verification.** Quickstart step 10 rejects the
+    hostile value before `git` runs, so the separators were never exercised.
+    Step 13 was added to test that layer on its own — statically, and by
+    simulating a validation bypass.
+- Also corrected: the phase ordering was justified by citing Constitution §II,
+  which governs *conflict resolution*, not authoring sequence — the ordering is
+  now defended on its own terms, and the cost it imposes (T001 registers a
+  command whose file T012 has not yet created) is stated rather than glossed.

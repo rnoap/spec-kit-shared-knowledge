@@ -1,6 +1,6 @@
 # Feature Specification: Source Lifecycle & Cache Policy
 
-**Feature Branch**: `main`
+**Feature Branch**: `004-source-lifecycle-cache`
 **Created**: 2026-09-04
 **Status**: Draft
 
@@ -31,7 +31,8 @@ Knowledge sources today can only be added: removing or pausing one means hand-ed
 - **FR-007**: When the supplied identifier matches no configured source, the command MUST report that clearly and leave the configuration unchanged.
 - **FR-008**: Disabled sources MUST be skipped during synchronization and MUST NOT contribute items to the knowledge index.
 - **FR-028**: Every configured source MUST carry a label that is unique within the project. When adding a source would produce a label that already exists — whether because two locations share a final path component or because the same repository is added twice at different revisions — the configure command MUST resolve the collision before writing, so that no two sources can ever share a label.
-- **FR-031**: When no enabled sources remain — whether because every source was removed or every source was disabled — synchronization MUST report the project as having no configured knowledge, MUST delete any existing knowledge index so that unconfigured content stops being readable, and MUST NOT emit the agent-facing context instructions. The command MUST still complete successfully.
+- **FR-031**: When no enabled sources remain — whether because every source was removed or every source was disabled — synchronization MUST report the project as having no configured knowledge, MUST delete any existing knowledge index so that unconfigured content stops being readable, and MUST NOT emit the agent-facing context instructions. The command MUST still complete successfully, per FR-023.
+- **FR-032**: Synchronization MUST delete any cached content that belongs to no configured source, so that changing a source's revision — which gives that source a new cache identity under FR-011 — does not strand the cache built for its previous revision. The set of caches to keep MUST be computed over **every** configured source, enabled and disabled alike, because FR-004 requires a disabled source to retain its cache. Each deletion MUST be reported.
 
 ### Per-source revision pinning
 
@@ -50,18 +51,20 @@ Knowledge sources today can only be added: removing or pausing one means hand-ed
 ### Configuration validation
 
 - **FR-029**: Every value read from the project configuration — repository location, revision, path filter, and maximum cache age — MUST be checked against a documented rule for its field **each time the configuration is read**, not only when a command writes it. Configuration reaches a project by hand-editing, by pull request, and from earlier versions of the extension; validating only on write leaves all three routes unchecked.
-- **FR-030**: A value that fails its field rule MUST cause only its own source to be skipped, with a message naming the offending field and value. Remaining sources MUST continue to be processed, and the command MUST still complete successfully.
+- **FR-030**: A value that fails its field rule MUST cause only its own source to be skipped, with a message naming the offending field and value. Remaining sources MUST continue to be processed, and the command MUST still complete successfully, per FR-023.
+- **FR-034**: Configuration values are handed to an external version-control tool as command arguments. A configured value MUST NOT be able to alter that tool's behavior. Two defenses are required together: values that could be read as options MUST be rejected under FR-029, **and** every invocation MUST additionally be constructed so that a value which escaped validation still cannot be interpreted as an option. Neither suffices alone — validation can be bypassed by a future code path that forgets to apply it, and argument neutralization does not describe which values are legitimate in the first place.
 
 ### Cache freshness policy
 
 - **FR-016**: The configuration MUST support a maximum cache age, settable once for all sources and overridable per source.
-- **FR-017**: When no maximum cache age is configured, every synchronization MUST fetch, matching current behavior.
+- **FR-017**: When no maximum cache age is configured, every synchronization MUST fetch, matching current behavior. This is the freshness-scoped instance of the general compatibility guarantee in FR-024.
 - **FR-018**: When a source's cache is younger than its maximum age, synchronization MUST skip the network for that source and reuse the cached content.
 - **FR-019**: A source skipped for freshness MUST be reported distinctly from one that was fetched, so the user can tell no network access occurred.
 - **FR-020**: A source skipped for freshness MUST count as usable knowledge, so the agent-facing context instructions are still emitted.
 - **FR-021**: The sync command MUST provide a way to force a fetch that ignores the freshness policy.
 - **FR-022**: Automatically triggered synchronizations MUST NOT be able to force a fetch, so the freshness policy always applies to hook-driven runs.
 - **FR-027**: A cache older than its maximum age MUST remain usable when its source cannot be reached. The maximum age governs only whether a refresh is *attempted*, never whether cached content may be *served*: a source whose refresh fails MUST fall back to its existing cache and report its staleness, exactly as it does today.
+- **FR-033**: Where a source has an effective maximum cache age, **that policy** — not any fixed built-in threshold — MUST determine whether the source is reported as current or stale. A source with no policy MUST keep the reporting behavior it has today, as FR-024 requires. The threshold actually applied MUST be visible in the output, so a reported state is never unexplained.
 
 ### Compatibility
 
@@ -74,13 +77,15 @@ Knowledge sources today can only be added: removing or pausing one means hand-ed
 - **SC-001**: A user removes a source and its cached content with a single command and zero manual edits to any configuration file.
 - **SC-002**: While a source is disabled it contributes no items to the knowledge index, and a subsequent re-enable restores it to full use without re-downloading its content.
 - **SC-003**: Two sources pointing at the same repository at different revisions each surface the content of their own revision, with no cross-contamination and without either revision's files being reported as conflicting with the other's.
-- **SC-004**: With a maximum cache age configured that exceeds the length of a working session, a full feature cycle that triggers all four synchronization points performs at most one network fetch per source.
+- **SC-004**: With a maximum cache age of four hours configured, a full feature cycle completed inside that four-hour window — triggering all four synchronization points — performs at most one network fetch per source.
 - **SC-005**: An existing project that upgrades and changes nothing produces the same synchronization results, the same index contents, and the same agent-facing output as before the upgrade.
-- **SC-006**: Every command exits successfully on every path exercised here, including unknown source identifiers, unresolvable revisions, and expired or missing caches.
+- **SC-006**: Every command exits successfully on every path exercised here, including unknown source identifiers, unresolvable revisions, and over-age or missing caches.
 - **SC-007**: Removing every source leaves no cached content and no knowledge index behind on disk, and the next synchronization reports the project as unconfigured rather than pointing an agent at knowledge the project no longer declares.
 - **SC-008**: With a maximum cache age configured and every source unreachable, a synchronization still surfaces the cached knowledge and reports each source's staleness — configuring a freshness policy never leaves a project with less available knowledge than it had before the policy was set.
 - **SC-009**: No two configured sources share a label, including when the same repository is added twice at different revisions or when two local locations share a final path component; and removing by a repository URL that matches more than one source reports the ambiguity instead of removing the wrong one.
-- **SC-010**: A configuration value that violates its field rule is rejected before it reaches any external tool — regardless of how it got into the file — the affected source is skipped with a message naming the field, and every other source still synchronizes.
+- **SC-010**: A configuration value that violates its field rule is rejected before it reaches any external tool — regardless of how it got into the file — the affected source is skipped with a message naming the field, and every other source still synchronizes. A value crafted to be read as an option by the external tool remains inert even when it reaches that tool, so neither defense depends on the other.
+- **SC-011**: After a source's revision is changed and the project re-synchronized, only the current revision's cached content remains on disk. After a source is disabled, its cached content survives the same synchronization untouched.
+- **SC-012**: Every source's reported freshness agrees with the policy configured for it, and the output states which threshold produced that report.
 
 ## Assumptions
 
@@ -95,4 +100,5 @@ Knowledge sources today can only be added: removing or pausing one means hand-ed
 - **The label is the stable identity of a source.** A repository URL stopped being a unique key the moment revisions became pinnable, so uniqueness is enforced on the label when a source is added rather than resolved separately by every command that consumes one. That keeps the ergonomic form working and means each future source-taking command inherits unambiguous resolution for free.
 - **Validation belongs at the read boundary, not the write boundary.** Today's path-filter checks run only inside the configure command, so a value arriving by hand-edit, by pull request, or from an older version of the extension is consumed unchecked. Moving the guarantee to the read path covers every route into the file at once — which matters more now that the configuration is committed, shared across a team, and consumed by four automatic hooks per feature cycle.
 - **A stale index is worse than no index.** Leaving the previous index in place after the last source is removed would let an agent keep reading and citing knowledge the project no longer declares — a silent failure that looks like success. Deleting it also costs nothing in interface terms, because the status command already reports and explains the missing-index state.
+- **Three requirements were added after this specification was first written.** FR-032, FR-033, and FR-034 came from the implementation plan and the cross-artifact analysis that followed it, not from the original drafting. FR-032 and FR-033 follow through on consequences of FR-011 and FR-016 that the original text left implicit — a changed revision strands its old cache, and an explicit policy contradicts a fixed built-in threshold. FR-034 promotes an existing security obligation from implementation habit to stated requirement. They are recorded here so this document remains the complete description of what ships; a reader of the specification alone should not be surprised by anything in the built result.
 - **The three capabilities ship together.** The freshness policy is what makes the four synchronization points introduced in 1.3.0 affordable, and revision pinning is what makes a long-lived cache safe to trust. Shipping them separately leaves the extension in a worse state than shipping none of them.

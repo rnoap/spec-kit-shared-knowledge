@@ -175,9 +175,10 @@ The cache root holds one directory per slug. Three forces create and destroy the
 | Source removed | **Purged** (FR-003) |
 | Source's `revision` edited | Slug changes → a *new* directory is created; the old one is **orphaned** |
 
-That last row is gap **G1** in [research.md](research.md): no Functional Requirement covers it,
-yet it produces exactly the "orphaned cache directories accumulate" outcome FR-003 exists to
-prevent. The proposed handling is a prune pass at the end of sync:
+That last row is **FR-032**. It began as gap G1 in [research.md](research.md) — no requirement
+covered it, yet it produces exactly the "orphaned cache directories accumulate" outcome FR-003
+exists to prevent. It was promoted to a requirement after cross-artifact analysis. The handling
+is a prune pass at the end of sync:
 
 ```text
 expected = { slug(s) : s ∈ sources }        # ALL sources — enabled AND disabled
@@ -236,4 +237,6 @@ Every entity, field, and transition above traces to at least one requirement.
 | FR-024, FR-025 | § 1.1 defaults; § 2.1 conditional hash input |
 | FR-026 | § 2.2 repository identity |
 | FR-028 | § 1.1 `label`; § 2.2 rationale |
-| FR-029, FR-030 | [contracts/knowledge-config.schema.md](contracts/knowledge-config.schema.md) |
+| FR-029, FR-030, FR-034 | [contracts/knowledge-config.schema.md](contracts/knowledge-config.schema.md) |
+| FR-032 | § 4 cache directory lifecycle (prune pass) |
+| FR-033 | § 2.3 freshness verdict; rendered by `status` |

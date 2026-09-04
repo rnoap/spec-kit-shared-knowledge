@@ -51,7 +51,7 @@ a revision component, and only for sources that pin one.
 **Testing**: Manual smoke test in a real spec-kit consumer project — the same approach used by
 001, 002, and 003. Constitution §III explicitly waives an automated framework for agent
 prompts. The verification walkthrough lives in [quickstart.md](quickstart.md) and covers all
-ten Success Criteria.
+twelve Success Criteria.
 
 **Target Platform**: Any POSIX environment with spec-kit `>= 0.10.0` and git `>= 2.25`.
 macOS/BSD and Linux/GNU must behave identically — this is an active constraint on the design,
@@ -60,8 +60,8 @@ not an assumption (see [research.md](research.md) § R4).
 **Project Type**: spec-kit extension package. Agent-prompt Markdown files are the deliverable.
 No `src/`, no `tests/`, no build step.
 
-**Performance Goals**: The point of the feature. With `max_cache_age` set above the length of a
-working session, one full SDD cycle (specify → clarify → plan → tasks) performs **at most one
+**Performance Goals**: The point of the feature. With `max_cache_age` set to four hours, one full
+SDD cycle (specify → clarify → plan → tasks) completed inside that window performs **at most one
 network fetch per source** instead of four (SC-004). A freshness-skipped source costs a single
 `find` invocation — no `git`, no network.
 
@@ -81,7 +81,7 @@ network fetch per source** instead of four (SC-004). A freshness-skipped source 
   begin with `-` is an argument-injection vector; validation and `--` separators are mandatory,
   not stylistic (see [research.md](research.md) § R5).
 
-**Scale/Scope**: 1 new command file; 3 command files modified; `config-template.yml`,
+**Scale/Scope**: 1 new command file; 4 command files modified; `config-template.yml`,
 `extension.yml`, `README.md`, and `CHANGELOG.md` updated. No file is deleted. Command count
 goes 4 → 5, which touches Constitution Quality Gate §2 and §5.
 
@@ -95,7 +95,7 @@ goes 4 → 5, which touches Constitution Quality Gate §2 and §5.
 | **I.** — `config-template.yml` `schema_version` bumped on breaking change | ✅ | ✅ | Two new keys, both optional with backward-compatible defaults. Not breaking, so `schema_version` correctly stays `"1.0"` (FR-025). |
 | **I.** — Commands are self-contained Markdown with no hidden runtime dependencies | ✅ | ✅ | The new command is one Markdown file. The freshness gate deliberately avoids `python3` and GNU-only tools so nothing undeclared is required. |
 | **I.** — Installation delegated entirely to the spec-kit CLI | ✅ | ✅ | No install logic touched. The new command is registered by spec-kit from `extension.yml`. |
-| **II. Source-of-Truth Hierarchy** | ✅ | ✅ | Authoring order respected: `extension.yml` → `config-template.yml` → `commands/*.md` → `README.md`. Task ordering in Phase 2 must follow it. |
+| **II. Source-of-Truth Hierarchy** | ✅ | ✅ | Applies to *conflict resolution*, and no artifact here conflicts with a higher one. It does **not** prescribe an authoring sequence; the phase order in tasks.md is a design choice, justified there on its own terms. |
 | **III. Simplicity (YAGNI)** — Markdown-only when expressible as Markdown | ✅ | ✅ | Zero scripts added. The one real temptation — a duration-parsing helper — is avoided by `find -mmin` ([research.md](research.md) § R4). |
 | **III.** — No CI / no test framework required | ✅ | ✅ | Verification is the manual walkthrough in [quickstart.md](quickstart.md). |
 | **IV. Conventional Commits (NON-NEGOTIABLE)** | ✅ | ✅ | `feat(remove):`, `feat(sync):`, `feat(config):`, `docs(readme):`, `chore(release):`. No `!` — nothing here is breaking. |
@@ -147,8 +147,10 @@ commands/
 ├── speckit.knowledge.sync.md        # MODIFIED — revision-aware slug; freshness gate; `--force`;
 │                                    #   read-time validation; conflict scoping by repository
 │                                    #   identity; empty-state index deletion; orphan pruning
-└── speckit.knowledge.status.md      # MODIFIED — show effective revision; report freshness-skip
-                                     #   distinctly; reconcile the legacy 24h heuristic
+├── speckit.knowledge.status.md      # MODIFIED — show effective revision; report freshness-skip
+│                                    #   distinctly; reconcile the legacy 24h heuristic
+└── speckit.knowledge.search.md      # MODIFIED — missing-index message must distinguish
+                                     #   "no sources configured" from "unreachable" (FR-031)
 
 config-template.yml                  # MODIFIED — document `revision` and `max_cache_age`
                                      #   (schema_version stays "1.0")
@@ -159,9 +161,10 @@ CHANGELOG.md                         # MODIFIED — new [1.4.0] section
 .specify/memory/constitution.md      # MODIFIED — Quality Gate §2 says "four commands"
 ```
 
-`speckit.knowledge.search.md` is modified **only** if it reads `knowledge-config.yml` directly;
-it reads `knowledge-index.md`, so it inherits validation transitively and is expected to stay
-untouched. Confirm during `/speckit.tasks`.
+`speckit.knowledge.search.md` reads `knowledge-index.md`, never `knowledge-config.yml`, so it
+inherits validation transitively and needs no rule block. It is still modified for one reason:
+FR-031 deletes the index when no enabled sources remain, and search's missing-index message
+blames unreachability for that state.
 
 **Structure Decision**: The repository has no `src/` or `tests/` tree and will not grow one.
 The `commands/` directory *is* the source tree, `config-template.yml` *is* the schema, and
@@ -186,15 +189,21 @@ Six unknowns were extracted from Technical Context and resolved in
 | R5 | What is the validation rule per field, and where does it run? | Six rules, duplicated verbatim into each reading command; the leading-`-` ban is a security control |
 | R6 | How is a pinned commit SHA fetched under `--depth=1`? | Attempt shallow SHA fetch, one deepening retry, then FR-015 cache fallback |
 
-**Two gaps were discovered during research** and are recorded there for `/speckit.tasks` and
-`/speckit.analyze` to act on — neither is covered by an existing FR:
+**Two gaps were discovered during research.** Both have since been **promoted to requirements**
+in [spec.md](spec.md) — they described behavior that would otherwise ship with nothing
+authorizing it:
 
-1. **Orphaned caches from a revision change.** FR-003 purges the cache on *removal*, but FR-012
-   changes the slug when a *revision* changes, stranding the previous directory. Sync must prune
-   cache directories that match no configured source (enabled **or** disabled).
-2. **The legacy 24-hour heuristic in `status` collides with `max_cache_age`.** `status` today
-   hard-codes "fresh = synced within 24h". Once a policy exists the policy must win; the
-   heuristic survives only as the no-policy default, for FR-024.
+1. **Orphaned caches from a revision change** → now **FR-032**. FR-003 purges the cache on
+   *removal*, but FR-011 changes the slug when a *revision* changes, stranding the previous
+   directory. Sync must prune cache directories that match no configured source (enabled **or**
+   disabled).
+2. **The legacy 24-hour heuristic in `status` collides with `max_cache_age`** → now **FR-033**.
+   `status` today hard-codes "fresh = synced within 24h". Once a policy exists the policy must
+   win; the heuristic survives only as the no-policy default, for FR-024.
+
+A third requirement, **FR-034**, arrived by the same route during cross-artifact analysis: the
+mandatory `--` separators on every `git` invocation were an implementation habit documented only
+in § R5 below, with no requirement behind them and no verification step exercising them.
 
 **Output**: [research.md](research.md) — all NEEDS CLARIFICATION resolved.
 
@@ -219,6 +228,8 @@ Six unknowns were extracted from Technical Context and resolved in
 
 ## Next Command
 
-`/speckit.tasks` — generate the dependency-ordered task list. Task ordering must follow
-Constitution §II: `extension.yml` and `config-template.yml` first, then `commands/*.md`, then
-`README.md`, `CHANGELOG.md`, and the constitution amendment last.
+`/speckit.tasks` — generate the dependency-ordered task list. Phases declare the contract before
+implementing it: `extension.yml` and `config-template.yml` first, then `commands/*.md`, then
+`README.md`, `CHANGELOG.md`, and the constitution amendment last. This ordering is a design
+choice, not a Constitution §II requirement — §II governs conflict resolution, not authoring
+sequence.

