@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.10.0-7d4cdb">
-  <img alt="Status" src="https://img.shields.io/badge/status-v1.4.0-success">
+  <img alt="Status" src="https://img.shields.io/badge/status-v1.5.0-success">
 </p>
 
 ## Overview
@@ -302,6 +302,162 @@ times. With `4h` set and the cycle finished inside that window, it fetches once.
 - A skipped source is reported as `⏭️ current`, distinct from `fresh`, so you can see no network access happened.
 - `--force` ignores the policy. It is **unreachable from an automatic trigger** — the hook entries declare no arguments — so hook-driven syncs always respect the policy.
 - **It is a hint, not an expiry.** An over-age cache is still served when its source cannot be reached. Setting a policy never leaves you with less knowledge than you had without one.
+
+## Context budget
+
+Every sync tells the agent to read the index **in full** and open **every** file it
+references. That instruction has no upper bound, and the corpus grows with your
+team. Two optional ceilings give it one:
+
+```yaml
+max_items: 120        # project-wide
+max_bytes: 1mb        # project-wide
+
+sources:
+  - url: https://github.com/org/big-docs
+    label: big-docs
+    max_items: 40     # sub-ceiling for this source
+```
+
+`max_items` is a whole number ≥ 1. `max_bytes` is `<N>kb` or `<N>mb` in binary
+units. Both are optional and independent — set either, both, or neither.
+
+**A per-source ceiling is a sub-ceiling, not an override.** It can only lower what
+that source contributes, never raise it. This is deliberately *unlike*
+`max_cache_age`, which sits in the same two positions in the file but whose
+per-source value *replaces* the project value. A per-source budget above the
+project ceiling is clamped down to it and the clamp reported — it never
+invalidates the source.
+
+### What gets kept, and how you can predict it
+
+The rule is fixed, owned by the extension, and influenced by no configuration
+value — so you can work out your own index on paper. Per dimension:
+
+1. `share = ⌊ceiling ÷ number of sources with items⌋`
+2. Every source needing no more than its share is satisfied in full, and **releases
+   the remainder to the others**. Repeat from 1 with what is left.
+3. When a pass satisfies nobody, everyone left takes `share`.
+4. Any remainder goes one item each, in ascending label order.
+
+Within a source, items are taken in **ascending path order** — not smallest-first.
+Smallest-first would fit more files, but adding one large document would silently
+change which unrelated small ones survive, and you could no longer predict your own
+corpus.
+
+**Worked example.** Ceiling 120 items; four sources holding 312 / 55 / 88 / 12.
+Share is `⌊120/4⌋ = 30`; the 12-item source is satisfied and releases 18;
+`⌊108/3⌋ = 36` and nobody else fits, so the other three take 36 each.
+**36 + 36 + 36 + 12 = 120.** A flat quarter-share each would have injected only
+102 and stranded 18 — releasing unused share is what fills the ceiling.
+
+### Nothing is withheld silently
+
+```
+  big-docs           ✅ fresh    36 items
+                     ✂️  budget: 36 of 312 items (118kb of 3.4mb) — limit 36 items (share of 120)
+
+⚠️  Withheld: big-docs › huge.md (2.4mb) exceeds the 1mb size ceiling on its own;
+    excluded without consuming the budget.
+
+✅ Knowledge index updated: 120 items from 4 sources (347 withheld, 3.5mb).
+```
+
+- The index header carries the same counts, and marks itself `⚠️ Partial`.
+- The agent is told the corpus is partial, so it will not present it as complete.
+- `--verbose` lists every withheld path.
+- **`/speckit.knowledge.search` still finds withheld items.** The budget bounds what
+  is *injected automatically*, not what the project knows — nothing leaves the cache.
+
+Two versions of a conflicting path are kept or dropped **together**; the budget
+never picks a winner between two teams' versions of the same file.
+
+### If you set no budget
+
+Behaviour is byte-identical to before, and **no default is applied**. Once the
+corpus passes **200 items or 2 mb**, sync says so once per run:
+
+```
+⚠️  This project's knowledge corpus is 340 items / 2.7mb, past the advisory
+    threshold of 200 items / 2mb. An agent instructed to read all of it may
+    exhaust its context. Consider setting `max_items` or `max_bytes`.
+```
+
+It changes nothing it reports on — same standing as the existing
+"more than ten sources" warning.
+
+**No flag raises or bypasses the budget.** `--force` overrides cache freshness
+only. The automatic sync points are exactly where a context overflow does the most
+damage, so there is no escape hatch reachable from them.
+
+## Trust model
+
+`knowledge-config.yml` is **committed and shared**. That is the point — it declares
+your team's knowledge sources — but it also means a merged pull request adding one
+`url` line causes that location to be fetched on **every teammate's machine and
+every automated environment** that later runs a sync. Including via the four
+automatic hooks, which the reviewer who approved the change may never invoke
+themselves.
+
+This section states what that grants, and what it does not.
+
+### What does NOT happen
+
+Fetched content is read as **data**. It is never executed.
+
+- No build step, script, or repository hook from a source is ever run.
+- Clones use `--no-checkout` and `--filter=blob:none`; only `.md` files under your
+  `path_filter` are read.
+- Nothing from a source is written outside
+  `.specify/extensions/knowledge/cache/<slug>/`.
+
+### What the extension defends against
+
+| Defense | Covers | Does **not** cover |
+|---------|--------|--------------------|
+| Values beginning with `-` are rejected | Argument injection into `git` — a `revision` of `--upload-pack=<cmd>` would be remote code execution | A legitimately shaped value pointing somewhere hostile |
+| `--` before every config-derived `git` operand | The same, if validation is ever bypassed | As above |
+| Validation runs on **read**, not just write | Values arriving by hand-edit, by PR, or from an older version | Values that are valid but unwanted |
+| `--no-checkout` + `--filter=blob:none` | Fetching a working tree wholesale | The subsequent checkout, which does write the filtered files |
+| `timeout 10` / `timeout 30` on network calls | A hung or tarpitting host | A fast host serving hostile content |
+| `path_filter` | Corpus size and blast radius | Anything inside the filtered paths |
+| Hooks are `optional: true` | Unattended fetches — you are prompted | A prompt you accept |
+| Manifest SHA-256 integrity check | Local cache corruption | Content that was hostile when fetched |
+
+### What it does NOT defend against
+
+Stated plainly, because a trust model that lists only its strengths is worse than
+none:
+
+1. **Prompt injection.** Fetched markdown enters the agent's context uninspected
+   and unsanitized. A source can contain instructions aimed at your agent. There is
+   no reliable general defense and this extension does not attempt one.
+2. **Credential exposure.** Your local git credential helper decides what to send
+   to a configured host. The extension neither scopes nor filters it. A URL
+   pointing at an attacker-controlled host may be offered credentials.
+3. **Symlink following.** A fetched `.md` may be a **symbolic link**. `git checkout`
+   recreates links faithfully, and nothing here resolves, rejects, or flags one — so
+   a source containing `notes.md -> ~/.ssh/id_rsa` produces an index entry the agent
+   is instructed to open and read into its context, and from there potentially into
+   a committed spec. **This is a real data-exfiltration path and it is currently
+   open.** Refusing to index links that escape the cache root is the intended fix;
+   it is not implemented yet.
+
+### Reviewing a change to `knowledge-config.yml`
+
+Treat it as a **security-relevant change**, not a config tweak. Before approving:
+
+- [ ] Is the `url` a repository your organisation controls, or one you have reason
+      to trust with your credentials and your agent's context?
+- [ ] Is it reached over a host you expect? Check for lookalike domains.
+- [ ] Is `revision` pinned to a tag or full SHA, rather than tracking a branch
+      someone else can move under you?
+- [ ] Does `path_filter` scope the read to what is actually needed?
+- [ ] Do you understand that this will fetch on your machine the next time you run
+      any spec-kit command with a knowledge hook enabled?
+
+If a source is outside your organisation, prefer a pinned `revision` and a narrow
+`path_filter`, and read what it contains before merging.
 
 ## Integration with the spec-kit lifecycle
 
