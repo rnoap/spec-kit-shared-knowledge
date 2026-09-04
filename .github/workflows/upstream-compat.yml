@@ -1,0 +1,87 @@
+name: upstream-compat
+
+# The pin in validate.yml is deliberate: without it, an upstream breaking change
+# lands as a red build on an unrelated pull request. `specify init --ai` became
+# `--integration` during development of 1.4.0 and broke the smoke test — exactly
+# the noise the pin exists to prevent.
+#
+# But a pin has its own failure mode: you stop learning that upstream broke you,
+# until the day you bump it and inherit a pile of breakage at once.
+#
+# This job closes that gap. Same smoke test, spec-kit's `main` instead of the
+# pinned tag, on a schedule. It can go red without blocking anyone: it never runs
+# on `pull_request`, and it is deliberately NOT a required status check.
+#
+# A red run here means one thing: upstream changed something this extension
+# depends on. Decide, then bump SPEC_KIT_REF in validate.yml on purpose.
+
+on:
+  schedule:
+    # Mondays, 06:00 UTC. Weekly is enough — this reports drift, it does not gate.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-against-main:
+    name: Install smoke test (spec-kit main)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          enable-cache: false
+
+      - name: Install spec-kit from main
+        id: install-cli
+        run: |
+          uv tool install specify-cli \
+            --from "git+https://github.com/github/spec-kit.git@main"
+          specify --version
+
+      - name: Install the extension into a clean consumer project
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/consumer && cd /tmp/consumer
+          specify init . --integration copilot --non-interactive --force > init.log 2>&1
+          specify extension add "$GITHUB_WORKSPACE" --dev 2>&1 | tee install.log
+
+      # Same script the gating workflow runs. One copy on purpose: if the two
+      # drifted, this job could pass a check the gating job no longer performs.
+      - name: Assert the install produced what the manifest promised
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/assert-install.sh" /tmp/consumer "$GITHUB_WORKSPACE"
+
+      - name: Explain what a failure here means
+        if: failure()
+        run: |
+          PINNED=$(grep -oE 'SPEC_KIT_REF: .*' .github/workflows/validate.yml | cut -d' ' -f2)
+          cat <<EOF
+          ────────────────────────────────────────────────────────────────────
+          This is a compatibility signal, not a broken build.
+
+          The extension installs correctly against the pinned spec-kit
+          ($PINNED) — validate.yml is still green, and pull requests are
+          unaffected. Something on spec-kit's main branch changed in a way this
+          extension depends on.
+
+          What to do:
+            1. Read the failing assertion above.
+            2. If the extension needs to adapt, fix it and bump SPEC_KIT_REF in
+               .github/workflows/validate.yml in the same pull request.
+            3. If upstream is mid-refactor, do nothing. This will go green again,
+               or it will still be red when you next bump on purpose — which is
+               the point.
+          ────────────────────────────────────────────────────────────────────
+          EOF
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: upstream-compat-logs
+          path: /tmp/consumer/*.log
+          retention-days: 14
