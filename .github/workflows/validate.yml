@@ -1,0 +1,146 @@
+name: validate
+
+# The v1.2.0 release fixed eight defects that all reached `main`. Four of them —
+# a config target spec-kit silently refused to scaffold, an unsupported manifest
+# key, an install that copied 110 files instead of 9, and a published archive
+# carrying this repo's own workspace — were only found by installing the
+# extension into a clean project by hand. Nothing forced that to happen.
+#
+# This workflow forces it, on every pull request.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Read-only. This workflow needs nothing else, and the repo has no secrets.
+permissions:
+  contents: read
+
+env:
+  # Pinned deliberately. Tracking spec-kit's main branch would turn an upstream
+  # change into a red build on an unrelated PR — `specify init --ai` became
+  # `--integration` mid-development, which would have done exactly that. Bump
+  # this line on purpose, and let the smoke test tell you what broke.
+  SPEC_KIT_REF: v1.0.4
+
+jobs:
+  validate:
+    name: Static validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # git archive needs the full history to resolve export-ignore rules.
+          fetch-depth: 0
+
+      - name: Validate the extension package
+        run: bash .github/scripts/validate-extension.sh
+
+  smoke:
+    name: Install smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install spec-kit
+        run: |
+          uv tool install specify-cli \
+            --from "git+https://github.com/github/spec-kit.git@${SPEC_KIT_REF}"
+          specify --version
+
+      - name: Install the extension into a clean consumer project
+        id: install
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/consumer && cd /tmp/consumer
+          specify init . --integration copilot --non-interactive --force > init.log 2>&1
+          specify extension add "$GITHUB_WORKSPACE" --dev 2>&1 | tee install.log
+
+      - name: Assert the install produced what the manifest promised
+        run: |
+          set -uo pipefail
+          cd /tmp/consumer
+          fail=0
+          ok()  { printf '  \033[32mPASS\033[0m  %s\n' "$1"; }
+          bad() { printf '  \033[31mFAIL\033[0m  %s\n' "$1"; fail=1; }
+
+          MANIFEST="$GITHUB_WORKSPACE/extension.yml"
+          EXT_ID=$(python3 -c "import yaml;print(yaml.safe_load(open('$MANIFEST'))['extension']['id'])")
+          VERSION=$(python3 -c "import yaml;print(yaml.safe_load(open('$MANIFEST'))['extension']['version'])")
+          NCMD=$(python3 -c "import yaml;print(len(yaml.safe_load(open('$MANIFEST'))['provides']['commands']))")
+          NHOOK=$(python3 -c "import yaml;print(len(yaml.safe_load(open('$MANIFEST')).get('hooks') or {}))")
+          DEST=".specify/extensions/$EXT_ID"
+
+          # Quality Gate §1 — the install must not warn about the config template.
+          # This is the exact string spec-kit printed while the config silently
+          # failed to scaffold in 1.1.0.
+          grep -qi 'not scaffolded' install.log \
+            && bad "spec-kit refused to scaffold the config template" \
+            || ok  "no config-scaffolding warning"
+
+          # ...and the file it promised must actually be on disk.
+          CFG=$(python3 -c "
+          import yaml
+          c = (yaml.safe_load(open('$MANIFEST')).get('provides', {}).get('config') or [])
+          print(c[0]['name'] if c else '')")
+          if [ -z "$CFG" ]; then ok "manifest declares no config template"
+          elif [ -f "$DEST/$CFG" ]; then ok "config scaffolded: $CFG"
+          else bad "config declared but not created: $DEST/$CFG"; fi
+
+          # Quality Gate §2 — every declared command is registered, counted from
+          # the manifest rather than hardcoded, so adding a sixth needs no edit here.
+          # Match "• speckit." specifically: the install output also bullets the
+          # scaffolded config, and counting every bullet reports one too many.
+          got=$(grep -cE '• speckit\.' install.log || echo 0)
+          [ "$got" -eq "$NCMD" ] \
+            && ok "all $NCMD commands registered" \
+            || bad "manifest declares $NCMD commands, install reported $got"
+
+          # Quality Gate §3 — the version a consumer sees is the version we shipped.
+          grep -q "v$VERSION" install.log \
+            && ok "installed version reported as v$VERSION" \
+            || bad "install did not report v$VERSION"
+
+          # BLOCKER v1.2.0 #3 — .extensionignore gaps once copied 110 files into
+          # the consumer, 86 of them belonging to other extensions entirely.
+          n=$(find "$DEST" -type f | wc -l | tr -d ' ')
+          [ "$n" -lt 30 ] \
+            && ok "installed file count is sane ($n)" \
+            || { bad "install copied $n files — check .extensionignore"; \
+                 find "$DEST" -type f | head -20; }
+
+          # Hooks must auto-register, and must stay argument-free: that is what
+          # keeps --force unreachable from an automatic trigger (FR-022).
+          python3 - "$EXT_ID" "$NHOOK" <<'PY' || fail=1
+          import sys, yaml
+          ext, expected = sys.argv[1], int(sys.argv[2])
+          hooks = (yaml.safe_load(open('.specify/extensions.yml')) or {}).get('hooks') or {}
+          mine = [(ev, e) for ev, es in hooks.items()
+                  for e in (es if isinstance(es, list) else [es])
+                  if e.get('extension') == ext]
+          if len(mine) != expected:
+              print(f'  \033[31mFAIL\033[0m  manifest declares {expected} hooks, {len(mine)} registered')
+              sys.exit(1)
+          armed = [ev for ev, e in mine if 'args' in e or 'arguments' in e]
+          if armed:
+              print(f'  \033[31mFAIL\033[0m  hook(s) carry arguments, breaking FR-022: {armed}')
+              sys.exit(1)
+          print(f'  \033[32mPASS\033[0m  {expected} hooks registered, none carrying arguments')
+          PY
+
+          echo
+          [ "$fail" -eq 0 ] || { echo "Smoke test failed."; exit 1; }
+          echo "Smoke test passed."
+
+      - name: Upload install log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-log
+          path: /tmp/consumer/*.log
+          retention-days: 7
