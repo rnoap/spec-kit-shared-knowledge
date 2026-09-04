@@ -2,8 +2,8 @@
   "workflow": "speckit",
   "specName": "source lifecycle cache",
   "branch": "main",
-  "currentStep": "tasks",
-  "status": "ready-to-implement",
+  "currentStep": "specify",
+  "status": "specified",
   "history": [
     {
       "step": "specify",
@@ -81,6 +81,13 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-09-04T16:47:43.776Z"
+    },
+    {
+      "step": "analyze",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-09-04T16:51:34.158Z"
     }
   ],
   "telemetryInstanceId": "76267a62-db39-46d0-8930-e0cd2373399e"
