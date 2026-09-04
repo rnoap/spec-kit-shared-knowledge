@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.10.0-7d4cdb">
-  <img alt="Status" src="https://img.shields.io/badge/status-v1.2.0-success">
+  <img alt="Status" src="https://img.shields.io/badge/status-v1.3.0-success">
 </p>
 
 ## Overview
@@ -173,9 +173,20 @@ Display current state of all configured sources.
 
 **Flags**: `--verbose` — list all cached file paths per source
 
-## Integration with /speckit-specify and /speckit-plan
+## Integration with the spec-kit lifecycle
 
-The `before_specify` and `before_plan` hooks declared in [`extension.yml`](extension.yml) are **auto-registered by spec-kit** when the extension is installed via `specify extension add` — no manual edits to `.specify/extensions.yml` are required. See the [spec-kit Extension Development Guide](https://github.com/github/spec-kit/blob/main/extensions/EXTENSION-DEVELOPMENT-GUIDE.md) for the underlying mechanism. The AI agent's knowledge-reading behavior is driven by the **Context Output block** emitted at the end of every successful or degraded sync (see [`commands/speckit.knowledge.sync.md`](commands/speckit.knowledge.sync.md) § "10. Emit Context Output for AI Agents block").
+The hooks declared in [`extension.yml`](extension.yml) are **auto-registered by spec-kit** when the extension is installed via `specify extension add` — no manual edits to `.specify/extensions.yml` are required. See the [spec-kit Extension Development Guide](https://github.com/github/spec-kit/blob/main/extensions/EXTENSION-DEVELOPMENT-GUIDE.md) for the underlying mechanism.
+
+| Hook | Runs before | Why |
+|------|-------------|-----|
+| `before_specify` | `/speckit-specify` | Spec drafting reflects current contracts |
+| `before_clarify` | `/speckit-clarify` | Ambiguities resolved against real decisions |
+| `before_plan` | `/speckit-plan` | Planning sees the current architecture |
+| `before_tasks` | `/speckit-tasks` | Task breakdown reflects current contracts |
+
+All four are **optional**, so spec-kit prompts before each sync and you can decline. There is no cache TTL yet — every accepted hook refetches — so decline the ones you don't need in a given session.
+
+The AI agent's knowledge-reading behavior is driven by the **Context Output block** emitted at the end of every successful or degraded sync (see [`commands/speckit.knowledge.sync.md`](commands/speckit.knowledge.sync.md) § "10. Emit Context Output for AI Agents block").
 
 > **Migration note**: If you previously followed the prior README and added `knowledge` entries to your project's `.specify/extensions.yml`, you may safely remove them — auto-registration handles them now.
 

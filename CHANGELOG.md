@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-04
+
+### Added
+
+- `feat(hooks): sync knowledge before clarify and task generation` — `extension.yml` now declares `before_clarify` and `before_tasks` in addition to `before_specify` and `before_plan`. Shared contracts and decisions are as relevant when resolving spec ambiguities and breaking work into tasks as they are when drafting a spec, but those two commands previously ran against whatever the cache happened to hold. Both new hooks are `optional: true`, so spec-kit prompts before each sync.
+
+### Known limitation
+
+- Going from two hooks to four means up to four clone/fetch operations per feature cycle. Every hook is declinable, but the real fix is a cache TTL (`max_age`) that lets sync no-op when the cache is still fresh. That work is tracked separately and is not in this release.
+
+### Changed
+
+- `extension.yml` `version` bumped from `1.2.0` to `1.3.0`.
+- README § "Integration with /speckit-specify and /speckit-plan" renamed to "Integration with the spec-kit lifecycle" and rewritten as a four-row hook table with a note on the per-cycle sync cost.
+
 ## [1.2.0] - 2026-09-04
 
 Pre-publication hardening release. Verified against `specify 1.0.4` with a real
@@ -88,7 +103,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.3.0
 [1.2.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.2.0
 [1.1.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.1.0
 [1.0.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.0.0
