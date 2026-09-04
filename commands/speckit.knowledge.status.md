@@ -21,12 +21,12 @@ Uses the same **Source Slug Generation** and **Cache Integrity Check** algorithm
 
 ### 1. Read configuration
 
-Read `.specify/extensions/knowledge/knowledge.yml`.
+Read `.specify/extensions/knowledge/knowledge-config.yml`.
 
 - If absent: print:
   ```
   ℹ️  knowledge extension is not configured for this project.
-  Run /speckit-knowledge-configure to add knowledge sources.
+  Run __SPECKIT_COMMAND_KNOWLEDGE_CONFIGURE__ to add knowledge sources.
   ```
   Exit 0.
 - If YAML invalid: print error and exit 0.
@@ -67,7 +67,7 @@ Disabled sources: show `— disabled` without a reachability check.
 
 ```
 📊 Shared Knowledge Status
-   Config: .specify/extensions/knowledge/knowledge.yml
+   Config: .specify/extensions/knowledge/knowledge-config.yml
    Index:  .specify/extensions/knowledge/knowledge-index.md
 
 ┌──────────────────────┬──────────────┬──────────┬───────┬────────────┐
@@ -90,7 +90,7 @@ Status values:
 
 Indicate if `knowledge-index.md` is absent:
 ```
-⚠️  knowledge-index.md not found — run /speckit-knowledge-sync to generate it.
+⚠️  knowledge-index.md not found — run __SPECKIT_COMMAND_KNOWLEDGE_SYNC__ to generate it.
 ```
 
 ### 5. --verbose flag

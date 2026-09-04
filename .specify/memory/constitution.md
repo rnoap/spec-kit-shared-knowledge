@@ -78,7 +78,7 @@ Types: feat | fix | refactor | docs | chore | test | style
 
 Before tagging a release:
 
-1. `specify extension add knowledge --dev <path>` runs to completion without errors in a clean consumer project.
+1. `specify extension add <path> --dev` runs to completion without errors in a clean consumer project, with no "Config templates not scaffolded" warning.
 2. All four commands are registered and visible via `specify extension list`.
 3. `extension.yml` `version` matches the intended git tag.
 4. `CHANGELOG.md` has an entry for the new version.

@@ -80,12 +80,12 @@ The machine-readable HTML comment on line 1 allows scripts to detect the index w
 
 ### 1. Read and validate configuration
 
-Read `.specify/extensions/knowledge/knowledge.yml`.
+Read `.specify/extensions/knowledge/knowledge-config.yml`.
 
-- If file absent: print `❌ Error: knowledge.yml not found. Run /speckit-knowledge-configure to initialize.` and exit 0.
-- If YAML invalid: print `❌ Error: knowledge.yml contains invalid YAML: <parse error>` and exit 0.
+- If file absent: print `❌ Error: knowledge-config.yml not found. Run __SPECKIT_COMMAND_KNOWLEDGE_CONFIGURE__ to initialize.` and exit 0.
+- If YAML invalid: print `❌ Error: knowledge-config.yml contains invalid YAML: <parse error>` and exit 0.
 - If `schema_version` missing or unknown: print `❌ Error: Unrecognized schema_version. Expected "1.0".` and exit 0.
-- If `sources` key missing: print `❌ Error: knowledge.yml is missing the required "sources" key.` and exit 0.
+- If `sources` key missing: print `❌ Error: knowledge-config.yml is missing the required "sources" key.` and exit 0.
 
 ### 2. Source-count warning
 
@@ -289,7 +289,7 @@ This is the LAST thing printed on stdout. Nothing follows it.
 **Soft warning (all unreachable + no cache, FR-013a)**:
 
 ```
-⚠️  No knowledge-index.md found yet. Run /speckit-knowledge-sync once when sources are reachable.
+⚠️  No knowledge-index.md found yet. Run __SPECKIT_COMMAND_KNOWLEDGE_SYNC__ once when sources are reachable.
 ```
 
 Then exit 0.
@@ -360,5 +360,5 @@ This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose
 - Creates `cache/<slug>/` directories with sparse-checkout git state
 - Writes `cache/<slug>/.manifest.json` per source
 - Writes/updates `knowledge-index.md`
-- Does **not** modify `knowledge.yml`
+- Does **not** modify `knowledge-config.yml`
 - Does **not** modify `.specify/extensions.yml`

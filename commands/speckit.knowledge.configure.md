@@ -21,7 +21,7 @@ description: "Initialize or edit the knowledge source configuration for the curr
 
 ### 1. Locate or create configuration file
 
-Check for `.specify/extensions/knowledge/knowledge.yml` in the project root.
+Check for `.specify/extensions/knowledge/knowledge-config.yml` in the project root.
 
 - **If absent**: create the directory `.specify/extensions/knowledge/` and copy the extension's `config-template.yml` to that location, producing a file with `schema_version: "1.0"` and `sources: []`.
 - **If present**: read the existing file and parse its `sources` list.
@@ -76,11 +76,11 @@ Prompt the developer to confirm or edit the displayed configuration before writi
 
 ### 4. Write configuration
 
-On confirmation, write the updated `knowledge.yml` back to disk, preserving `schema_version: "1.0"` at the top and all existing source entries.
+On confirmation, write the updated `knowledge-config.yml` back to disk, preserving `schema_version: "1.0"` at the top and all existing source entries.
 
 ### 5. Update .gitignore
 
-After writing `knowledge.yml`, check the project root `.gitignore` (create it if absent) for the two knowledge-cache entries. For each entry that is **not already present**, append it:
+After writing `knowledge-config.yml`, check the project root `.gitignore` (create it if absent) for the two knowledge-cache entries. For each entry that is **not already present**, append it:
 
 ```
 # knowledge extension cache (local only; do not commit)
@@ -95,32 +95,32 @@ After writing `knowledge.yml`, check the project root `.gitignore` (create it if
 ### 6. Emit success output
 
 ```
-✅ knowledge.yml updated.
+✅ knowledge-config.yml updated.
 ✅ .gitignore updated with cache exclusion entries.
 
 Configured sources:
   1. payment-service  →  https://github.com/your-org/payment-service  (path: specs/)
   2. identity-service →  https://github.com/your-org/identity-service  (path: all .md files)
 
-Run /speckit-knowledge-sync to refresh the cache.
+Run __SPECKIT_COMMAND_KNOWLEDGE_SYNC__ to refresh the cache.
 ```
 
 If no sources are configured (empty list):
 ```
-✅ knowledge.yml initialized with empty sources list.
+✅ knowledge-config.yml initialized with empty sources list.
 ✅ .gitignore updated with cache exclusion entries.
 
-Run /speckit-knowledge-configure <url> to add a knowledge source.
+Run __SPECKIT_COMMAND_KNOWLEDGE_CONFIGURE__ <url> to add a knowledge source.
 ```
 
 ---
 
 ## --verbose flag
 
-When `--verbose` is present in `$ARGUMENTS`, additionally print the full YAML content of `knowledge.yml` after the success message:
+When `--verbose` is present in `$ARGUMENTS`, additionally print the full YAML content of `knowledge-config.yml` after the success message:
 
 ```
---- VERBOSE: knowledge.yml ---
+--- VERBOSE: knowledge-config.yml ---
 schema_version: "1.0"
 
 sources:
@@ -140,8 +140,8 @@ sources:
 | `path_filter` contains `..` | `❌ Error: path_filter must not contain .. (directory traversal not allowed)` |
 | Local path does not exist | `❌ Error: Local path "<path>" does not exist.` |
 | Local path is not a git repo | `❌ Error: Local path "<path>" is not a Git repository (no .git directory found).` |
-| Invalid YAML in existing config | `❌ Error: knowledge.yml contains invalid YAML: <parse error>. Fix the file manually and re-run.` |
-| `schema_version` missing | `❌ Error: knowledge.yml is missing schema_version. Expected "1.0".` |
+| Invalid YAML in existing config | `❌ Error: knowledge-config.yml contains invalid YAML: <parse error>. Fix the file manually and re-run.` |
+| `schema_version` missing | `❌ Error: knowledge-config.yml is missing schema_version. Expected "1.0".` |
 | `schema_version` unknown | `⚠️ Warning: Unknown schema_version "<value>". Proceeding with caution.` |
 
 ---
@@ -149,9 +149,9 @@ sources:
 ## Side effects
 
 - Creates `.specify/extensions/knowledge/` directory if absent
-- Creates or modifies `.specify/extensions/knowledge/knowledge.yml`
+- Creates or modifies `.specify/extensions/knowledge/knowledge-config.yml`
 - Does **not** modify `.specify/extensions.yml` (hook registration is a separate manual step)
-- Does **not** run sync (prompt developer to run `/speckit-knowledge-sync` afterwards)
+- Does **not** run sync (prompt developer to run `__SPECKIT_COMMAND_KNOWLEDGE_SYNC__` afterwards)
 
 ---
 

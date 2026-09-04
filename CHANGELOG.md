@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-04
+
+Pre-publication hardening release. Verified against `specify 1.0.4` with a real
+`extension add --dev` install into a clean project.
+
+### Fixed
+
+- `fix(manifest)!: rename the config target to knowledge-config.yml` — spec-kit rejected `provides.config[].name: knowledge.yml` (`Warning: Config templates not scaffolded: knowledge.yml`), so no config file was ever created on install. `ExtensionManager._target_follows_preserved_convention` only accepts a top-level target ending in `-config.yml` / `-config.local.yml`; anything else is also `rmtree`d by `extension add --force` and by `extension remove --keep-config`, so the old name risked silently destroying a user's source list on reinstall. The project config file is now `.specify/extensions/knowledge/knowledge-config.yml`.
+- `fix(manifest): drop the unsupported provides.config[].location key` — not part of the manifest schema; config is always deployed under `.specify/extensions/<id>/`. Replaced with the documented `description` field.
+- `fix(packaging): exclude .github/ and .wibey/ from the installed copy` — `.extensionignore` did not cover this repo's own agent command surfaces, so `extension add` copied 110 files into the consumer's `.specify/extensions/knowledge/`, 86 of which were unrelated `speckit.*.agent.md` / `speckit.*.prompt.md` files belonging to other extensions. The installed copy is now 8 files.
+- `fix(packaging): add .gitattributes export-ignore for dev-only trees` — the catalog `download_url` is the GitHub source archive, which is produced by `git archive`. Without this, every published archive shipped this repo's own `.specify/` workspace, including four vendored third-party extensions.
+- `fix(commands): use agent-neutral __SPECKIT_COMMAND_*__ tokens` — command bodies hard-coded `/speckit-knowledge-sync`, which is correct for slash agents only and breaks on Codex/ZCode (`$speckit-knowledge-sync`), Kimi (`/skill:...`), and dot-separator agents. Spec Kit now renders the invocation per agent.
+- `docs(readme): correct the dev-install invocation` — `specify extension add knowledge --dev <path>` fails on spec-kit ≥ 1.0 with `Got unexpected extra argument(s)`. The path is the positional argument: `specify extension add <path> --dev`.
+- `docs: status badge now tracks the manifest version` (was pinned at v1.0.0 while the manifest was 1.1.0).
+
+### Changed
+
+- `extension.yml` `version` bumped from `1.1.0` to `1.2.0`.
+- Constitution quality gate #1 now asserts a clean install *and* successful config scaffolding.
+
+### Migration
+
+If you installed 1.1.0 with `--dev` and already configured sources, rename the
+file before upgrading:
+
+```bash
+mv .specify/extensions/knowledge/knowledge.yml \
+   .specify/extensions/knowledge/knowledge-config.yml
+```
+
 ## [1.1.0] - 2026-06-17
 
 ### Added
@@ -33,7 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README § "Quick Start" and § "Commands" rewritten with four example variants (remote URL, local absolute path, local tilde path, multi-folder filter) and an expanded `/speckit-knowledge-configure` reference.
 - `config-template.yml` rewritten with five commented examples covering every source-type and path_filter combination.
 
-## [1.0.0] - TBD
+## [1.0.0] - 2026-06-11
 
 ### Added
 
@@ -58,5 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.2.0
+[1.1.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.1.0
 [1.0.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.0.0

@@ -12,11 +12,18 @@ CHANGELOG.md
 # Local tool / editor state
 .specify/
 .claude/
+.wibey/
 .vscode/
 .idea/
 
+# Agent command/prompt surfaces generated for THIS repo's own spec-kit workspace.
+# These belong to other extensions (git, brownfield, companion) — copying them
+# into a consumer project would install ~86 unrelated files.
+.github/
+
 # Version control
 .git/
+.gitattributes
 .gitignore
 
 # OS junk
@@ -24,7 +31,3 @@ CHANGELOG.md
 Thumbs.db
 *.swp
 *.tmp
-
-# Local-install helper script (not needed once the extension is installed
-# via `specify extension add`)
-scripts/

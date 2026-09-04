@@ -3,7 +3,7 @@ schema_version: "1.0"
 extension:
   id: knowledge
   name: "Shared Knowledge"
-  version: "1.1.0"
+  version: "1.2.0"
   description: "Inject cross-repo decisions, contracts, and conventions into your spec-kit workflow."
   author: "Raúl Noa Pedroso"
   repository: "https://github.com/rnoap/spec-kit-shared-knowledge"
@@ -31,10 +31,12 @@ provides:
       file: commands/speckit.knowledge.status.md
       description: "Show reachability, last-sync timestamp, item count, and cache age per source"
 
+  # `name` must end in `-config.yml` — spec-kit only preserves that pattern across
+  # `extension add --force` / `remove --keep-config`.
   config:
-    - name: "knowledge.yml"
+    - name: "knowledge-config.yml"
       template: "config-template.yml"
-      location: ".specify/extensions/knowledge/"
+      description: "Knowledge source configuration for this project"
       required: false
 
 hooks:

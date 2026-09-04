@@ -1,0 +1,15 @@
+# Files stripped from `git archive` output — this is what GitHub serves at
+# /archive/refs/tags/<tag>.zip, which is the extension's catalog download_url.
+# Without these, the published archive would ship this repo's own spec-kit
+# workspace (including four unrelated third-party extensions) to every consumer.
+
+.github/            export-ignore
+.specify/           export-ignore
+.claude/            export-ignore
+.wibey/             export-ignore
+.vscode/            export-ignore
+.code-review-graph/ export-ignore
+specs/              export-ignore
+AGENTS.md           export-ignore
+.gitattributes      export-ignore
+.gitignore          export-ignore

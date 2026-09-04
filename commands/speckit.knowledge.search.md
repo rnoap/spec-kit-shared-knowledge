@@ -23,10 +23,10 @@ Read `.specify/extensions/knowledge/knowledge-index.md`.
   ```
   ℹ️  knowledge-index.md not found — running sync first...
   ```
-  Execute `speckit.knowledge.sync` (i.e., invoke `/speckit-knowledge-sync`), then re-read the index.
+  Execute the sync command (`__SPECKIT_COMMAND_KNOWLEDGE_SYNC__`), then re-read the index.
   If sync also fails or index is still absent after sync, print:
   ```
-  ❌ Unable to build knowledge index. Check that knowledge.yml is configured and at least one source is reachable.
+  ❌ Unable to build knowledge index. Check that knowledge-config.yml is configured and at least one source is reachable.
   ```
   Exit 0.
 
@@ -84,7 +84,7 @@ Found <N> items across <M> sources:
 🔍 Search: "<query>"
 
 No matching items found across <M> sources.
-Tip: Run /speckit-knowledge-sync to refresh the cache, then try again.
+Tip: Run __SPECKIT_COMMAND_KNOWLEDGE_SYNC__ to refresh the cache, then try again.
 ```
 
 ---

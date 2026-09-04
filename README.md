@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.10.0-7d4cdb">
-  <img alt="Status" src="https://img.shields.io/badge/status-v1.0.0-success">
+  <img alt="Status" src="https://img.shields.io/badge/status-v1.2.0-success">
 </p>
 
 ## Overview
@@ -34,25 +34,26 @@ When working in a microservices or multi-repo environment, architectural decisio
 specify extension add knowledge
 ```
 
-Or from a local ZIP:
+Or from a release archive:
 
 ```bash
-specify extension add knowledge --from /path/to/spec-kit-shared-knowledge.zip
+specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.2.0.zip
 ```
 
 ### Local / Development Install
 
-Install directly from a local checkout:
+Install directly from a local checkout — the path is the positional argument:
 
 ```bash
 cd /path/to/your/spec-kit-project
-specify extension add knowledge --dev /path/to/spec-kit-shared-knowledge
+specify extension add /path/to/spec-kit-shared-knowledge --dev
 ```
 
 This copies the four command files, the manifest, and `config-template.yml`
-into `.specify/extensions/knowledge/`, registers the extension, and
-auto-registers the `before_specify` / `before_plan` hooks. After install,
-add these two lines to your project's `.gitignore`:
+into `.specify/extensions/knowledge/`, scaffolds `knowledge-config.yml`,
+registers the extension, and auto-registers the `before_specify` /
+`before_plan` hooks. After install, add these two lines to your project's
+`.gitignore`:
 
 ```gitignore
 .specify/extensions/knowledge/cache/
@@ -114,7 +115,7 @@ Initialize or edit the knowledge source configuration for the current project. A
 **Output**:
 
 ```
-✅ knowledge.yml updated.
+✅ knowledge-config.yml updated.
 ✅ .gitignore updated with cache exclusion entries.
 
 Configured sources:
@@ -178,7 +179,7 @@ The `before_specify` and `before_plan` hooks declared in [`extension.yml`](exten
 
 > **Migration note**: If you previously followed the prior README and added `knowledge` entries to your project's `.specify/extensions.yml`, you may safely remove them — auto-registration handles them now.
 
-> **No-op when not configured**: If `.specify/extensions/knowledge/knowledge.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
+> **No-op when not configured**: If `.specify/extensions/knowledge/knowledge-config.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
 
 ## Configuration Reference
 
@@ -210,7 +211,7 @@ If you need to add them by hand (e.g. before running configure for the first tim
 .specify/extensions/knowledge/knowledge-index.md
 ```
 
-The `knowledge.yml` config file **should** be committed — it declares your team's knowledge sources and is shared across all developers.
+The `knowledge-config.yml` config file **should** be committed — it declares your team's knowledge sources and is shared across all developers.
 
 ## Troubleshooting
 
@@ -229,7 +230,7 @@ Contributions are welcome. To propose a change:
 1. Open an issue describing the bug or enhancement before sending a PR for non-trivial changes
 2. Fork the repo and create a feature branch (`feat/<short-name>` or `fix/<short-name>`)
 3. Update `CHANGELOG.md` under `[Unreleased]` with your change
-4. Test the change with `specify extension add knowledge --dev /path/to/spec-kit-shared-knowledge` against a real spec-kit project
+4. Test the change with `specify extension add /path/to/spec-kit-shared-knowledge --dev` against a real spec-kit project
 5. Open a pull request and reference the issue
 
 For larger architectural changes, please file a discussion first. See `specs/` for the reverse-engineered specs that document the current behavior.
