@@ -121,6 +121,8 @@ los comandos romperían en runtime. Lo que hace es hacer segura la duplicación.
 - [x] T8 Branch protection: los dos checks pasan a **required**
 - [x] T9 Extraer `assert-install.sh` — una sola copia para los dos workflows
 - [x] T10 `upstream-compat.yml` — smoke semanal contra spec-kit `main`, advisory
+- [x] T11 Migrar la protección clásica a **rulesets**
+- [x] T12 Ruleset de tags: `refs/tags/v*` inmutable
 
 ## Done When
 
@@ -131,6 +133,8 @@ los comandos romperían en runtime. Lo que hace es hacer segura la duplicación.
 - [x] Los checks son **bloqueantes**, no solo informativos
 - [x] `upstream-compat` no se dispara en `pull_request` — verificado, no puede
       bloquear a nadie
+- [x] Borrar y mover un tag `v*` fallan — verificado con pushes reales contra un
+      tag desechable, no contra un release
 
 ## Lo que encontró probar el propio test
 
@@ -154,8 +158,33 @@ que nadie confunda un build verde con una feature que funciona.
 
 ## Pendiente
 
-- `strict: true` en la protección exige que la rama esté al día antes de mergear.
-  Con un solo mantenedor es fricción menor; protege del caso "PR verde que rompe
-  al mergear".
+- `strict: true` sigue exigiendo que la rama esté al día antes de mergear. Con un
+  solo mantenedor es fricción menor; protege del caso "PR verde que rompe al
+  mergear".
 - `upstream-compat` aún no ha corrido en su horario — se dispara el primer lunes
   a las 06:00 UTC. Se puede forzar antes con `gh workflow run upstream-compat.yml`.
+- La migración automática partió la protección de `main` en **dos** rulesets
+  (`main-1` borrado/force-push sin bypass, `main-2` checks requeridos con bypass
+  de admin). Es fiel a lo que había — ese bypass era el antiguo
+  `enforce_admins: false` — pero es asimétrico: el admin puede saltarse los
+  checks y no puede borrar la rama. Fusionarlos queda pendiente si molesta.
+
+## Protección: de branch protection clásica a rulesets
+
+La protección original se aplicó con `PUT /branches/main/protection` — la API
+clásica. Vive en *Settings → Branches*, **no** en *Settings → Rules → Rulesets*,
+que es un sistema distinto que convive con ella. Ver la pantalla de rulesets
+vacía no significa que no haya protección.
+
+**Por qué migrar.** Una razón concreta, no estética: rulesets protege **tags** y
+la clásica no puede. Esta extensión se distribuye por `download_url` apuntando a
+un tag; si `v1.4.0` se mueve o se borra, cambia lo que la gente descarga sin que
+nadie lo note. Ese agujero solo se cierra con un ruleset.
+
+`Release tags are immutable` cubre `refs/tags/v*` con `deletion`,
+`non_fast_forward` y `update`. Los tres hacen falta: `non_fast_forward` solo
+frena movimientos no-fast-forward, así que sin `update` un tag podía reapuntarse
+a un commit descendiente sin resistencia.
+
+**Sin bypass, a propósito.** Borrar un tag publicado debería costar un acto
+consciente: desactivar el ruleset, borrar, reactivarlo. Es la única vía.
