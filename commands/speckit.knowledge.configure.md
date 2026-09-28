@@ -296,7 +296,7 @@ Every row exits **0** — validation problems are messages, never process failur
 | Local path does not exist | `❌ Error: Local path "<path>" does not exist.` |
 | Local path is not a git repo | `❌ Error: Local path "<path>" is not a Git repository (no .git directory found).` |
 | `label` contains whitespace | `❌ Error: label must not contain whitespace` |
-| `label` already used by another source | `❌ Error: label "<label>" is already used. Choose another with --label, or remove the existing source first.` |
+| `label` already used by another source | `❌ Error: label "<label>" is already used. Accept the suggested label, type a different one, or remove the existing source first with __SPECKIT_COMMAND_KNOWLEDGE_REMOVE__ <label>.` |
 | `revision` fails `^[A-Za-z0-9._/-]+$` | `❌ Error: revision "<value>" contains characters git does not accept in a refname` |
 | `revision` begins with `-` | `❌ Error: revision must not begin with "-" (it would be read as a git option)` |
 | `revision` contains `..` or ends `.lock` | `❌ Error: revision "<value>" is not a valid refname` |
@@ -316,7 +316,7 @@ Every row exits **0** — validation problems are messages, never process failur
 
 - Creates `.specify/extensions/knowledge/` directory if absent
 - Creates or modifies `.specify/extensions/knowledge/knowledge-config.yml`
-- Does **not** modify `.specify/extensions.yml` (hook registration is a separate manual step)
+- Does **not** modify `.specify/extensions.yml` — spec-kit auto-registers the hooks when the extension is installed
 - Does **not** run sync (prompt developer to run `__SPECKIT_COMMAND_KNOWLEDGE_SYNC__` afterwards)
 
 ---

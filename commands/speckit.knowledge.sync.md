@@ -231,7 +231,7 @@ Run this check before using an existing cache as fallback:
 
 ### `knowledge-index.md` Format
 
-Written to `.specify/extensions/knowledge/knowledge-index.md`. This is the **only file** that `speckit-specify` and `speckit-plan` read directly.
+Written to `.specify/extensions/knowledge/knowledge-index.md`. This is the **only file** that the spec-kit commands behind the four hooks — `specify`, `clarify`, `plan`, and `tasks` — read directly.
 
 ```markdown
 <!-- knowledge-index-meta: schema_version=1.0 generated_at=<ISO8601> sources=<N> items=<N>
@@ -1040,7 +1040,7 @@ a hook entry would break this**; `extension.yml` carries a comment saying so.
 
 When `--no-context-output` is present in `$ARGUMENTS`, set `suppress_context_output = true` and skip emitting the trailing Context Output for AI Agents block (step 10). All other output — per-source status lines, summary line, pointer line — prints identically. Exit code remains 0.
 
-This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose`. It composes orthogonally with `--verbose` (both may be present simultaneously). The auto-trigger paths (`before_specify`, `before_plan`) declare no arguments in `extension.yml`, so `--no-context-output` is structurally unreachable from those hooks — the block always emits on auto-trigger.
+This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose`. It composes orthogonally with `--verbose` (both may be present simultaneously). The four auto-trigger paths (`before_specify`, `before_clarify`, `before_plan`, `before_tasks`) declare no arguments in `extension.yml`, so `--no-context-output` is structurally unreachable from those hooks — the block always emits on auto-trigger.
 
 ---
 
