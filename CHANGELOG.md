@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.5.0] - 2026-09-04
+## [1.5.0] - 2026-09-28
 
 A ceiling on how much the agent is told to read, and a written trust model for the
 committed configuration. Two views of one concern: what an uncontrolled corpus does
@@ -26,6 +26,8 @@ to the agent, and what an uncontrolled configuration grants to whoever edits it.
 ### Fixed
 
 - `fix(search): read the manifests, not the index` — `search` iterated the items *in* `knowledge-index.md`. Once the index is bounded by a budget, a withheld item would have been absent from the only file search read — unfindable rather than merely un-injected, collapsing the distinction the whole feature rests on. Search now builds its inventory from the per-source `.manifest.json` files, which are written **before** the budget is applied and always hold the complete list. Found during planning research, not during implementation.
+- `fix(commands): drop stale hook and flag references` — `configure` still called hook registration a manual step, though spec-kit has auto-registered hooks since 1.1.0, and its label-collision error pointed at a `--label` flag that never existed. `sync` described `--no-context-output` as unreachable from two hooks and the index as read by two commands; both have been four since 1.4.0.
+- `docs(readme): catch up with 1.4.0 and 1.5.0` — the release-archive example pinned `v1.2.0`; install and overview described two hooks and four commands; the lifecycle section still claimed there was no cache TTL; the configuration reference lacked `revision`, `max_cache_age`, `max_items`, and `max_bytes`; `sync --no-context-output` and the `status` budget column were undocumented; troubleshooting pointed at setup steps removed in 1.1.0; spec-kit core commands used the hyphenated form.
 
 ### Security
 
@@ -37,6 +39,8 @@ to the agent, and what an uncontrolled configuration grants to whoever edits it.
 - `config-template.yml` documents both keys and carries a security block pointing at the trust model. **`schema_version` stays `"1.0"`**: both keys are optional and default to prior behaviour.
 - A per-source budget is a **sub-ceiling**, deliberately unlike `max_cache_age` — which occupies the same two positions in the file but whose per-source value *replaces* the project value. A per-source ceiling above the project ceiling is clamped and reported rather than skipping the source, since the value is well-formed and has exactly one safe reading.
 - The Configuration Validation Rules block gained two rows in all three copies at once, as Quality Gate §11 requires.
+- `docs(readme): add emojis to headings, the feature list, and tables`. Headings use single-codepoint emojis only, so their `#-section` anchors carry no invisible variation selector.
+- Released 2026-09-28 rather than on completion (2026-09-04): the tag was held until the fixes above landed, so the published archive carries them.
 
 ### Compatibility
 
@@ -188,7 +192,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.5.0
 [1.4.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.4.0
 [1.3.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.3.0
 [1.2.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.2.0

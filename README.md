@@ -1,4 +1,4 @@
-<h1 align="center">Shared Knowledge</h1>
+<h1 align="center">📚 Shared Knowledge</h1>
 
 <p align="center">
   <em>A spec-kit extension that injects architectural decisions, API contracts, and shared conventions from other Git repositories into your spec-kit workflow.</em>
@@ -10,25 +10,29 @@
   <img alt="Status" src="https://img.shields.io/badge/status-v1.5.0-success">
 </p>
 
-## Overview
+## 📖 Overview
 
-When working in a microservices or multi-repo environment, architectural decisions and API contracts are scattered across repositories. This extension lets you declare which repositories are "knowledge sources" for your project. During `/speckit-specify` and `/speckit-plan`, the assistant automatically loads and surfaces relevant knowledge from those sources — so the generated spec reflects the real contracts and decisions your team has already made.
+When working in a microservices or multi-repo environment, architectural decisions and API contracts are scattered across repositories. This extension lets you declare which repositories are "knowledge sources" for your project. During `/speckit.specify`, `/speckit.clarify`, `/speckit.plan`, and `/speckit.tasks`, the assistant automatically loads and surfaces relevant knowledge from those sources — so the generated spec, plan, and tasks reflect the real contracts and decisions your team has already made.
 
 **Key features**:
-- Explicit opt-in: each project declares its own knowledge sources
-- Git-native: clones repositories with sparse checkout (only the paths you need)
-- Offline-friendly: cached knowledge is used when sources are unreachable
-- Path-filtered: scope reads to `specs/`, `docs/decisions/`, or any subdirectory
-- Conflict-aware: duplicate paths across sources are flagged, both versions surfaced
+- 🙋 Explicit opt-in: each project declares its own knowledge sources
+- 🌿 Git-native: clones repositories with sparse checkout (only the paths you need)
+- ✈️ Offline-friendly: cached knowledge is used when sources are unreachable
+- 📂 Path-filtered: scope reads to `specs/`, `docs/decisions/`, or any subdirectory
+- ⚠️ Conflict-aware: duplicate paths across sources are flagged, both versions surfaced
+- 📌 Revision-pinned: lock a source to a branch, tag, or full commit SHA
+- ⏳ Cache-aware: skip the network entirely while the cache is still current
+- 📏 Budget-bounded: cap how much the agent is told to read — nothing is withheld silently
+- 🚦 Lifecycle-managed: remove, disable, or re-enable a source without hand-editing YAML
 
-## Prerequisites
+## 📋 Prerequisites
 
 - `git >= 2.25` (sparse-checkout support required)
 - spec-kit `>= 0.10.0`
 
-## Installation
+## 📦 Installation
 
-### Published (once available in the catalog)
+### 🌐 Published (once available in the catalog)
 
 ```bash
 specify extension add knowledge
@@ -37,10 +41,10 @@ specify extension add knowledge
 Or from a release archive:
 
 ```bash
-specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.2.0.zip
+specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.5.0.zip
 ```
 
-### Local / Development Install
+### 💻 Local / Development Install
 
 Install directly from a local checkout — the path is the positional argument:
 
@@ -49,20 +53,16 @@ cd /path/to/your/spec-kit-project
 specify extension add /path/to/spec-kit-shared-knowledge --dev
 ```
 
-This copies the four command files, the manifest, and `config-template.yml`
+This copies the five command files, the manifest, and `config-template.yml`
 into `.specify/extensions/knowledge/`, scaffolds `knowledge-config.yml`,
-registers the extension, and auto-registers the `before_specify` /
-`before_plan` hooks. After install, add these two lines to your project's
-`.gitignore`:
-
-```gitignore
-.specify/extensions/knowledge/cache/
-.specify/extensions/knowledge/knowledge-index.md
-```
+registers the extension, and auto-registers the `before_specify`,
+`before_clarify`, `before_plan`, and `before_tasks` hooks. The first
+`/speckit.knowledge.configure` adds the cache entries to your `.gitignore` for
+you — see [.gitignore](#-gitignore).
 
 Then reload your editor / AI agent so it picks up the new commands.
 
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
 # 1a. Add a knowledge source from a REMOTE repository (single folder filter)
@@ -80,26 +80,26 @@ Then reload your editor / AI agent so it picks up the new commands.
 # 2. Sync (fetch & cache)
 /speckit.knowledge.sync
 
-# 3. Use — next time you run /speckit-specify, cross-repo context is injected automatically
+# 3. Use — run /speckit.specify (or clarify, plan, tasks), accept the sync prompt, and cross-repo context is injected
 ```
 
-## Commands
+## 🧰 Commands
 
 | Command | What it does |
 |---------|--------------|
-| `/speckit.knowledge.configure` | Initialize or edit the knowledge source configuration |
-| `/speckit.knowledge.sync` | Refresh the local cache for all configured, enabled sources |
-| `/speckit.knowledge.search` | Browse and search the knowledge corpus |
-| `/speckit.knowledge.status` | Show reachability, revision, last sync, item count, and cache age |
-| `/speckit.knowledge.remove` | Remove, disable, or re-enable a configured source |
+| 🔧 `/speckit.knowledge.configure` | Initialize or edit the knowledge source configuration |
+| 🔄 `/speckit.knowledge.sync` | Refresh the local cache for all configured, enabled sources |
+| 🔍 `/speckit.knowledge.search` | Browse and search the knowledge corpus |
+| 📊 `/speckit.knowledge.status` | Show reachability, revision, last sync, item count, budget, and cache age |
+| 🔌 `/speckit.knowledge.remove` | Remove, disable, or re-enable a configured source |
 
-### `/speckit.knowledge.configure [url-or-path] [--revision <rev>] [path_filter ...]`
+### 🔧 `/speckit.knowledge.configure [url-or-path] [--revision <rev>] [path_filter ...]`
 
 Initialize or edit the knowledge source configuration for the current project. Accepts:
 
 - **A remote Git URL** — HTTPS (`https://github.com/your-org/your-repo`) or SSH (`git@github.com:your-org/your-repo`).
 - **A local filesystem path to a Git repository** — use this when the repo is already cloned on your machine and you want to avoid network roundtrips, or when it lives on a private network. Both **absolute** paths and **`~`-prefixed** paths are supported (the tilde is expanded to `$HOME`).
-- **An optional revision** — a branch, tag, or full commit SHA. See [Pinning a revision](#pinning-a-revision).
+- **An optional revision** — a branch, tag, or full commit SHA. See [Pinning a revision](#-pinning-a-revision).
 - **Zero or more path filters** after the URL/path. With zero filters every `.md` file in the repo is indexed; with one or more filters, indexing is restricted to those folders only.
 
 **Examples**:
@@ -138,7 +138,7 @@ Configured sources:
 
 **Flags**: `--verbose` — print full YAML after write
 
-### `/speckit.knowledge.sync [--force]`
+### 🔄 `/speckit.knowledge.sync [--force]`
 
 Refresh the local cache for all configured, enabled knowledge sources.
 
@@ -155,8 +155,9 @@ Refresh the local cache for all configured, enabled knowledge sources.
 **Flags**:
 - `--verbose` — list all files loaded and items written to index
 - `--force` — ignore the cache freshness policy and fetch every source
+- `--no-context-output` — suppress the trailing context block for the AI agent (diagnostic use only)
 
-### `/speckit.knowledge.search <query>`
+### 🔍 `/speckit.knowledge.search <query>`
 
 Browse and search the knowledge corpus without triggering a full spec workflow.
 
@@ -172,7 +173,7 @@ Found 2 items across 1 source:
 
 **Flags**: `--source <label>`, `--tag <tag>`, `--verbose`
 
-### `/speckit.knowledge.status`
+### 📊 `/speckit.knowledge.status`
 
 Display current state of all configured sources.
 
@@ -189,9 +190,12 @@ Display current state of all configured sources.
 Freshness policy: payments-v2 7d (per-source) · others 4h (project)
 ```
 
+With a [context budget](#-context-budget) configured, `Items` shows indexed-of-total
+and an extra **Budget** column names the limit that produced each number.
+
 **Flags**: `--verbose` — list all cached file paths per source
 
-### `/speckit.knowledge.remove <label> [--disable | --enable]`
+### 🔌 `/speckit.knowledge.remove <label> [--disable | --enable]`
 
 Remove, disable, or re-enable a configured source. Named for its destructive mode,
 but it owns the whole activation lifecycle — there is deliberately no second
@@ -224,17 +228,17 @@ match several, and the command lists the candidates rather than guessing:
 
 **Flags**: `--disable`, `--enable`, `--verbose`
 
-## Source lifecycle
+## 🚦 Source lifecycle
 
 Before 1.4.0 the only way to stop consuming a source was to hand-edit YAML. Now:
 
 | You want to | Use | Entry | Cache |
 |-------------|-----|-------|-------|
-| Stop consuming it permanently | `remove <label>` | deleted | **purged** |
-| Pause it temporarily | `remove <label> --disable` | kept, `enabled: false` | **kept** |
-| Bring a paused source back | `remove <label> --enable` | kept, `enabled: true` | reused |
+| 🗑️ Stop consuming it permanently | `remove <label>` | deleted | **purged** |
+| ⏸️ Pause it temporarily | `remove <label> --disable` | kept, `enabled: false` | **kept** |
+| ▶️ Bring a paused source back | `remove <label> --enable` | kept, `enabled: true` | reused |
 
-**Prefer `--disable` over remove for a pause.** The cache is retained, so
+💡 **Prefer `--disable` over remove for a pause.** The cache is retained, so
 re-enabling costs no download at all. Removal purges immediately rather than
 deferring to a cleanup step — "remove" that leaves the bytes behind is the more
 surprising reading.
@@ -244,7 +248,7 @@ and **deletes the knowledge index**. A stale index would let an agent keep citin
 knowledge the project no longer declares — a silent failure that looks like
 success.
 
-## Pinning a revision
+## 📌 Pinning a revision
 
 Each source may pin a `revision` — a branch, tag, or **full** commit SHA:
 
@@ -271,14 +275,14 @@ Omit it and the source tracks the remote's default revision, exactly as before.
 - **SSH URLs** already contain `@`, so pass the revision with `--revision` rather
   than the `<url>@<rev>` shorthand.
 
-**Known limitation.** A source configured as a local path is not identified with
+⚠️ **Known limitation.** A source configured as a local path is not identified with
 the remote it was cloned from. If you configure both `~/repos/payments` and
 `https://github.com/org/payments`, overlapping paths between them *are* reported
 as conflicts. Reading the local clone's `origin` would fix this but adds a failure
 mode and a trust question to a purely advisory report, so it is deliberately not
 done.
 
-## Cache freshness
+## ⏳ Cache freshness
 
 Set `max_cache_age` and a sync will skip the network entirely when the cached
 content is still current:
@@ -303,7 +307,7 @@ times. With `4h` set and the cycle finished inside that window, it fetches once.
 - `--force` ignores the policy. It is **unreachable from an automatic trigger** — the hook entries declare no arguments — so hook-driven syncs always respect the policy.
 - **It is a hint, not an expiry.** An over-age cache is still served when its source cannot be reached. Setting a policy never leaves you with less knowledge than you had without one.
 
-## Context budget
+## 📏 Context budget
 
 Every sync tells the agent to read the index **in full** and open **every** file it
 references. That instruction has no upper bound, and the corpus grows with your
@@ -329,7 +333,7 @@ per-source value *replaces* the project value. A per-source budget above the
 project ceiling is clamped down to it and the clamp reported — it never
 invalidates the source.
 
-### What gets kept, and how you can predict it
+### 🧮 What gets kept, and how you can predict it
 
 The rule is fixed, owned by the extension, and influenced by no configuration
 value — so you can work out your own index on paper. Per dimension:
@@ -345,13 +349,13 @@ Smallest-first would fit more files, but adding one large document would silentl
 change which unrelated small ones survive, and you could no longer predict your own
 corpus.
 
-**Worked example.** Ceiling 120 items; four sources holding 312 / 55 / 88 / 12.
+✏️ **Worked example.** Ceiling 120 items; four sources holding 312 / 55 / 88 / 12.
 Share is `⌊120/4⌋ = 30`; the 12-item source is satisfied and releases 18;
 `⌊108/3⌋ = 36` and nobody else fits, so the other three take 36 each.
 **36 + 36 + 36 + 12 = 120.** A flat quarter-share each would have injected only
 102 and stranded 18 — releasing unused share is what fills the ceiling.
 
-### Nothing is withheld silently
+### 📣 Nothing is withheld silently
 
 ```
   big-docs           ✅ fresh    36 items
@@ -372,7 +376,7 @@ Share is `⌊120/4⌋ = 30`; the 12-item source is satisfied and releases 18;
 Two versions of a conflicting path are kept or dropped **together**; the budget
 never picks a winner between two teams' versions of the same file.
 
-### If you set no budget
+### 💡 If you set no budget
 
 Behaviour is byte-identical to before, and **no default is applied**. Once the
 corpus passes **200 items or 2 mb**, sync says so once per run:
@@ -386,11 +390,11 @@ corpus passes **200 items or 2 mb**, sync says so once per run:
 It changes nothing it reports on — same standing as the existing
 "more than ten sources" warning.
 
-**No flag raises or bypasses the budget.** `--force` overrides cache freshness
+🔒 **No flag raises or bypasses the budget.** `--force` overrides cache freshness
 only. The automatic sync points are exactly where a context overflow does the most
 damage, so there is no escape hatch reachable from them.
 
-## Trust model
+## 🔐 Trust model
 
 `knowledge-config.yml` is **committed and shared**. That is the point — it declares
 your team's knowledge sources — but it also means a merged pull request adding one
@@ -401,7 +405,7 @@ themselves.
 
 This section states what that grants, and what it does not.
 
-### What does NOT happen
+### 🚫 What does NOT happen
 
 Fetched content is read as **data**. It is never executed.
 
@@ -411,7 +415,7 @@ Fetched content is read as **data**. It is never executed.
 - Nothing from a source is written outside
   `.specify/extensions/knowledge/cache/<slug>/`.
 
-### What the extension defends against
+### ✅ What the extension defends against
 
 | Defense | Covers | Does **not** cover |
 |---------|--------|--------------------|
@@ -424,7 +428,7 @@ Fetched content is read as **data**. It is never executed.
 | Hooks are `optional: true` | Unattended fetches — you are prompted | A prompt you accept |
 | Manifest SHA-256 integrity check | Local cache corruption | Content that was hostile when fetched |
 
-### What it does NOT defend against
+### 🚨 What it does NOT defend against
 
 Stated plainly, because a trust model that lists only its strengths is worse than
 none:
@@ -443,7 +447,7 @@ none:
    open.** Refusing to index links that escape the cache root is the intended fix;
    it is not implemented yet.
 
-### Reviewing a change to `knowledge-config.yml`
+### 👀 Reviewing a change to `knowledge-config.yml`
 
 Treat it as a **security-relevant change**, not a config tweak. Before approving:
 
@@ -459,28 +463,35 @@ Treat it as a **security-relevant change**, not a config tweak. Before approving
 If a source is outside your organisation, prefer a pinned `revision` and a narrow
 `path_filter`, and read what it contains before merging.
 
-## Integration with the spec-kit lifecycle
+## 🔗 Integration with the spec-kit lifecycle
 
 The hooks declared in [`extension.yml`](extension.yml) are **auto-registered by spec-kit** when the extension is installed via `specify extension add` — no manual edits to `.specify/extensions.yml` are required. See the [spec-kit Extension Development Guide](https://github.com/github/spec-kit/blob/main/extensions/EXTENSION-DEVELOPMENT-GUIDE.md) for the underlying mechanism.
 
 | Hook | Runs before | Why |
 |------|-------------|-----|
-| `before_specify` | `/speckit-specify` | Spec drafting reflects current contracts |
-| `before_clarify` | `/speckit-clarify` | Ambiguities resolved against real decisions |
-| `before_plan` | `/speckit-plan` | Planning sees the current architecture |
-| `before_tasks` | `/speckit-tasks` | Task breakdown reflects current contracts |
+| `before_specify` | `/speckit.specify` | Spec drafting reflects current contracts |
+| `before_clarify` | `/speckit.clarify` | Ambiguities resolved against real decisions |
+| `before_plan` | `/speckit.plan` | Planning sees the current architecture |
+| `before_tasks` | `/speckit.tasks` | Task breakdown reflects current contracts |
 
-All four are **optional**, so spec-kit prompts before each sync and you can decline. There is no cache TTL yet — every accepted hook refetches — so decline the ones you don't need in a given session.
+All four are **optional**, so spec-kit prompts before each sync and you can decline. Set a [`max_cache_age`](#-cache-freshness) and an accepted hook skips the network while the cache is still current — with `4h` and a feature cycle that fits inside it, you fetch once instead of four times.
 
 The AI agent's knowledge-reading behavior is driven by the **Context Output block** emitted at the end of every successful or degraded sync (see [`commands/speckit.knowledge.sync.md`](commands/speckit.knowledge.sync.md) § "10. Emit Context Output for AI Agents block").
 
-> **Migration note**: If you previously followed the prior README and added `knowledge` entries to your project's `.specify/extensions.yml`, you may safely remove them — auto-registration handles them now.
+> 🔁 **Migration note**: If you previously followed the prior README and added `knowledge` entries to your project's `.specify/extensions.yml`, you may safely remove them — auto-registration handles them now.
 
-> **No-op when not configured**: If `.specify/extensions/knowledge/knowledge-config.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
+> 💤 **No-op when not configured**: If `.specify/extensions/knowledge/knowledge-config.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
 
-## Configuration Reference
+## 📑 Configuration Reference
 
 See [`config-template.yml`](config-template.yml) for the full annotated configuration schema.
+
+Top-level fields:
+
+- `schema_version` — **required**; exactly `"1.0"`.
+- `max_cache_age` — optional; project-wide freshness policy (`30m`, `4h`, `7d`). See [Cache freshness](#-cache-freshness).
+- `max_items` / `max_bytes` — optional; project-wide context budget. See [Context budget](#-context-budget).
+- `sources` — **required**; the list of knowledge sources. May be empty.
 
 Key fields per source entry:
 
@@ -489,14 +500,19 @@ Key fields per source entry:
   - SSH Git URL: `git@github.com:your-org/your-repo`
   - **Local absolute path** to a Git repository: `/Users/devuser/repos/your-repo`
   - **Local tilde path** (expanded to `$HOME`): `~/repos/your-repo`
-- `sources[*].label` — optional; human-readable name used for attribution. Defaults: for remote URLs, `<host>/<org>/<repo>` derived from the URL; for local paths, the last path component (e.g. `~/repos/payment-service` → `payment-service`).
+- `sources[*].label` — optional; human-readable name used for attribution, and the identifier `remove` takes. Must be **unique** and contain no whitespace. Defaults: for remote URLs, `<host>/<org>/<repo>` derived from the URL; for local paths, the last path component (e.g. `~/repos/payment-service` → `payment-service`).
+- `sources[*].revision` — optional; a branch, tag, or full commit SHA. Omitted → the remote's default revision. See [Pinning a revision](#-pinning-a-revision).
 - `sources[*].path_filter` — optional. Three forms:
   - **Omitted** → every `.md` file in the repo is indexed.
   - **Single string** → `path_filter: specs/` indexes only files under `specs/`.
   - **YAML list** → `path_filter: [specs/, docs/decisions/]` indexes those two trees and nothing else.
-- `sources[*].enabled` — optional; default `true`; set `false` to skip a source without removing it from the file.
+- `sources[*].enabled` — optional; default `true`; set `false` to skip a source without removing it from the file — or run `/speckit.knowledge.remove <label> --disable`.
+- `sources[*].max_cache_age` — optional; **replaces** the project-wide value for this source.
+- `sources[*].max_items` / `sources[*].max_bytes` — optional; a **sub-ceiling** that can only lower what this source contributes.
 
-## .gitignore
+Every value is validated each time the file is read. A source with an invalid value is skipped with a message naming the field and value; the other sources still sync.
+
+## 🙈 .gitignore
 
 The `/speckit.knowledge.configure` command **automatically adds** the required cache exclusion entries to your project's `.gitignore` when you first configure a source — no manual step needed.
 
@@ -510,28 +526,29 @@ If you need to add them by hand (e.g. before running configure for the first tim
 
 The `knowledge-config.yml` config file **should** be committed — it declares your team's knowledge sources and is shared across all developers.
 
-## Troubleshooting
+## 🩺 Troubleshooting
 
-**Source unreachable**: The command falls back to the existing cache and reports `⚠️ cached` with the last-sync timestamp and cache age. The command always exits 0.
+📡 **Source unreachable**: The command falls back to the existing cache and reports `⚠️ cached` with the last-sync timestamp and cache age. The command always exits 0.
 
-**Corrupted cache**: If `.manifest.json` is absent or fails integrity checks, the cache directory is discarded and a fresh sync is attempted. If the fresh sync also fails, the source is marked `❌ unreachable`.
+💥 **Corrupted cache**: If `.manifest.json` is absent or fails integrity checks, the cache directory is discarded and a fresh sync is attempted. If the fresh sync also fails, the source is marked `❌ unreachable`.
 
-**More than 10 sources**: A soft warning is emitted before the sync loop. The command continues normally — the warning is informational only. Use `path_filter` to reduce per-source clone size.
+🐢 **More than 10 sources**: A soft warning is emitted before the sync loop. The command continues normally — the warning is informational only. Use `path_filter` to reduce per-source clone size.
 
-**Context not appearing in spec output**: Verify both setup steps above are complete. Run `/speckit.knowledge.status` to confirm sources are reachable and `knowledge-index.md` exists.
+🤔 **Context not appearing in spec output**: The hooks are optional — check that you accepted the sync prompt. Then run `/speckit.knowledge.status` to confirm sources are reachable and `knowledge-index.md` exists. With no enabled sources left, sync deletes the index on purpose.
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome. To propose a change:
 
-1. Open an issue describing the bug or enhancement before sending a PR for non-trivial changes
-2. Fork the repo and create a feature branch (`feat/<short-name>` or `fix/<short-name>`)
-3. Update `CHANGELOG.md` under `[Unreleased]` with your change
-4. Test the change with `specify extension add /path/to/spec-kit-shared-knowledge --dev` against a real spec-kit project
-5. Open a pull request and reference the issue
+1. 💬 Open an issue describing the bug or enhancement before sending a PR for non-trivial changes
+2. 🍴 Fork the repo and create a feature branch (`feat/<short-name>` or `fix/<short-name>`)
+3. 📝 Update `CHANGELOG.md` under `[Unreleased]` with your change
+4. 🧪 Test the change with `specify extension add /path/to/spec-kit-shared-knowledge --dev` against a real spec-kit project
+5. ✅ Run `bash .github/scripts/validate-extension.sh` (needs `python3` with PyYAML) — CI runs the same checks, plus an install smoke test, on every pull request
+6. 🚀 Open a pull request and reference the issue
 
-For larger architectural changes, please file a discussion first. See `specs/` for the reverse-engineered specs that document the current behavior.
+For larger architectural changes, please file a discussion first. See `specs/` for the feature specs that document the current behavior.
 
-## License
+## 📜 License
 
 [MIT](LICENSE) © Raúl Noa Pedroso
