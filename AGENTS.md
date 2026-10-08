@@ -55,6 +55,32 @@ extension's arguments here, and skip any extension that is not in
 > until a human noticed.
 <!-- SPECKIT-HOOKS END -->
 
+<!-- SPECKIT-TINY-SPECS START -->
+## Tiny specs are numbered — `specs/tiny/NNN-<slug>.md`
+
+Reserve the number before you create a tiny spec, including one written by hand.
+Never invent, guess or reuse a number, and never use a PR number. The helper
+ships with the spec-kit-walmart plugin; unless `CLAUDE_PLUGIN_ROOT` is set, set
+`SPECKIT_RUNTIME` to `wibey` or `code_puppy` (yours, or whichever has the plugin
+on this machine):
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/skills/speckit-setup/scripts/next-tiny-number.sh" --slug "fix receipt preview"
+# -> specs/tiny/NNN-fix-receipt-preview.md
+```
+
+- The number is one above the highest `NNN-` prefix in this checkout, the other
+  worktrees and every local and remote-tracking branch — offline and local.
+- Before answering, the helper numbers any tiny spec still missing a prefix
+  (oldest first: by when git first recorded it, else its `**Date**:` line, else
+  by name) and rewrites links to it. Commit those renames with your change.
+  `--check` instead of `--slug` previews them without touching anything.
+- A tiny spec's number is its permanent ID: never renumber or reuse one.
+- Plugin not installed: one above the highest `NNN-` prefix in `specs/tiny/`,
+  zero-padded, after checking `git worktree list` for an uncommitted one
+  elsewhere. Leave unnumbered files to `/speckit-update`.
+<!-- SPECKIT-TINY-SPECS END -->
+
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
