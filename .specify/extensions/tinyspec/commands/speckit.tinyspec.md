@@ -20,6 +20,33 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
 2. Verify git is available and the project is a git repository
 3. Verify the user has described the change (if not, ask what they want to build)
 
+<!-- spec-kit-walmart:tiny-numbering START -->
+## Numbered file name (MANDATORY)
+
+<!-- Managed by the spec-kit-walmart plugin; /speckit-update re-applies it. -->
+
+Every tiny spec is `specs/tiny/NNN-<feature-name>.md`. Reserve the number with
+the spec-kit-walmart plugin's helper before you write the file — never invent it
+or use a PR number (the PR does not exist yet). Unless `CLAUDE_PLUGIN_ROOT` is
+set, set `SPECKIT_RUNTIME` first: `wibey` or `code_puppy` — the assistant you
+are, or, if you are neither, whichever of the two has the plugin on this machine.
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/skills/speckit-setup/scripts/next-tiny-number.sh" --slug "<feature-name>"
+# -> specs/tiny/NNN-feature-name.md
+```
+
+- Create the file at exactly the printed path. Wherever the steps below say
+  `specs/tiny/{NNN}-{feature-name}.md`, they mean that path.
+- The helper first numbers any older tiny spec that has no prefix yet and
+  rewrites the links to it, printing one `TINY_SPEC_RENAME=` line per file.
+  List those renames in your report — they belong in the same commit.
+- Plugin not installed: use one above the highest `NNN-` prefix in `specs/tiny/`,
+  zero-padded to three digits, after checking `git worktree list` for an
+  uncommitted `specs/tiny/NNN-*` in another checkout. Leave unnumbered files to
+  `/speckit-update`. Never create an unnumbered file.
+<!-- spec-kit-walmart:tiny-numbering END -->
+
 ## Outline
 
 1. **Assess scope**: Quickly evaluate whether this task is appropriate for tinyspec:
@@ -32,7 +59,7 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
    - Which files provide context (imports, types, related components)
    - Which test files will need updates
 
-3. **Generate tinyspec file**: Create a single file at `specs/tiny/{feature-name}.md` with this structure:
+3. **Generate tinyspec file**: Create a single file at `specs/tiny/{NNN}-{feature-name}.md` with this structure:
 
    ```markdown
    # TinySpec: {Title}
@@ -87,12 +114,12 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
 
    | Field | Value |
    |-------|-------|
-   | **File** | `specs/tiny/{feature-name}.md` |
+   | **File** | `specs/tiny/{NNN}-{feature-name}.md` |
    | **Tasks** | {N} tasks |
    | **Files affected** | {N} files |
 
    ## Next Steps
-   - Review the tinyspec at `specs/tiny/{feature-name}.md`
+   - Review the tinyspec at `specs/tiny/{NNN}-{feature-name}.md`
    - Run `/speckit.tinyspec.implement` to build it
    - Or implement manually — the spec is your checklist
    ```
