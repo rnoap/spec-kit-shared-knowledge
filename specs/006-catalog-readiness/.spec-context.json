@@ -1,0 +1,286 @@
+{
+  "workflow": "companion",
+  "specName": "Catalog Readiness",
+  "branch": "006-catalog-readiness",
+  "currentStep": "tasks",
+  "status": "ready-to-implement",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-14T17:45:08.000Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-14T17:51:09.306Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-14T17:53:29.239Z"
+    },
+    {
+      "step": "plan",
+      "substep": "research",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:02:36.969Z"
+    },
+    {
+      "step": "plan",
+      "substep": "design",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:28:46.709Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:29:03.916Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-14T18:39:23.075Z"
+    },
+    {
+      "step": "tasks",
+      "substep": "generate",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:44:07.691Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:44:15.618Z"
+    }
+  ],
+  "telemetryInstanceId": "3960675e-5c4f-4a75-b2cf-83aca865be5d",
+  "last_action": "living specs evaluated — skipped (not configured)",
+  "coverage": {
+    "FR-001": {
+      "title": "Manifest declares the minimum spec-kit version as >=0.15.2",
+      "tasks": [
+        "T002",
+        "T009"
+      ]
+    },
+    "FR-002": {
+      "title": "README badge, README prerequisites, constitution and plan template state the same minimum",
+      "tasks": [
+        "T003",
+        "T007",
+        "T008",
+        "T018"
+      ]
+    },
+    "FR-003": {
+      "title": "Constitution change follows Governance: docs: commit, rationale, version and amendment date",
+      "tasks": [
+        "T007"
+      ]
+    },
+    "FR-004": {
+      "title": "README says the community catalog is searchable but not installable by default",
+      "tasks": [
+        "T004",
+        "T006"
+      ]
+    },
+    "FR-005": {
+      "title": "README primary install works on a default setup via --from <release archive URL>",
+      "tasks": [
+        "T004",
+        "T006"
+      ]
+    },
+    "FR-006": {
+      "title": "README says spec-kit asks to confirm the source during that install",
+      "tasks": [
+        "T004",
+        "T006"
+      ]
+    },
+    "FR-007": {
+      "title": "README points teams that want to skip the prompt to a catalog they control",
+      "tasks": [
+        "T004"
+      ]
+    },
+    "FR-008": {
+      "title": "README does not suggest marking the community catalog install-allowed",
+      "tasks": [
+        "T004"
+      ]
+    },
+    "FR-009": {
+      "title": "README notes agents may show another command name, e.g. /speckit-knowledge-sync",
+      "tasks": [
+        "T005",
+        "T006"
+      ]
+    },
+    "FR-010": {
+      "title": "README states platforms: macOS and Linux; Windows through WSL or Git Bash",
+      "tasks": [
+        "T003"
+      ]
+    },
+    "FR-011": {
+      "title": "Manifest declares category: integration and effect: read-write",
+      "tasks": [
+        "T002",
+        "T010"
+      ]
+    },
+    "FR-012": {
+      "title": "Status reachability check puts -- between options and the source URL",
+      "tasks": [
+        "T011",
+        "T012"
+      ]
+    },
+    "FR-013": {
+      "title": "Gating install smoke test installs against spec-kit v1.2.0",
+      "tasks": [
+        "T015",
+        "T016"
+      ]
+    },
+    "FR-014": {
+      "title": "CI runs the install smoke test against the declared minimum v0.15.2 on every PR",
+      "tasks": [
+        "T015",
+        "T016"
+      ]
+    },
+    "FR-015": {
+      "title": "Required checks Static validation and Install smoke test keep their names",
+      "tasks": [
+        "T015",
+        "T018"
+      ]
+    },
+    "FR-016": {
+      "title": "Install check fails cleanly with count 0 when no commands registered",
+      "tasks": [
+        "T013",
+        "T014",
+        "T016"
+      ]
+    },
+    "FR-017": {
+      "title": "Install check fails when the install copied no files",
+      "tasks": [
+        "T013",
+        "T014",
+        "T016"
+      ]
+    },
+    "FR-018": {
+      "title": "Each change recorded under [Unreleased] in the CHANGELOG",
+      "tasks": [
+        "T017"
+      ]
+    }
+  },
+  "size": "normal",
+  "classification": {
+    "projectedFiles": 8,
+    "projectedTasks": 12,
+    "scopeSignal": "none",
+    "verdict": "normal"
+  },
+  "expectations": [
+    "Sync defects (full-SHA pin, warm-sync deletions, timeout on macOS, symlink indexing) go in a separate spec",
+    "No version bump, tag, release or catalog submission",
+    "No GitHub topics or homepage changes",
+    "README examples keep the canonical dot form"
+  ],
+  "context": [
+    "area: extension.yml (requires.speckit_version, extension.category/effect)",
+    "area: README.md (spec-kit badge, Prerequisites, Installation, Commands)",
+    "area: commands/speckit.knowledge.status.md L128 (git ls-remote)",
+    "area: .github/workflows/validate.yml (SPEC_KIT_REF v1.0.4, smoke job)",
+    "area: .github/scripts/assert-install.sh L53 (grep -c || echo 0), L66 (file count)",
+    "area: .specify/memory/constitution.md (Requirements & Compatibility, Quality Gates, Governance)",
+    "area: .specify/templates/plan-template.md L17, L38 (states >= 0.10.0)",
+    "constraint: main requires checks Static validation and Install smoke test by name",
+    "constraint: constitution amendments need a docs: commit with rationale",
+    "constraint: validate-extension.sh requires README to mention every /speckit.knowledge.* in dot form",
+    "evidence 2026-10-14: install OK on spec-kit 0.15.2, 1.1.2 (from release zip), 1.2.0; config not scaffolded on 0.10.0",
+    "evidence: spec-kit 1.1.2 ships the community catalog with install_allowed=False and refuses installs below requires.speckit_version",
+    "area: .specify/templates/overrides/plan-template.md L17, L42 (project template now lives in overrides/, untracked until the toolchain change lands)",
+    "area: .specify/templates/plan-template.md L17, L42 (overrides/ was temporary; 395c326 restored the project template in place)"
+  ],
+  "intent": "Make the package tell catalog users the truth (spec-kit floor, install path, invocation names, metadata) and make CI prove the floor",
+  "planBlocks": [],
+  "planBlocksPicked": [],
+  "decisions": [
+    {
+      "decision": "Declare requires.speckit_version >=0.15.2",
+      "why": "0.15.2 first scaffolds config templates on install; 0.10.0 verified missing the config; skills render tokens since 0.12.17",
+      "rejected": ">=0.12.17 (config not scaffolded) and >=1.0.4 (excludes working versions without evidence)"
+    },
+    {
+      "decision": "smoke-minimum reads the floor from the manifest >= clause",
+      "why": "tests whatever the manifest claims, no second copy to drift; matches assert-install.sh convention",
+      "rejected": "hardcoding v0.15.2 in the workflow"
+    },
+    {
+      "decision": "Separate job named Install smoke test (minimum spec-kit), not a matrix",
+      "why": "a matrix renames runs after matrix values, so the required check Install smoke test would stop reporting and block merges",
+      "rejected": "matrix over spec-kit versions"
+    },
+    {
+      "decision": "README documents only --from plus a team-controlled catalog; never --install-allowed on community",
+      "why": "spec-kit calls that flag the vetting boundary and catalog add replaces the built-in catalog list, dropping default",
+      "rejected": "FR-007/FR-008 as first written (flip community with a trust warning)"
+    },
+    {
+      "decision": "assert-install.sh: single-integer count, zero files fails, readable FAIL without extensions.yml",
+      "why": "an aborted install produced a [ error, a PASS at 0 files and a Python traceback",
+      "rejected": "|| true, which still leaves an empty count when the log is missing"
+    },
+    {
+      "decision": "Constitution 1.2.0 with rationale; hand-edit plan template as a justified violation",
+      "why": "a requirement changes and a gate gains a run; the template restates the floor and is project-owned in practice",
+      "rejected": "1.1.1 patch; leaving the template stale; amending Code Boundaries"
+    }
+  ],
+  "concerns": [
+    {
+      "note": "plan-blocks.py failed: installed companion 0.25.0 lacks presets/_parts (call-paths.md, code-pins.md); recorded none and wrote the CI flow and the grep -c note as prose"
+    },
+    {
+      "note": "Explore subagents have no terminal, so readers 1-4 could not check in; readers 1 and 3 returned nothing and their areas were covered inline"
+    },
+    {
+      "note": "A spec-kit integration upgrade (copilot --skills) ran outside this step at 15:08 local and left 119 staged changes plus unstaged template overwrites on this branch; not part of feature 006 and must not be swept into its commits"
+    }
+  ],
+  "step_summaries": {
+    "plan": {
+      "summary": "Plan for catalog readiness: floor >=0.15.2 everywhere, manifest category/effect, --from-only install docs, status --, CI pin v1.2.0 plus a manifest-derived minimum job, robust install assertions",
+      "key_finding": "spec-kit advises against flipping the community catalog to install_allowed and catalog add replaces the built-in catalog list, so the spec was clarified to drop that route"
+    },
+    "tasks": {
+      "summary": "18 tasks: a Setup gate (toolchain change lands first), 1 foundational manifest task, 5 story phases with disjoint files (US1 README, US2 constitution and template, US3 verify, US4 status, US5 CI with fail-first seeds), Polish (CHANGELOG and validation)"
+    }
+  },
+  "approach": "Edit in place across the manifest, README, status command, constitution, plan template, validate.yml and assert-install.sh. The floor moves to >=0.15.2 in every restatement; CI pins v1.2.0 and adds a job that installs the floor read from the manifest; the README leads with --from and never suggests flipping the community catalog."
+}
