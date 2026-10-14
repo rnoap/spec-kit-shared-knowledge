@@ -1,0 +1,2 @@
+{"step": "implement", "substep": null, "task": "T001", "kind": "complete", "by": "ai", "at": "2026-10-14T19:20:57.165Z", "did": "Verified separate toolchain (26b66be), resolver (febb4b2), and constitution 1.2.0 (a17ac60) commits; no pending changes outside the requested scope."}
+{"step": "implement", "substep": null, "task": "T002", "kind": "complete", "by": "ai", "at": "2026-10-14T19:24:03.013Z", "did": "Set spec-kit >=0.15.2, category integration and effect read-write; the exact manifest contract and all 13 static package checks pass.", "files": ["extension.yml"]}

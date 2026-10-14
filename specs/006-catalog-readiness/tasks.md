@@ -8,13 +8,13 @@ Format: `- [ ] **T###** [P?] [US#] Description · path`. `[P]` means independent
 
 Files: none.
 
-- [ ] **T001** Gate: the toolchain upgrade is already committed separately. Before implementation, also confirm that the prerequisite resolver fix and constitution 1.2.0 template-authorship amendment are committed separately from feature 006. The constitution must explicitly permit project-owned template edits. Pass when `git status --short` lists nothing outside `specs/006-catalog-readiness/` and the files the next task owns. Do not sweep pending prerequisite or unrelated changes into a feature commit · (repository state)
+- [x] **T001** Gate: the toolchain upgrade is already committed separately. Before implementation, also confirm that the prerequisite resolver fix and constitution 1.2.0 template-authorship amendment are committed separately from feature 006. The constitution must explicitly permit project-owned template edits. Pass when `git status --short` lists nothing outside `specs/006-catalog-readiness/` and the files the next task owns. Do not sweep pending prerequisite or unrelated changes into a feature commit · (repository state)
 
 ## Phase 2: Foundational
 
 Files: `extension.yml`. Every story either restates or reads these values.
 
-- [ ] **T002** Set `requires.speckit_version: ">=0.15.2"`, and add `category: integration` and `effect: read-write` under `extension:` (FR-001, FR-011) · `extension.yml`
+- [x] **T002** Set `requires.speckit_version: ">=0.15.2"`, and add `category: integration` and `effect: read-write` under `extension:` (FR-001, FR-011) · `extension.yml`
 
 ## Phase 3: User Story 1 - Install from the catalog listing (P1)
 

@@ -9,9 +9,11 @@ extension:
   repository: "https://github.com/rnoap/spec-kit-shared-knowledge"
   homepage: "https://github.com/rnoap/spec-kit-shared-knowledge"
   license: MIT
+  category: integration
+  effect: read-write
 
 requires:
-  speckit_version: ">=0.10.0"
+  speckit_version: ">=0.15.2"
   tools:
     - name: git
       required: true

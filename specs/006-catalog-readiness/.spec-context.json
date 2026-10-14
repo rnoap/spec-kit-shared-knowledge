@@ -2,8 +2,8 @@
   "workflow": "companion",
   "specName": "Catalog Readiness",
   "branch": "006-catalog-readiness",
-  "currentStep": "tasks",
-  "status": "ready-to-implement",
+  "currentStep": "implement",
+  "status": "implementing",
   "history": [
     {
       "step": "specify",
@@ -67,10 +67,33 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-10-14T18:44:15.618Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-14T19:18:59.572Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T001",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:20:57.165Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T002",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:24:03.013Z"
     }
   ],
   "telemetryInstanceId": "3960675e-5c4f-4a75-b2cf-83aca865be5d",
-  "last_action": "living specs evaluated — skipped (not configured)",
+  "last_action": "T001 and T002 complete; the exact manifest contract and 13/13 static checks pass. Phases 3-8 remain pending and status remains implementing.",
   "coverage": {
     "FR-001": {
       "title": "Manifest declares the minimum spec-kit version as >=0.15.2",
@@ -282,6 +305,11 @@
       "decision": "Execute installed agent commands rather than infer runtime behavior from skill files or standalone Git calls",
       "why": "E1: T006 checks the unconfigured command, T012 checks real remote status on Linux, and T018 repeats against the candidate. macOS remains a publication dependency on its timeout fix.",
       "rejected": "Recording command-file existence as runtime success"
+    },
+    {
+      "decision": "Limit this run to phases 1 and 2 (T001 and T002), both executed inline.",
+      "why": "The user explicitly requested only these phases; the Foundational dispatcher assigns its single task inline.",
+      "rejected": "Implement user-story phases or mark the full feature complete."
     }
   ],
   "concerns": [
@@ -293,6 +321,10 @@
     },
     {
       "note": "A spec-kit integration upgrade (copilot --skills) ran outside this step at 15:08 local and left 119 staged changes plus unstaged template overwrites on this branch; not part of feature 006 and must not be swept into its commits"
+    },
+    {
+      "note": "Partial implementation only: README, constitution and template still state the previous floor until their owning phases run. Installation and end-to-end checks in later phases were not executed. This feature is not ready for release.",
+      "step": "implement"
     }
   ],
   "step_summaries": {
@@ -302,7 +334,50 @@
     },
     "tasks": {
       "summary": "18 tasks: a Setup gate (toolchain change lands first), 1 foundational manifest task, 5 story phases with disjoint files (US1 README, US2 constitution and template, US3 verify, US4 status, US5 CI with fail-first seeds), Polish (CHANGELOG and validation)"
+    },
+    "implement": {
+      "summary": "Completed phases 1 and 2: confirmed separately committed prerequisites and updated the manifest floor, category and effect."
     }
   },
-  "approach": "Edit in place across the manifest, README, status command, constitution, plan template, validate.yml and assert-install.sh. The floor moves to >=0.15.2 in every restatement; CI pins v1.2.0 and adds a job that installs the floor read from the manifest; the README leads with --from and never suggests flipping the community catalog."
+  "approach": "Edit in place across the manifest, README, status command, constitution, plan template, validate.yml and assert-install.sh. The floor moves to >=0.15.2 in every restatement; CI pins v1.2.0 and adds a job that installs the floor read from the manifest; the README leads with --from and never suggests flipping the community catalog.",
+  "verified": [
+    {
+      "what": "Phase 1 prerequisite gate",
+      "command": "git merge-base --is-ancestor 26b66be HEAD && git merge-base --is-ancestor febb4b2 HEAD && git merge-base --is-ancestor a17ac60 HEAD && git show a17ac60:.specify/memory/constitution.md | grep -Fq \"Extension authors may edit these files\" && test -z \"$(git status --short -- . \":(exclude)specs/006-catalog-readiness/**\" \":(exclude)extension.yml\")\" && printf \"PASS separate prerequisites, template authorship and clean scope\\n\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "PASS separate prerequisites, template authorship and clean scope"
+    },
+    {
+      "what": "T002 manifest contract",
+      "command": "python3 -c 'import subprocess, yaml; current = yaml.safe_load(open(\"extension.yml\")); expected = yaml.safe_load(subprocess.check_output([\"git\", \"show\", \"HEAD:extension.yml\"], text=True)); expected[\"requires\"][\"speckit_version\"] = \">=0.15.2\"; expected[\"extension\"].update(category=\"integration\", effect=\"read-write\"); assert current == expected, \"manifest differs outside T002\"; print(\"PASS T002: exact floor and metadata; every other field unchanged\")'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "PASS T002: exact floor and metadata; every other field unchanged"
+    },
+    {
+      "what": "Static extension validation",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    }
+  ],
+  "currentTask": "T002",
+  "task_summaries": {
+    "T001": {
+      "status": "DONE",
+      "did": "Verified separate toolchain (26b66be), resolver (febb4b2), and constitution 1.2.0 (a17ac60) commits; no pending changes outside the requested scope."
+    },
+    "T002": {
+      "status": "DONE",
+      "did": "Set spec-kit >=0.15.2, category integration and effect read-write; the exact manifest contract and all 13 static package checks pass.",
+      "files": [
+        "extension.yml"
+      ]
+    }
+  }
 }
