@@ -90,6 +90,38 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-10-14T19:24:03.013Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T003",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:42:37.210Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T004",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:42:46.730Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T005",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:42:59.136Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T006",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:55:55.943Z"
     }
   ],
   "telemetryInstanceId": "3960675e-5c4f-4a75-b2cf-83aca865be5d",
@@ -325,6 +357,10 @@
     {
       "note": "Partial implementation only: README, constitution and template still state the previous floor until their owning phases run. Installation and end-to-end checks in later phases were not executed. This feature is not ready for release.",
       "step": "implement"
+    },
+    {
+      "note": "Pre-existing, outside 006: status prints the not-configured message only when knowledge-config.yml is absent. A fresh install scaffolds the file with sources: null, so status shows an empty table plus a sync hint instead of pointing to configure.",
+      "step": "implement"
     }
   ],
   "step_summaries": {
@@ -364,9 +400,33 @@
       "exitCode": 0,
       "durationSeconds": 0.7,
       "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T006 plain add refused as discovery-only (loopback fixture, spec-kit 1.2.0)",
+      "command": "cd /tmp/kn006/t006/discovery && if env -u SPECKIT_CATALOG_URL specify extension add knowledge > add.log 2>&1; then echo \"UNEXPECTED install\"; exit 1; fi; grep -q \"discovery-only\" add.log && test ! -e .specify/extensions/knowledge && ! grep -q \"extension: knowledge\" .specify/extensions.yml && echo \"PASS refused, nothing installed: $(grep -m1 \"discovery-only\" add.log | tr -s \" \")\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "result": "PASS refused, nothing installed: discovery-only — a search surface, not an install source. · grep: .specify/extensions.yml: No such file or directory"
+    },
+    {
+      "what": "T006 README --from v1.5.0 prompted then installed (spec-kit 1.2.0)",
+      "command": "cd /tmp/kn006/t006/release && grep -q \"Untrusted Source\" install.log && grep -q \"Continue with installation? \\[y/N\\]: y\" install.log && grep -q \"Extension installed successfully\" install.log && test -f .specify/extensions/knowledge/knowledge-config.yml && test \"$(ls -d .github/skills/speckit-knowledge-* | wc -l | tr -d \" \")\" = 5 && bash /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge/.github/scripts/assert-install.sh /tmp/kn006/t006/release /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.4,
+      "result": "  \u001b[32mPASS\u001b[0m  installed file count is sane (10) ·   \u001b[32mPASS\u001b[0m  4 hooks registered, none carrying arguments · Smoke test passed."
+    },
+    {
+      "what": "T006 agent executed installed /speckit-knowledge-status with no sources (spec-kit 1.2.0, v1.5.0 --from install)",
+      "command": "independent subagent loaded /tmp/kn006/t006/release/.github/skills/speckit-knowledge-status/SKILL.md and followed it",
+      "result": "Completed and exited 0: valid schema_version, sources null treated as no configured sources; printed a header-only table with Total: 0 items from 0 sources and the missing-index hint; no unresolved __SPECKIT_COMMAND_ tokens; no git call needed",
+      "warnings": [
+        "Agent judgement, not a recorded command exit code"
+      ]
     }
   ],
-  "currentTask": "T002",
+  "currentTask": "T006",
   "task_summaries": {
     "T001": {
       "status": "DONE",
@@ -377,6 +437,34 @@
       "did": "Set spec-kit >=0.15.2, category integration and effect read-write; the exact manifest contract and all 13 static package checks pass.",
       "files": [
         "extension.yml"
+      ]
+    },
+    "T003": {
+      "status": "DONE",
+      "did": "README badge and Prerequisites state spec-kit >=0.15.2; Prerequisites lists macOS and Linux, Windows through WSL or Git Bash.",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T004": {
+      "status": "DONE",
+      "did": "Installation leads with the v1.5.0 --from archive, states the community catalog is searchable not installable, names the Untrusted Source confirmation, and points teams to a catalog they control.",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T005": {
+      "status": "DONE",
+      "did": "Commands opens with a note: dot form in examples, /speckit-knowledge-sync for skills agents, $speckit-knowledge-sync for Codex; every dot-form example kept and static validation passes.",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T006": {
+      "status": "DONE",
+      "did": "spec-kit 1.2.0: loopback discovery-only catalog refused plain add with nothing installed; README v1.5.0 --from showed Untrusted Source and installed once confirmed (assert-install passed); an independent agent executed the installed status skill with no sources and it completed.",
+      "files": [
+        "/tmp/kn006/t006"
       ]
     }
   }

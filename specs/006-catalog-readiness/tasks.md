@@ -27,13 +27,13 @@ Files: `README.md`
 
 **Wave 1 — single task (README.md):**
 
-- [ ] **T003** [US1] Restate the floor and add platforms: spec-kit badge to `spec--kit-%E2%89%A50.15.2` (L9); Prerequisites to spec-kit `>=0.15.2` (L31), plus "macOS and Linux; Windows through WSL or Git Bash" (FR-002, FR-010) · `README.md`
+- [x] **T003** [US1] Restate the floor and add platforms: spec-kit badge to `spec--kit-%E2%89%A50.15.2` (L9); Prerequisites to spec-kit `>=0.15.2` (L31), plus "macOS and Linux; Windows through WSL or Git Bash" (FR-002, FR-010) · `README.md`
 
 **⟶ Wait for Wave 1 to finish, then:**
 
 **Wave 2 — single task (same file):**
 
-- [ ] **T004** [US1] Rewrite § Installation's catalog subsection as [contracts/commands.md](./contracts/commands.md) § 1 states it (FR-004 to FR-008):
+- [x] **T004** [US1] Rewrite § Installation's catalog subsection as [contracts/commands.md](./contracts/commands.md) § 1 states it (FR-004 to FR-008):
   - Spec-kit's community catalog is searchable, not installable, by default.
   - The primary install is `specify extension add knowledge --from <release zip URL>`, still on the `v1.5.0` tag, and spec-kit shows an `Untrusted Source` prompt the user confirms.
   - Teams that want no prompt list the extension in a catalog they control.
@@ -46,11 +46,11 @@ Files: `README.md`
 
 **Wave 3 — single task (same file):**
 
-- [ ] **T005** [US1] Add one note at the top of § Commands: the examples use spec-kit's canonical dot form, skills-based agents show `/speckit-knowledge-sync`, and Codex shows `$speckit-knowledge-sync`. Leave every dot-form example in place, because static validation requires them (FR-009) · `README.md`
+- [x] **T005** [US1] Add one note at the top of § Commands: the examples use spec-kit's canonical dot form, skills-based agents show `/speckit-knowledge-sync`, and Codex shows `$speckit-knowledge-sync`. Leave every dot-form example in place, because static validation requires them (FR-009) · `README.md`
 
 **⟶ Wait for Wave 3 to finish, then:**
 
-- [ ] **T006** [US1] Verify in a throwaway project on spec-kit v1.2.0:
+- [x] **T006** [US1] Verify in a throwaway project on spec-kit v1.2.0:
   - Serve a temporary catalog containing `knowledge` on `http://127.0.0.1:<port>/catalog.json`. Register it only in the temporary consumer with `specify extension catalog add <fixture URL> --name knowledge-fixture --no-install-allowed`. Plain `specify extension add knowledge` must fail as discovery-only. Do not depend on the public catalog, where the entry may not exist yet.
   - In a separate fresh consumer, the README's v1.5.0 `--from` command shows `Untrusted Source` and installs once confirmed. This checks the historical download route only; the current package is checked after the story join in T018.
   - Have the agent load and execute the installed `/speckit-knowledge-status` skill with no configured sources. It must report the unconfigured state successfully. The presence of a skill file alone is not a pass (FR-009).
