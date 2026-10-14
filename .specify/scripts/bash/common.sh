@@ -214,6 +214,19 @@ get_feature_paths() {
         return 1
     fi
 
+    local feature_spec="$feature_dir/spec.md"
+    if [[ ! -f "$feature_spec" ]]; then
+        local spec_candidate
+        for spec_candidate in "$feature_dir"/*.spec.md; do
+            [[ -f "$spec_candidate" ]] || continue
+            if [[ "$feature_spec" != "$feature_dir/spec.md" ]]; then
+                echo "ERROR: Multiple feature specifications found in $feature_dir. Keep spec.md or a single *.spec.md." >&2
+                return 1
+            fi
+            feature_spec="$spec_candidate"
+        done
+    fi
+
     # When no branch context exists (no SPECIFY_FEATURE, feature resolved via
     # SPECIFY_FEATURE_DIRECTORY or feature.json), fall back to the feature
     # directory basename so CURRENT_BRANCH is a usable identifier rather than
@@ -228,7 +241,7 @@ get_feature_paths() {
     printf 'REPO_ROOT=%q\n' "$repo_root"
     printf 'CURRENT_BRANCH=%q\n' "$current_branch"
     printf 'FEATURE_DIR=%q\n' "$feature_dir"
-    printf 'FEATURE_SPEC=%q\n' "$feature_dir/spec.md"
+    printf 'FEATURE_SPEC=%q\n' "$feature_spec"
     printf 'IMPL_PLAN=%q\n' "$feature_dir/plan.md"
     printf 'TASKS=%q\n' "$feature_dir/tasks.md"
     printf 'RESEARCH=%q\n' "$feature_dir/research.md"
