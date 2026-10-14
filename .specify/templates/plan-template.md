@@ -14,7 +14,7 @@
 
 **Language/Version**: Markdown (CommonMark) for command prompts and docs; YAML 1.2 for `extension.yml` and `config-template.yml`. Bash appears only as illustrative pseudocode inside prompts and in the CI scripts under `.github/scripts/` (not shipped to consumers). No compiled code, no shipped scripts.
 
-**Primary Dependencies**: spec-kit `>= 0.10.0` and git `>= 2.25` (constitution § Requirements & Compatibility) — no compiled runtime, no package manager lock file. Prompts assume `find`, `wc`, and `sha256sum` or `shasum` are present. `sync` and `status` also call GNU `timeout`, which stock macOS lacks — a known gap tracked separately, so do not add another GNU-only dependency.
+**Primary Dependencies**: spec-kit `>=0.15.2` and git `>= 2.25` (constitution § Requirements & Compatibility) — no compiled runtime, no package manager lock file. Prompts assume `find`, `wc`, and `sha256sum` or `shasum` are present. `sync` and `status` also call GNU `timeout`, which stock macOS lacks — a known gap tracked separately, so do not add another GNU-only dependency.
 
 **Storage**: Files only. The deliverable is `commands/*.md`, `extension.yml` and `config-template.yml`. Consumer state is written by the commands at run time under the consumer's `.specify/extensions/knowledge/`: `knowledge-config.yml` (committed), plus local-only `cache/<slug>/` (with a per-source `.manifest.json`) and `knowledge-index.md`. No install script writes anything.
 
@@ -39,7 +39,7 @@
 - Installation is delegated entirely to `specify extension add`; the repository ships no install script.
 - A new dev-only path must be listed in both `.extensionignore` (installed copy) and `.gitattributes` with `export-ignore` (published archive), or it ships to every consumer.
 - The checks required on `main` are named "Static validation" and "Install smoke test"; renaming either blocks every merge.
-- Must remain compatible with spec-kit `>= 0.10.0`.
+- Must remain compatible with spec-kit `>=0.15.2`.
 
 **Scale/Scope**: Small package. `extension.yml#provides` is the source of truth for the inventory — currently 5 commands, 4 optional `before_*` sync hooks, 1 config template, no scripts. Changes are additive; breaking changes require a `MAJOR` version bump in `extension.yml` and a `feat!:` commit.
 

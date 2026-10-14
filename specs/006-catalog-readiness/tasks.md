@@ -70,15 +70,15 @@ Files: `.specify/memory/constitution.md`, `.specify/templates/plan-template.md`
 
 **Wave 1 — independent (different files):**
 
-- [ ] **T007** [P] [US2] Amend the constitution in one `docs(constitution):` commit (FR-002, FR-003):
+- [x] **T007** [P] [US2] Amend the constitution in one `docs(constitution):` commit (FR-002, FR-003):
   - § Requirements & Compatibility: spec-kit `>=0.15.2`.
   - § Quality Gates › Install smoke test: runs twice, against the selected pinned release and against the minimum the manifest declares.
   - `**Version**: 1.3.0`, with `Last Amended` set to the commit date. Preserve the separate 1.2.0 template-authorship amendment.
   - A `> **1.3.0 rationale.**` note, in the existing style, saying why `>= 0.10.0` was false.
 
   · `.specify/memory/constitution.md`
-- [ ] **T008** [P] [US2] Floor to `>=0.15.2` on L17, Primary Dependencies, and L42, the compatibility constraint (FR-002) · `.specify/templates/plan-template.md`
-- [ ] **T009** [P] [US2] Verify in throwaway projects (FR-001, SC-002):
+- [x] **T008** [P] [US2] Floor to `>=0.15.2` on L17, Primary Dependencies, and L42, the compatibility constraint (FR-002) · `.specify/templates/plan-template.md`
+- [x] **T009** [P] [US2] Verify in throwaway projects (FR-001, SC-002):
   - On spec-kit v0.15.1, `specify extension add <repo> --dev` is refused, with a message naming `>=0.15.2`, and installs nothing.
   - On v0.15.2, run `specify init . --integration copilot --force < /dev/null` (that release has no `--non-interactive`), then the install. It brings 5 commands, 4 hooks and `knowledge-config.yml`.
 

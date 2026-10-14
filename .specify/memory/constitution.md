@@ -72,7 +72,7 @@ Types: feat | fix | refactor | docs | chore | test | style
 
 ## Requirements & Compatibility
 
-- **spec-kit**: `>= 0.10.0`
+- **spec-kit**: `>=0.15.2`
 - **git**: `>= 2.25`
 - **License**: MIT
 
@@ -108,7 +108,9 @@ locally before you push:
     duplication is only safe while the copies cannot drift.
 
 **Install smoke test** — a real `specify extension add` into a clean consumer
-project, asserting against the manifest rather than hardcoded numbers:
+project, asserting against the manifest rather than hardcoded numbers. It runs
+twice: against the spec-kit release pinned in `SPEC_KIT_REF`, and against the
+minimum the manifest declares in `requires.speckit_version`. Each run checks:
 
 1. No "Config templates not scaffolded" warning, and the declared config file
    exists on disk afterwards.
@@ -131,7 +133,7 @@ package, not the prose.
   pull request. Everything else — principles, naming, boundaries, and whether a
   command actually behaves as its prose claims — is verified by human review.
 
-**Version**: 1.2.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-14
+**Version**: 1.3.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-14
 
 > **1.1.0 rationale.** §III previously stated "No CI/CD pipeline exists yet;
 > quality gates are manual." That principle was the root cause of the v1.2.0
@@ -147,3 +149,11 @@ package, not the prose.
 > updates explicitly instead of asking feature plans to justify a prohibited
 > edit. Scripts, installed extensions, presets and generated agent files remain
 > tooling-owned. The package compatibility floor and quality gates are unchanged.
+>
+> **1.3.0 rationale.** The stated floor, `>= 0.10.0`, was false. On spec-kit
+> 0.10.0 the install ran but never created `knowledge-config.yml`: spec-kit
+> scaffolds config templates only since 0.15.2, and skills render command
+> references only since 0.12.17. The floor is now `>=0.15.2`, the oldest release
+> verified to install correctly. A floor nothing tests drifts back into fiction,
+> so the install smoke test now also runs against the minimum the manifest
+> declares, on every pull request.
