@@ -85,15 +85,16 @@ bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/sk
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
 
-- Active feature: `004-source-lifecycle-cache`
-- **Plan: [specs/004-source-lifecycle-cache/plan.md](specs/004-source-lifecycle-cache/plan.md)**
-- Spec: [specs/004-source-lifecycle-cache/spec.md](specs/004-source-lifecycle-cache/spec.md)
-- Research: [specs/004-source-lifecycle-cache/research.md](specs/004-source-lifecycle-cache/research.md)
-- Data model: [specs/004-source-lifecycle-cache/data-model.md](specs/004-source-lifecycle-cache/data-model.md)
-- Contracts: [config schema](specs/004-source-lifecycle-cache/contracts/knowledge-config.schema.md) · [command surface](specs/004-source-lifecycle-cache/contracts/commands.md)
-- Verification: [specs/004-source-lifecycle-cache/quickstart.md](specs/004-source-lifecycle-cache/quickstart.md)
+- Latest feature: `005-context-budget-trust`
+- **Plan: [specs/005-context-budget-trust/plan.md](specs/005-context-budget-trust/plan.md)**
+- Spec: [specs/005-context-budget-trust/spec.md](specs/005-context-budget-trust/spec.md)
+- Research: [specs/005-context-budget-trust/research.md](specs/005-context-budget-trust/research.md)
+- Data model: [specs/005-context-budget-trust/data-model.md](specs/005-context-budget-trust/data-model.md)
+- Contracts: [config schema](specs/005-context-budget-trust/contracts/knowledge-config.schema.md) · [command surface](specs/005-context-budget-trust/contracts/commands.md)
+- Tasks: [specs/005-context-budget-trust/tasks.md](specs/005-context-budget-trust/tasks.md)
+- Verification: [specs/005-context-budget-trust/quickstart.md](specs/005-context-budget-trust/quickstart.md)
 
-Status: planned. `tasks.md` does not exist yet — run `/speckit.tasks` next.
+Status: completed — shipped in v1.5.0. No feature is in progress.
 <!-- SPECKIT END -->
 
 <!-- CODE-GRAPH-GUIDE START -->
