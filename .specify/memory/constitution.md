@@ -33,7 +33,7 @@ When any two artifacts conflict, resolve using this order (highest → lowest au
 
 Every commit **must** follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-```
+```text
 <type>[optional scope]: <description>
 
 Types: feat | fix | refactor | docs | chore | test | style
@@ -57,13 +57,14 @@ Types: feat | fix | refactor | docs | chore | test | style
 ## Code Boundaries
 
 | Directory / File | Purpose | Who touches it |
-|-----------------|---------|---------------|
+| --- | --- | --- |
 | `commands/` | Agent prompt Markdown files (the extension's deliverable) | Extension authors |
 | `extension.yml` | Package manifest | Extension authors; bump `version` on every release |
 | `config-template.yml` | User-facing config schema (no-clobber install) | Extension authors; bump `schema_version` on breaking changes |
 | `README.md` | User documentation | Extension authors; must mirror `extension.yml` commands list |
 | `CHANGELOG.md` | Release history (Keep a Changelog format) | Extension authors; update before every version tag |
-| `.specify/` | Spec-kit workspace for THIS project's own features | SDD tooling; do not hand-edit — **except `.specify/memory/`**, which § Governance requires amending by hand |
+| `.specify/` | Spec-kit workspace for THIS project's own features | SDD tooling; do not hand-edit except `.specify/memory/` and the project-owned templates listed below |
+| `.specify/templates/*-template.md` | Project-owned SDD templates | Extension authors may edit these files to reflect this constitution and the package contract. Review changes and preserve customizations across toolchain upgrades. This permission does not extend to scripts, installed extensions, presets, or generated agent files |
 | `.github/workflows/`, `.github/scripts/` | Automated quality gates (§ Quality Gates) | Extension authors. Excluded from both the published archive and the installed copy, so they cost consumers nothing |
 | `specs/` | Feature specs for THIS project | Extension authors via `/speckit-specify` |
 
@@ -130,7 +131,7 @@ package, not the prose.
   pull request. Everything else — principles, naming, boundaries, and whether a
   command actually behaves as its prose claims — is verified by human review.
 
-**Version**: 1.1.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-09-04
+**Version**: 1.2.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-14
 
 > **1.1.0 rationale.** §III previously stated "No CI/CD pipeline exists yet;
 > quality gates are manual." That principle was the root cause of the v1.2.0
@@ -140,3 +141,9 @@ package, not the prose.
 > request. Also folded in: Quality Gate §2 corrected from four commands to five,
 > and § Code Boundaries exempted `.specify/memory/` from its no-hand-edit rule,
 > which § Governance had always required contradicting.
+>
+> **1.2.0 rationale.** Project-owned templates restate the package contract and
+> need authored updates when it changes. Code Boundaries now permits those
+> updates explicitly instead of asking feature plans to justify a prohibited
+> edit. Scripts, installed extensions, presets and generated agent files remain
+> tooling-owned. The package compatibility floor and quality gates are unchanged.
