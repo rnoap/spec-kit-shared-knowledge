@@ -93,7 +93,7 @@ Files: `.specify/memory/constitution.md`, `.specify/templates/plan-template.md`
 
 Files: none. The manifest fields land in T002.
 
-- [ ] **T010** [US3] Verify in a throwaway project on spec-kit v1.2.0: after `specify extension add <repo> --dev`, `specify extension info knowledge` prints `Category: integration` and `Effect: read-write` (FR-011, SC-007) · (temp project)
+- [x] **T010** [US3] Verify in a throwaway project on spec-kit v1.2.0: after `specify extension add <repo> --dev`, `specify extension info knowledge` prints `Category: integration` and `Effect: read-write` (FR-011, SC-007) · (temp project)
 
 **Checkpoint**: US3 is independently functional: spec-kit displays both values.
 

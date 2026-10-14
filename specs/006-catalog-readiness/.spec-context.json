@@ -146,6 +146,14 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-10-14T20:01:03.011Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T010",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:01:51.848Z"
     }
   ],
   "telemetryInstanceId": "3960675e-5c4f-4a75-b2cf-83aca865be5d",
@@ -468,9 +476,17 @@
       "exitCode": 0,
       "durationSeconds": 2.2,
       "result": "  \u001b[32mPASS\u001b[0m  installed file count is sane (24) ·   \u001b[32mPASS\u001b[0m  4 hooks registered, none carrying arguments · Smoke test passed."
+    },
+    {
+      "what": "T010 spec-kit 1.2.0 extension info shows Category and Effect",
+      "command": "cd /tmp/kn006/t010 && specify --version && env -u SPECKIT_CATALOG_URL specify init . --integration copilot --non-interactive --force > init.log 2>&1 && env -u SPECKIT_CATALOG_URL specify extension add /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge --dev > install.log 2>&1 && env -u SPECKIT_CATALOG_URL specify extension info knowledge > info.log 2>&1; cat info.log; grep -qE '^Category: integration$' info.log && grep -qE '^Effect: read-write$' info.log && echo 'PASS Category: integration, Effect: read-write'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 4.8,
+      "result": "Priority: 10 · To remove: specify extension remove knowledge · PASS Category: integration, Effect: read-write"
     }
   ],
-  "currentTask": "T009",
+  "currentTask": "T010",
   "task_summaries": {
     "T001": {
       "status": "DONE",
@@ -530,6 +546,13 @@
       "did": "spec-kit 0.15.1 refused --dev install with 'Extension requires spec-kit >=0.15.2, but 0.15.1 is installed.' and installed nothing; 0.15.2 ran init --integration copilot --force < /dev/null, then installed 5 commands, 4 hooks and knowledge-config.yml (assert-install passed).",
       "files": [
         "/tmp/kn006/t009"
+      ]
+    },
+    "T010": {
+      "status": "DONE",
+      "did": "spec-kit 1.2.0: after extension add <repo> --dev, specify extension info knowledge printed Category: integration and Effect: read-write.",
+      "files": [
+        "/tmp/kn006/t010"
       ]
     }
   }
