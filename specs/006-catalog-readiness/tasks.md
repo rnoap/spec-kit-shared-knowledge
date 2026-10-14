@@ -108,11 +108,11 @@ Files: `commands/speckit.knowledge.status.md`
 
 **Wave 1 — single task:**
 
-- [ ] **T011** [US4] In § 3 Check reachability, change the call to `timeout 5 git ls-remote --exit-code -- <url> HEAD`. Keep `timeout 5`, which belongs to the separately tracked fix. The line sits outside the hashed Configuration Validation Rules block, so leave that block untouched (FR-012) · `commands/speckit.knowledge.status.md`
+- [x] **T011** [US4] In § 3 Check reachability, change the call to `timeout 5 git ls-remote --exit-code -- <url> HEAD`. Keep `timeout 5`, which belongs to the separately tracked fix. The line sits outside the hashed Configuration Validation Rules block, so leave that block untouched (FR-012) · `commands/speckit.knowledge.status.md`
 
 **⟶ Wait for Wave 1 to finish, then:**
 
-- [ ] **T012** [US4] Verify (SC-006):
+- [x] **T012** [US4] Verify (SC-006):
   - Every row of [contracts/commands.md](./contracts/commands.md) § 5 carries `--`.
   - In a temporary consumer installed from the working tree, have the agent execute the rendered status skill against the reachable remote `https://github.com/rnoap/spec-kit-shared-knowledge`. Verify the command reports reachable, not merely that a standalone Git call exits 0.
   - Run this reachability case on Linux with `timeout` available. On stock macOS it remains blocked by the separately tracked portability fix; report that limitation rather than substituting a different command and claiming a pass.

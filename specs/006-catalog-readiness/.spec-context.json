@@ -154,6 +154,22 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-10-14T20:01:51.848Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T011",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:02:21.604Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T012",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:14:37.255Z"
     }
   ],
   "telemetryInstanceId": "3960675e-5c4f-4a75-b2cf-83aca865be5d",
@@ -397,6 +413,10 @@
     {
       "note": "Outside 006, unreleased: a0e7287 tracks .agents/skills/* (7 files), but neither .extensionignore nor .gitattributes export-ignore lists .agents/. --dev installs copy them (CI included), and the next release archive would ship them to every consumer. validate-extension.sh leak regex does not cover .agents/. Fix: add .agents/ to both files and to the leak check. Local --dev installs also copy the untracked skills-lock.json and ignored .mcp.json.",
       "step": "implement"
+    },
+    {
+      "note": "Outside 006, pre-existing: the Source Slug Generation snippet in commands/speckit.knowledge.sync.md (L24-L27, rendered into the sync and status skills) puts a # comment after each line-continuation backslash, so run literally it is a bash syntax error; an agent must strip comments to get the slug. Fix separately: move the comments above the pipeline.",
+      "step": "implement"
     }
   ],
   "step_summaries": {
@@ -484,9 +504,33 @@
       "exitCode": 0,
       "durationSeconds": 4.8,
       "result": "Priority: 10 · To remove: specify extension remove knowledge · PASS Category: integration, Effect: read-write"
+    },
+    {
+      "what": "T012 every config-derived git operand follows --",
+      "command": "python3 /tmp/kn006/t012/audit.py",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "sync: git fetch --depth=1 origin -- <revision> · sync: git fetch origin -- <revision> · 11 config-derived git calls, 0 without --: []"
+    },
+    {
+      "what": "T012 validation blocks still byte-identical (static validation)",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.9,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T012 agent executed rendered /speckit-knowledge-status against https://github.com/rnoap/spec-kit-shared-knowledge on Linux (Fedora CoreOS 41, GNU timeout 9.5, working-tree install on spec-kit 1.2.0)",
+      "command": "independent subagent followed /private/tmp/kn006/t012/consumer/.github/skills/speckit-knowledge-status/SKILL.md; podman machine ssh -- timeout 5 git ls-remote --exit-code -- https://github.com/rnoap/spec-kit-shared-knowledge HEAD",
+      "result": "Reported shared-knowledge as reachable from an ls-remote exit 0 (HEAD f565b60), status not synced, Total: 0 items from 1 source (1 reachable, 1 not synced)",
+      "warnings": [
+        "Agent judgement plus the agent-reported exit code; the stock-macOS reachability case remains blocked on the separately tracked timeout fix"
+      ]
     }
   ],
-  "currentTask": "T010",
+  "currentTask": "T012",
   "task_summaries": {
     "T001": {
       "status": "DONE",
@@ -553,6 +597,20 @@
       "did": "spec-kit 1.2.0: after extension add <repo> --dev, specify extension info knowledge printed Category: integration and Effect: read-write.",
       "files": [
         "/tmp/kn006/t010"
+      ]
+    },
+    "T011": {
+      "status": "DONE",
+      "did": "status § 3 reachability call is now timeout 5 git ls-remote --exit-code -- <url> HEAD; validation block untouched.",
+      "files": [
+        "commands/speckit.knowledge.status.md"
+      ]
+    },
+    "T012": {
+      "status": "DONE",
+      "did": "All 11 config-derived git calls carry -- (audit flags the pre-T011 status); an independent agent ran the rendered status skill on Linux with GNU timeout and it reported the remote reachable; validation blocks byte-identical, 13/13 static checks.",
+      "files": [
+        "/tmp/kn006/t012"
       ]
     }
   }

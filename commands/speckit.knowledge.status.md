@@ -125,7 +125,7 @@ Cache age is computed from `synced_at` to now:
 
 **Remote URL**:
 ```bash
-timeout 5 git ls-remote --exit-code <url> HEAD
+timeout 5 git ls-remote --exit-code -- <url> HEAD
 ```
 - Exit 0 → `✅ reachable`
 - Non-zero / timeout → `❌ timeout`
