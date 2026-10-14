@@ -7,16 +7,14 @@
       "manifest_hash": "sha256:698cc7089602db44622de39730555db4999cda94ab47195bcfe18f41d08b430a",
       "enabled": true,
       "priority": 10,
-      "registered_commands": {
-        "copilot": [
-          "speckit.git.feature",
-          "speckit.git.validate",
-          "speckit.git.remote",
-          "speckit.git.initialize",
-          "speckit.git.commit"
-        ]
-      },
-      "registered_skills": [],
+      "registered_commands": {},
+      "registered_skills": [
+        "speckit-git-feature",
+        "speckit-git-validate",
+        "speckit-git-remote",
+        "speckit-git-initialize",
+        "speckit-git-commit"
+      ],
       "installed_at": "2026-10-08T16:22:34.506699+00:00"
     },
     "brownfield": {
@@ -28,15 +26,13 @@
       "manifest_hash": "sha256:671babc47c752bf18868d0aeeef66f0fc4f37c6cf52622cfa07e8715fb5ac4a6",
       "enabled": true,
       "priority": 10,
-      "registered_commands": {
-        "copilot": [
-          "speckit.brownfield.scan",
-          "speckit.brownfield.bootstrap",
-          "speckit.brownfield.validate",
-          "speckit.brownfield.migrate"
-        ]
-      },
-      "registered_skills": [],
+      "registered_commands": {},
+      "registered_skills": [
+        "speckit-brownfield-scan",
+        "speckit-brownfield-bootstrap",
+        "speckit-brownfield-validate",
+        "speckit-brownfield-migrate"
+      ],
       "installed_at": "2026-10-08T16:22:37.355355+00:00"
     },
     "agent-context": {
@@ -45,12 +41,10 @@
       "manifest_hash": "sha256:270100175bb742c37b8d549f2233c5b79114869dac754883dbecac2a4813beef",
       "enabled": true,
       "priority": 10,
-      "registered_commands": {
-        "copilot": [
-          "speckit.agent-context.update"
-        ]
-      },
-      "registered_skills": [],
+      "registered_commands": {},
+      "registered_skills": [
+        "speckit-agent-context-update"
+      ],
       "installed_at": "2026-10-08T16:22:37.703258+00:00"
     },
     "assess": {
@@ -59,16 +53,14 @@
       "manifest_hash": "sha256:a1c87d9ce8088e7865f1d352137777a693b0595ccc310957c7c051a604ca1db2",
       "enabled": true,
       "priority": 10,
-      "registered_commands": {
-        "copilot": [
-          "speckit.assess.intake",
-          "speckit.assess.research",
-          "speckit.assess.define",
-          "speckit.assess.shape",
-          "speckit.assess.decide"
-        ]
-      },
-      "registered_skills": [],
+      "registered_commands": {},
+      "registered_skills": [
+        "speckit-assess-intake",
+        "speckit-assess-research",
+        "speckit-assess-define",
+        "speckit-assess-shape",
+        "speckit-assess-decide"
+      ],
       "installed_at": "2026-10-08T16:22:38.448317+00:00"
     },
     "tinyspec": {
@@ -80,14 +72,12 @@
       "manifest_hash": "sha256:a78c4ede6a5e07f1430e187be0269b910dcef3e75f4e0609588e58fbce48b742",
       "enabled": true,
       "priority": 10,
-      "registered_commands": {
-        "copilot": [
-          "speckit.tinyspec.tinyspec",
-          "speckit.tinyspec.implement",
-          "speckit.tinyspec.classify"
-        ]
-      },
-      "registered_skills": [],
+      "registered_commands": {},
+      "registered_skills": [
+        "speckit-tinyspec-tinyspec",
+        "speckit-tinyspec-implement",
+        "speckit-tinyspec-classify"
+      ],
       "installed_at": "2026-10-08T16:22:41.239021+00:00"
     },
     "bug": {
@@ -99,14 +89,12 @@
       "manifest_hash": "sha256:0f8ca9b828f8855be72a17cdef1f355fba81d7173b16f349d500d2ab367384fb",
       "enabled": true,
       "priority": 10,
-      "registered_commands": {
-        "copilot": [
-          "speckit.bug.assess",
-          "speckit.bug.fix",
-          "speckit.bug.test"
-        ]
-      },
-      "registered_skills": [],
+      "registered_commands": {},
+      "registered_skills": [
+        "speckit-bug-assess",
+        "speckit-bug-fix",
+        "speckit-bug-test"
+      ],
       "installed_at": "2026-10-08T16:22:38.090167+00:00"
     },
     "companion": {
@@ -115,35 +103,33 @@
       "manifest_hash": "sha256:6c71d56fbf5912e3d0c056b56e0d30ff571fc9b370add089147f3e65ee622b09",
       "enabled": true,
       "priority": 10,
-      "registered_commands": {
-        "copilot": [
-          "speckit.companion.before-step",
-          "speckit.companion.after-specify",
-          "speckit.companion.after-plan",
-          "speckit.companion.after-tasks",
-          "speckit.companion.after-implement",
-          "speckit.companion.before-converge",
-          "speckit.companion.after-converge",
-          "speckit.companion.status",
-          "speckit.companion.resume",
-          "speckit.companion.specify",
-          "speckit.companion.plan",
-          "speckit.companion.tasks",
-          "speckit.companion.implement",
-          "speckit.companion.classify",
-          "speckit.companion.mark-complete",
-          "speckit.companion.auto",
-          "speckit.companion.doctor",
-          "speckit.companion.living-adopt",
-          "speckit.companion.living-move",
-          "speckit.companion.living-drift",
-          "speckit.companion.living-show",
-          "speckit.companion.living-validate",
-          "speckit.companion.living-coverage",
-          "speckit.companion.living-sync"
-        ]
-      },
-      "registered_skills": [],
+      "registered_commands": {},
+      "registered_skills": [
+        "speckit-companion-before-step",
+        "speckit-companion-after-specify",
+        "speckit-companion-after-plan",
+        "speckit-companion-after-tasks",
+        "speckit-companion-after-implement",
+        "speckit-companion-before-converge",
+        "speckit-companion-after-converge",
+        "speckit-companion-status",
+        "speckit-companion-resume",
+        "speckit-companion-specify",
+        "speckit-companion-plan",
+        "speckit-companion-tasks",
+        "speckit-companion-implement",
+        "speckit-companion-classify",
+        "speckit-companion-mark-complete",
+        "speckit-companion-auto",
+        "speckit-companion-doctor",
+        "speckit-companion-living-adopt",
+        "speckit-companion-living-move",
+        "speckit-companion-living-drift",
+        "speckit-companion-living-show",
+        "speckit-companion-living-validate",
+        "speckit-companion-living-coverage",
+        "speckit-companion-living-sync"
+      ],
       "installed_at": "2026-10-14T17:16:26.196481+00:00"
     }
   }
