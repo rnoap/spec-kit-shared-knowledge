@@ -82,7 +82,7 @@ A reviewer relies on the README's trust model, which says `--` comes before ever
 
 ### User Story 5 - CI proves the compatibility claim (Priority: P3)
 
-A maintainer opens a pull request. Today CI installs only against spec-kit 1.0.4: older than what new users run and newer than the claimed minimum, so neither end of the claim is tested. After this change every pull request installs against the declared minimum and against the newest release, and the install check reports a broken install clearly.
+A maintainer opens a pull request. Today CI installs only against spec-kit 1.0.4: older than what new users run and newer than the claimed minimum, so neither end of the claim is tested. After this change every pull request installs against the declared minimum and the selected supported release, and the install check reports a broken install clearly.
 
 **Why this priority**: Without it, the minimum drifts back into fiction the next time spec-kit changes.
 
@@ -99,6 +99,8 @@ A maintainer opens a pull request. Today CI installs only against spec-kit 1.0.4
 - A project that already trusts the community catalog can install with plain `specify extension add knowledge`, so the README must not say that command always fails.
 - The confirmation prompt needs a terminal, so a scripted `--from` install aborts. The README does not document a way around a security prompt.
 - The `--from` example names one release. At release time it must name the tag that matches the manifest version, or catalog users install an older release.
+- Before catalog submission the public id may be absent. Pre-publication checks must reproduce discovery-only behavior with a controlled catalog instead of requiring the public entry to exist.
+- A successful install of the previous release does not prove the new package. Distribution checks must also exercise the current candidate after all edits are complete.
 - spec-kit 0.15.2 has no non-interactive flag for project setup, and the minimum-version job must still run unattended.
 - The main branch requires the checks named "Static validation" and "Install smoke test". Renaming either blocks every merge. The new check gates merges only once a maintainer adds it to the branch rules.
 - Local paths written `/`, `~/` or `./` never reach the reachability call in status. A `../` path, which configure accepts, is treated as remote by status and does reach it; with `--` its result is unchanged.
@@ -108,7 +110,7 @@ A maintainer opens a pull request. Today CI installs only against spec-kit 1.0.4
 ### Functional Requirements
 
 - **FR-001**: The manifest MUST declare the minimum spec-kit version as `>=0.15.2`.
-- **FR-002**: Every other place in this repository that states the minimum MUST state the same value: the README badge, the README prerequisites, the constitution's Requirements & Compatibility, and the project's plan template.
+- **FR-002**: Every other current declaration of the minimum MUST state the same value: the README badge, the README prerequisites, the constitution's Requirements & Compatibility, and the project's plan template.
 - **FR-003**: The constitution change MUST follow its Governance rule: a `docs:` commit with a rationale note, and the constitution's version and amendment date updated.
 - **FR-004**: The README MUST say that spec-kit's community catalog is searchable but not installable by default.
 - **FR-005**: The README's primary install instruction MUST work on a default setup, using `specify extension add knowledge --from <release archive URL>`.
@@ -132,8 +134,8 @@ A maintainer opens a pull request. Today CI installs only against spec-kit 1.0.4
 
 - **SC-001**: On a fresh project with default settings, the README's primary install command installs the extension on the first try once the user confirms the source.
 - **SC-002**: A user on a spec-kit older than the minimum gets a refusal naming the required version, never an install that lacks its configuration file.
-- **SC-003**: 100% of the repository's statements of the minimum version read `>=0.15.2`.
-- **SC-004**: Every pull request proves installation on 2 spec-kit versions, the declared minimum and the newest release. A change that breaks either shows a failing check.
+- **SC-003**: 100% of the repository's current minimum-version declarations read `>=0.15.2`; historical quotations retain their original values.
+- **SC-004**: Every pull request proves installation on 2 spec-kit versions, the declared minimum and the selected supported release. A change that breaks either shows a failing check.
 - **SC-005**: Both seeded broken installs, no commands registered and no files copied, fail the install check with a readable message and no shell error: 2 of 2.
 - **SC-006**: 100% of the commands' git calls that take a configured value separate it from options, up from all but one.
 - **SC-007**: The extension's details, as spec-kit displays them, show a category and an effect.
@@ -144,7 +146,7 @@ A maintainer opens a pull request. Today CI installs only against spec-kit 1.0.4
 - spec-kit refuses an install below the declared minimum with a message naming it, as its 1.1.2 source shows.
 - spec-kit's own guidance, not this extension, sets the trust boundary: it calls `--install-allowed` on a discovery-only catalog the vetting boundary, so the README offers no way across it.
 - `integration` fits because the extension brings in content from other repositories, like the catalog's Confluence and Work IQ entries. `read-write` fits because it writes its configuration, its cache, its index and the project's `.gitignore`.
-- The plan template is a project-owned copy, restored by hand after each spec-kit upgrade (most recently `395c326`), so it is edited by hand like the constitution.
+- Constitution 1.2.0 explicitly permits authored project templates. The feature's later compatibility and CI amendment advances it to 1.3.0; neither change is justified by overriding the constitution in a feature plan.
 - This feature bumps no version and tags nothing. Its changes wait under `[Unreleased]` for the release that also carries the separately tracked sync fixes.
 - The platform statement includes macOS. It becomes accurate once the separately tracked `timeout` fix lands, and both ship in the same release.
 - Windows support is stated, not exercised by CI.

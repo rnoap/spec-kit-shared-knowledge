@@ -80,7 +80,7 @@
       ]
     },
     "FR-002": {
-      "title": "README badge, README prerequisites, constitution and plan template state the same minimum",
+      "title": "All current minimum-version declarations agree; historical quotations keep their original values",
       "tasks": [
         "T003",
         "T007",
@@ -225,7 +225,9 @@
     "evidence 2026-10-14: install OK on spec-kit 0.15.2, 1.1.2 (from release zip), 1.2.0; config not scaffolded on 0.10.0",
     "evidence: spec-kit 1.1.2 ships the community catalog with install_allowed=False and refuses installs below requires.speckit_version",
     "area: .specify/templates/overrides/plan-template.md L17, L42 (project template now lives in overrides/, untracked until the toolchain change lands)",
-    "area: .specify/templates/plan-template.md L17, L42 (overrides/ was temporary; 395c326 restored the project template in place)"
+    "area: .specify/templates/plan-template.md L17, L42 (overrides/ was temporary; 395c326 restored the project template in place)",
+    "Pre-implementation remediation: C1, I1, I2 and E1 are reflected in the existing plan, tasks, contracts and constitution. No implementation task was executed or closed.",
+    "Pending prerequisite commits: resolver compatibility fix and the separate docs: constitution 1.2.0 amendment. Preserve unrelated changes and keep these separate from feature implementation."
   ],
   "intent": "Make the package tell catalog users the truth (spec-kit floor, install path, invocation names, metadata) and make CI prove the floor",
   "planBlocks": [],
@@ -260,6 +262,26 @@
       "decision": "Constitution 1.2.0 with rationale; hand-edit plan template as a justified violation",
       "why": "a requirement changes and a gate gains a run; the template restates the floor and is project-owned in practice",
       "rejected": "1.1.1 patch; leaving the template stale; amending Code Boundaries"
+    },
+    {
+      "decision": "Supersedes the plan-level justified template violation: constitution 1.2.0 explicitly authorizes project-owned template edits",
+      "why": "C1 requires an explicit governance amendment, not an exception inferred by the feature plan. The feature compatibility and CI amendment will advance constitution 1.2.0 to 1.3.0.",
+      "rejected": "Treating historical manual edits or Complexity Tracking as permission to override the constitution"
+    },
+    {
+      "decision": "Test discovery-only installation through an isolated loopback catalog fixture before publication",
+      "why": "I1: knowledge may not exist in the public catalog yet. The fixture is registered only in a temporary consumer with --no-install-allowed.",
+      "rejected": "Requiring the public marketplace entry or changing the real project catalog trust"
+    },
+    {
+      "decision": "Validate a candidate archive containing the current distributable working-tree bytes after all story phases join",
+      "why": "I2: the v1.5.0 ZIP is only a historical download check. T018 compares candidate manifest and payload hashes with the edited working tree.",
+      "rejected": "Using the previous release or stale HEAD to prove uncommitted feature changes"
+    },
+    {
+      "decision": "Execute installed agent commands rather than infer runtime behavior from skill files or standalone Git calls",
+      "why": "E1: T006 checks the unconfigured command, T012 checks real remote status on Linux, and T018 repeats against the candidate. macOS remains a publication dependency on its timeout fix.",
+      "rejected": "Recording command-file existence as runtime success"
     }
   ],
   "concerns": [

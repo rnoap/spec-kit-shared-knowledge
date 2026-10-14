@@ -24,7 +24,7 @@ specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-
 ```
 
 | Moment | What happens |
-|---|---|
+| --- | --- |
 | Before downloading | A panel titled `Untrusted Source` shows the URL, then `Continue with installation?`, defaulting to **No** |
 | User confirms | The extension installs: 5 commands, 4 hooks, `knowledge-config.yml` (SC-001) |
 | User declines | `Cancelled`; nothing installed; exit 0 |
@@ -46,12 +46,14 @@ The README never suggests `specify extension catalog add <community catalog URL>
 
 ### 1.3 Plain `specify extension add knowledge`
 
-Works wherever a trusted catalog lists the extension, so the README does not say it always fails. On a default setup spec-kit refuses with `'knowledge' was found in the 'community' catalog, which is discovery-only — a search surface, not an install source.` and points to `--from`.
+Works wherever a trusted catalog lists the extension, so the README does not say it always fails. Before publication, the built-in catalogs may report the id as not found. Once listed in the discovery-only community catalog, spec-kit refuses installation and points to `--from`.
+
+Before publication, T006 uses a catalog served at `http://127.0.0.1:<port>/catalog.json`, with one `knowledge` entry. Register it only in a temporary consumer using `specify extension catalog add <fixture URL> --name knowledge-fixture --no-install-allowed`. Plain installation must then fail as discovery-only. Isolate user configuration and catalog-related environment variables; never change the real project's catalog or mark the public community catalog install-allowed. spec-kit 1.2.0 explicitly permits HTTP for loopback catalog and archive URLs; no TLS checks are disabled.
 
 ### 1.4 What the README states
 
 | Statement | Requirement |
-|---|---|
+| --- | --- |
 | The community catalog is searchable, not installable, by default | FR-004 |
 | The primary install is `specify extension add knowledge --from <release archive URL>` | FR-005 |
 | spec-kit asks the user to confirm the source | FR-006 |
@@ -70,7 +72,7 @@ The examples keep the dot form. One note at the top of README § Commands tells 
 agent may list the commands under another name.
 
 | Form | Sync command | Used by |
-|---|---|---|
+| --- | --- | --- |
 | Dot | `/speckit.knowledge.sync` | Agents that install commands as prompts or slash commands; every README example |
 | Skills | `/speckit-knowledge-sync` | Agents that install commands as skills, such as Copilot on spec-kit 1.1.2 (on 1.0.4 it gets prompts) |
 | Codex | `$speckit-knowledge-sync` | Codex ([research § 7](../research.md#7-one-invocation-note-examples-unchanged)) |
@@ -82,6 +84,7 @@ other four commands.
   fails without them.
 - The other forms appear in `README.md` only. Command bodies keep their `__SPECKIT_COMMAND_*__`
   tokens; a literal `/speckit-` or `$speckit-` under `commands/` fails the agent-portability check.
+- T006 has the agent load and execute the installed status skill with no sources. T012 and T018 execute it against a reachable configured remote on Linux. Finding the skill file or running its Git command separately does not satisfy these checks.
 
 ---
 
@@ -91,6 +94,7 @@ README § Prerequisites states: **macOS and Linux; Windows through WSL or Git Ba
 
 - CI runs on Linux only. Windows is stated, not exercised.
 - The macOS claim relies on the separately tracked `timeout` fix, which ships in the same release.
+- A real status invocation on macOS must pass after that fix before publication. A missing `timeout` is a blocked check, not a successful reachability result.
 
 ---
 
@@ -99,7 +103,7 @@ README § Prerequisites states: **macOS and Linux; Windows through WSL or Git Ba
 `commands/speckit.knowledge.status.md`, § 3 Check reachability, remote-URL branch:
 
 | | Call |
-|---|---|
+| --- | --- |
 | Before | `timeout 5 git ls-remote --exit-code <url> HEAD` |
 | After | `timeout 5 git ls-remote --exit-code -- <url> HEAD` |
 
@@ -120,7 +124,7 @@ The README's trust model promises `--` before every config-derived `git` operand
 applied, every row holds.
 
 | Command | Call | Value from config | `--` |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | status | `git ls-remote --exit-code -- <url> HEAD` | `url` | added here |
 | sync | `git clone … -- <url> <cache-dir>`, Tiers 1 and 2 | `url` | already |
 | sync | `git clone … -- <expanded-path> <cache-dir>` | `url`, local path | already |

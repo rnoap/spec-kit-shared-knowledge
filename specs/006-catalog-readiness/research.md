@@ -58,10 +58,10 @@ Every decision below was settled from the codebase, spec-kit's source and change
 
 **Alternatives considered**: Per-agent variants of every example multiply the README, and would still fail the validator if the dot form disappeared.
 
-## 8. Constitution version 1.2.0
+## 8. Constitution version 1.3.0
 
-**Decision**: Bump the constitution to 1.2.0, set `Last Amended` to the commit date, and add a `1.2.0 rationale` note in the existing style.
+**Decision**: The separate 1.2.0 amendment authorizes project-owned template edits. This feature then bumps the constitution from 1.2.0 to 1.3.0 for its compatibility and CI changes, updates `Last Amended`, and adds a `1.3.0 rationale` note.
 
 **Rationale**: A stated requirement changes and a quality gate grows a second run. That is more than a wording fix, which would be a patch, and removes no principle, which would be a major change.
 
-**Alternatives considered**: 1.1.1, which understates a changed requirement.
+**Alternatives considered**: Calling a forbidden template edit a justified exception does not satisfy the constitution. Reusing 1.2.0 for the later feature amendment would conflate two independently reviewed changes.

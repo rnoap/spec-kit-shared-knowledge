@@ -11,7 +11,7 @@ which waits for checks by name, and `upstream-compat.yml`, which reads the gatin
 ## 1. Checks
 
 | Workflow | Job id | Check name (exact) | Triggers | spec-kit | Required on `main` |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | `validate.yml` | `validate` | `Static validation` | pull request, push to `main`, manual | — | yes, unchanged |
 | `validate.yml` | `smoke` | `Install smoke test` | pull request, push to `main`, manual | `v1.2.0`, from `SPEC_KIT_REF` | yes, unchanged |
 | `validate.yml` | `smoke-minimum` | `Install smoke test (minimum spec-kit)` | pull request, push to `main`, manual | `v0.15.2`, from `extension.yml` | no, until a maintainer adds it |
@@ -31,7 +31,7 @@ env:
   SPEC_KIT_REF: v1.2.0
 ```
 
-- Stays workflow-level in `validate.yml`, and stays the file's only line matching `SPEC_KIT_REF: `.
+- Stays workflow-level in `validate.yml`, and stays the file's only line matching `SPEC_KIT_REF:` followed by a space.
   `upstream-compat.yml` reads it with
   `grep -oE 'SPEC_KIT_REF: .*' .github/workflows/validate.yml | cut -d' ' -f2`; a second match
   would garble its failure report.
@@ -43,7 +43,7 @@ env:
 ## 3. The minimum-version job (FR-014)
 
 | Step | `smoke` | `smoke-minimum` |
-|---|---|---|
+| --- | --- | --- |
 | spec-kit release | `${SPEC_KIT_REF}` | `v` + the version in the `>=` clause of `requires.speckit_version`: `v0.15.2` |
 | Project setup | `specify init . --integration copilot --non-interactive --force` | `specify init . --integration copilot --force < /dev/null` |
 | Extension install | `specify extension add "$GITHUB_WORKSPACE" --dev` | identical |
@@ -74,7 +74,7 @@ assert-install.sh <consumer-dir> <repo-root>
 ```
 
 | Argument | Default |
-|---|---|
+| --- | --- |
 | `<consumer-dir>` | `/tmp/consumer` |
 | `<repo-root>` | `$GITHUB_WORKSPACE`, else two directories above the script |
 
@@ -83,7 +83,7 @@ unchanged; what it reports for a broken install is not.
 
 - **Reads** `<repo-root>/extension.yml` for every expected number, and `install.log`,
   `.specify/extensions/<id>/` and `.specify/extensions.yml` under `<consumer-dir>`.
-- **Prints** one `  PASS  <text>` or `  FAIL  <text>` line per check, then a blank line and
+- **Prints** one `PASS  <text>` or `FAIL  <text>` line per check, each prefixed with two spaces, then a blank line and
   `Smoke test passed.` (exit 0) or `Smoke test failed.` (exit 1). `PASS` and `FAIL` are wrapped in
   ANSI colour codes; match on the text after them.
 - A missing `<consumer-dir>` prints `no consumer project at <consumer-dir>` and exits 1.
@@ -94,7 +94,7 @@ Expected values come from the manifest; today that is 5 commands, 4 hooks, `know
 and version `1.5.0`.
 
 | # | Check | PASS | FAIL | Change |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 1 | No scaffolding warning in `install.log` | `no config-scaffolding warning` | `spec-kit refused to scaffold the config template` | — |
 | 2 | Config file on disk | `config scaffolded: knowledge-config.yml` | `config declared but not created: .specify/extensions/knowledge/knowledge-config.yml` | — |
 | 3 | `• speckit.` lines in `install.log` | `all 5 commands registered` | `manifest declares 5 commands, install reported <n>` | `<n>` is a single integer: `0` when nothing matches or the log is missing (FR-016) |
@@ -105,10 +105,24 @@ and version `1.5.0`.
 ### 4.2 Broken installs it must catch (SC-005)
 
 | Seed | State under `<consumer-dir>` | Must print a FAIL line reading | Exit |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | A, no commands registered | A good install, with every `• speckit.` line removed from `install.log` | `manifest declares 5 commands, install reported 0` | 1 |
 | B, no files copied | `install.log` present; `.specify/extensions/knowledge/` and `.specify/extensions.yml` absent, as an aborted install leaves them | `install copied 0 files — the extension directory is missing or empty` | 1 |
 
 For both seeds the output holds no shell or interpreter error: no `integer expression expected`, no
 `Traceback`, and no `No such file or directory` from `find` or `grep`. Today seed A trips `[` on a
 two-line count, and seed B passes check 5 at 0 files, then ends in a Python traceback.
+
+---
+
+## 5. Candidate archive validation (T018)
+
+This manual distribution check runs after all story phases join. It does not add another required CI check.
+
+1. Build a temporary release-shaped ZIP from the current distributable working-tree bytes, honoring the package exclusions. An immutable release tag or an older `git archive HEAD` cannot stand in for uncommitted changes. Include the manifest, declared command files, config template, README and license.
+2. Before installation, assert `requires.speckit_version: ">=0.15.2"`, `category: integration`, and `effect: read-write` in the archive. Compare SHA-256 values for its payload with the working-tree files. Keep `extension.version` unchanged in this feature.
+3. Serve the archive only on `127.0.0.1`. Install through `--from http://127.0.0.1:<port>/<archive>` after the `Untrusted Source` confirmation. This uses spec-kit's explicit loopback exception, not disabled TLS verification.
+4. Run the fixed `assert-install.sh` against that installation. Verify the installed manifest and command payloads match the candidate, and that skills contain no unresolved command-reference tokens.
+5. Have the agent execute the installed status skill, first without sources and then against the reachable configured remote on Linux with `timeout` available. Record the actual reported state. Existence checks and standalone Git calls are insufficient.
+
+The v1.5.0 URL is retained only as a historical download-route regression. PR check results remain pending until a PR run exists. Publication additionally requires the separately tracked macOS timeout fix and its real-command check.

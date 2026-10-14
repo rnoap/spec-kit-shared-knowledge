@@ -35,3 +35,4 @@
 - Success criteria name spec-kit because compatibility with it is the outcome being measured. They name no tooling used to build the change.
 - No [NEEDS CLARIFICATION] markers: every open choice has an informed default under Assumptions.
 - FR-003 (constitution governance) and FR-018 (CHANGELOG) are process requirements with no user scenario. Review checks them on the pull request.
+- This checklist checks specification quality, not completed implementation. Catalog fixtures, candidate-archive installation and real command execution remain pending tasks, not recorded passes.

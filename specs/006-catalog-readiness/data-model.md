@@ -18,7 +18,7 @@ extension.yml (authoritative, constitution § II)
 ## 1. Manifest fields
 
 | Field | Today | After | spec-kit rule | Req |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | `requires.speckit_version` | `">=0.10.0"` | `">=0.15.2"` | Must parse as a version specifier. A running spec-kit that does not satisfy it refuses the install. | FR-001 |
 | `extension.category` | absent | `integration` | Optional, any non-empty string. | FR-011 |
 | `extension.effect` | absent | `read-write` | Optional, exactly `read-only` or `read-write`. | FR-011 |
@@ -32,29 +32,30 @@ extension.yml (authoritative, constitution § II)
 One version, stated in six places. The manifest is authoritative and the other five follow in the same pull request (FR-002). Every place writes the literal `>=0.15.2`, so one search for that string measures SC-003. The badge is the one exception: a shields.io path carries `≥` URL-encoded.
 
 | Location | Today | After |
-|---|---|---|
+| --- | --- | --- |
 | `extension.yml`, `requires.speckit_version` | `">=0.10.0"` | `">=0.15.2"` |
 | `README.md` L9, spec-kit badge | `spec--kit-%E2%89%A50.10.0` | `spec--kit-%E2%89%A50.15.2` |
 | `README.md` L31, Prerequisites | spec-kit `>= 0.10.0` | spec-kit `>=0.15.2` |
-| `.specify/memory/constitution.md` L74 | `>= 0.10.0` | `>=0.15.2` |
+| `.specify/memory/constitution.md`, Requirements & Compatibility | `>= 0.10.0` | `>=0.15.2` |
 | `.specify/templates/plan-template.md` L17 | `>= 0.10.0` | `>=0.15.2` |
 | `.specify/templates/plan-template.md` L42 | `>= 0.10.0` | `>=0.15.2` |
 
-Left as written, because they record what was true at the time: `specs/001` to `specs/005`, released CHANGELOG sections, and other extensions' floors under `.specify/extensions/`. The two template rows are the hand edit the plan's Complexity Tracking justifies.
+Left as written, because they record what was true at the time: `specs/001` to `specs/005`, released CHANGELOG sections, historical input and rationale quotations, and other extensions' floors under `.specify/extensions/`. Constitution 1.2.0 explicitly permits the two project-owned template edits.
 
 ## 3. Install routes
 
 These are spec-kit states the README must describe correctly (FR-004 to FR-008). Exact wording and commands are in [contracts/commands.md](contracts/commands.md) § 1.
 
 | Route | Command | On a default setup | README role |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | A | `specify extension add knowledge --from <release archive URL>` | `Untrusted Source` prompt, installs once confirmed | primary (FR-005, FR-006) |
 | B | `specify extension add knowledge` from a catalog the team controls and marks install-allowed | installs, no prompt | for teams (FR-007) |
-| C | `specify extension add knowledge` with spec-kit's built-in catalogs | refused: the community catalog is discovery-only | said to fail on a default setup, never always (FR-004) |
+| C | `specify extension add knowledge` with spec-kit's built-in catalogs | not found before publication; refused as discovery-only once listed | describe the listed state; use a temporary discovery-only catalog to test it before publication (FR-004) |
 | D | `specify extension add <path> --dev` | installs | unchanged, for contributors and CI |
 
 - spec-kit resolves catalogs from the first of: `SPECKIT_CATALOG_URL`, the project's `.specify/extension-catalogs.yml`, the user's `~/.specify/extension-catalogs.yml`, the built-in stack. The first one found is the whole list, which is why marking the community catalog install-allowed with `catalog add` drops the `default` catalog. FR-008 forbids suggesting it.
 - The route A URL names `v<extension.version>`, `v1.5.0` today. At release it must move with the manifest version, or catalog users install the previous release. Nothing checks this automatically.
+- The historical v1.5.0 download does not prove this feature's changes. T018 installs a candidate archive containing the current working-tree bytes after all story phases join, and compares its manifest and payload hashes with that source.
 
 ### State: a `--from` install
 
@@ -73,7 +74,7 @@ A script that checks only the exit code reads CANCELLED as success.
 The manifest name `speckit.knowledge.<verb>` is canonical. spec-kit renders it per agent at install time, so what a user types depends on the agent and the spec-kit version, never on this extension.
 
 | Form | Example | Used by |
-|---|---|---|
+| --- | --- | --- |
 | Dot | `/speckit.knowledge.sync` | agents that install prompts or slash commands, such as Copilot on spec-kit 1.0.4; every README example |
 | Skills | `/speckit-knowledge-sync` | agents that install skills, such as Copilot on spec-kit 1.1.2 |
 | Codex | `$speckit-knowledge-sync` | Codex |
@@ -86,7 +87,7 @@ The manifest name `speckit.knowledge.<verb>` is canonical. spec-kit renders it p
 `assert-install.sh` reads the manifest for every expected value, then checks the consumer project. Its interface is unchanged. What changes is how it reports a broken install (FR-016, FR-017):
 
 | Check | Today, on an aborted install | After |
-|---|---|---|
+| --- | --- | --- |
 | Commands registered | count reads `0` twice and the `[` test errors | one integer, `0` when nothing matches or the log is missing |
 | Files copied | a `find` error, then `PASS installed file count is sane (0)` | 0 files fails with a readable line |
 | Hooks registered | Python `FileNotFoundError` traceback | fails with a message naming the missing file |
@@ -96,11 +97,11 @@ Every assertion still runs after an earlier failure (`set -uo pipefail`, no `-e`
 ## 6. Constitution record
 
 | Field | Today | After |
-|---|---|---|
-| Version | 1.1.0 | 1.2.0 (research § 8) |
-| Last Amended | 2026-09-04 | the date of the amending commit |
-| Rationale notes | `1.1.0 rationale` | adds `1.2.0 rationale`, same blockquote style |
+| --- | --- | --- |
+| Version | 1.2.0, template authorship | 1.3.0, compatibility and CI (research § 8) |
+| Last Amended | 2026-10-14 | the date of the amending commit |
+| Rationale notes | includes `1.2.0 rationale` | preserves it and adds `1.3.0 rationale` |
 | Requirements & Compatibility | spec-kit `>= 0.10.0` | spec-kit `>=0.15.2` |
-| Quality Gates, Install smoke test | one run, at the pinned release | two runs: the pinned newest release and the manifest's floor |
+| Quality Gates, Install smoke test | one run, at the pinned release | two runs: the selected pinned release and the manifest's floor |
 
 One `docs(constitution):` commit lands it (Governance, Principle IV). Smoke check 4 already reads "the installed file count is sane", which covers a non-zero lower bound, so its wording stays.
