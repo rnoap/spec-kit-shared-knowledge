@@ -26,6 +26,18 @@ You **MUST** consider the user input before proceeding (if not empty). The user 
    - If no input, look for the most recently created tinyspec in `specs/tiny/`
    - If no tinyspec files exist, suggest running `/speckit.tinyspec` first
 
+<!-- spec-kit-walmart:tiny-numbering START -->
+## Finding the tiny spec
+
+<!-- Managed by the spec-kit-walmart plugin; /speckit-update re-applies it. -->
+
+Tiny specs are named `specs/tiny/NNN-<feature-name>.md`. Resolve the input in
+this order: a path → that file; a number (`42`, `042`) → `specs/tiny/042-*.md`;
+a name → `specs/tiny/[0-9]*-<name>.md`, then a legacy `specs/tiny/<name>.md`.
+With no input, the most recent tiny spec is the one with the highest number —
+not the newest modification time.
+<!-- spec-kit-walmart:tiny-numbering END -->
+
 ## Outline
 
 1. **Read the tinyspec**: Parse the tinyspec file to extract:

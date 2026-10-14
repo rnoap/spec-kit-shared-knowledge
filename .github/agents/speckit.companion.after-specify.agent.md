@@ -1,16 +1,16 @@
 ---
-description: Capture tasks completion (currentStep=tasks, status=ready-to-implement) into .spec-context.json for the Companion GUI
+description: Capture the current spec-kit step into .spec-context.json for the Companion GUI
 ---
 
 
 <!-- Extension: companion -->
 <!-- Config: .specify/extensions/companion/ -->
-# Capture Tasks Context
+# Capture Spec Context
 
-Record the active feature's tasks completion into `.spec-context.json` so the
+Record the active feature's current pipeline step into `.spec-context.json` so the
 SpecKit Companion GUI re-renders with the correct step and status. This command
-runs as the `after_tasks` lifecycle hook — **state-writing only**; the tasks
-document is created by the core `/speckit.tasks` workflow.
+runs as the `after_specify` lifecycle hook — **state-writing only**; the spec
+directory and files are created by the core `speckit.specify` workflow.
 
 ## Prerequisites
 
@@ -24,18 +24,18 @@ document is created by the core `/speckit.tasks` workflow.
 Run the writer script from the repository root:
 
 ```bash
-python3 .specify/extensions/companion/scripts/write-context.py --step tasks --status ready-to-implement --by extension
+python3 .specify/extensions/companion/scripts/write-context.py --step specify --status specified --by extension
 ```
 
 The script resolves the active feature directory on its own, in this order:
 `--feature-dir` → `SPECIFY_FEATURE_DIRECTORY` env → `SPECIFY_FEATURE` env →
 `.specify/feature.json` → current git branch prefix.
 
-If you already know the feature directory (e.g. the one `/speckit.tasks` just
-wrote into), pass it explicitly so resolution is unambiguous:
+If you already know the feature directory (e.g. the one `speckit.specify` just
+created), pass it explicitly so resolution is unambiguous:
 
 ```bash
-python3 .specify/extensions/companion/scripts/write-context.py --feature-dir specs/<NNN>-<slug> --step tasks --status ready-to-implement --by extension
+python3 .specify/extensions/companion/scripts/write-context.py --feature-dir specs/<NNN>-<slug> --step specify --status specified --by extension
 ```
 
 ## Graceful Degradation
@@ -48,6 +48,6 @@ The script is best-effort and never fails the host command:
 ## Output
 
 On success the script prints the path it updated and the values written, e.g.:
-`[companion] Updated specs/<NNN>-<slug>/.spec-context.json (currentStep=tasks, status=ready-to-implement, by=extension)`.
+`[companion] Updated specs/<NNN>-<slug>/.spec-context.json (currentStep=specify, status=specified, by=extension)`.
 The write is atomic (temp file + rename) and appends to the canonical `history[]` without
 rewriting existing entries.

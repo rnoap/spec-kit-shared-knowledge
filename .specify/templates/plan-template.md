@@ -12,29 +12,32 @@
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+**Language/Version**: Markdown (CommonMark) for command prompts and docs; YAML 1.2 for `extension.yml` and `config-template.yml`. Bash appears only as illustrative pseudocode inside prompts and in the CI scripts under `.github/scripts/` (not shipped to consumers). No compiled code, no shipped scripts.
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Primary Dependencies**: spec-kit `>= 0.10.0` and git `>= 2.25` (constitution § Requirements & Compatibility) — no compiled runtime, no package manager lock file. Prompts assume `find`, `wc`, `sha256sum` or `shasum`, and `timeout` are present.
 
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Storage**: Files only. The deliverable is `commands/*.md`, `extension.yml` and `config-template.yml`. Consumer state is written by the commands at run time under the consumer's `.specify/extensions/knowledge/`: `knowledge-config.yml` (committed), plus local-only `cache/<slug>/` (with a per-source `.manifest.json`) and `knowledge-index.md`. No install script writes anything.
 
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Testing**: CI enforces the packaging contract on every pull request — `.github/workflows/validate.yml` runs static validation (`bash .github/scripts/validate-extension.sh`, also runnable locally) and an install smoke test into a clean consumer project; `upstream-compat.yml` repeats the smoke test against spec-kit `main` on a schedule. Command *behavior* has no automated test (agent prompts are interpreted by a model at runtime): the `quickstart.md` walkthrough of each feature, run in a real consumer project, is the only behavioral check (constitution § III, § Quality Gates).
 
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
+**Target Platform**: Any POSIX environment with spec-kit and git installed (macOS, Linux). GNU and BSD userland must behave identically — an active design constraint, not an assumption.
 
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: spec-kit extension package — a distribution artifact (YAML manifest + Markdown agent prompts), not a compiled binary or web service. No `src/`, no `tests/`, no build step.
 
-**Project Type**: [e.g., library/cli/web-service/mobile-app/compiler/desktop-app or NEEDS CLARIFICATION]
+**Performance Goals**: No throughput targets; agent execution time is outside this project's scope. The one lever is network cost: with `max_cache_age` set, a sync inside the window skips the source without touching git or the network.
 
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Constraints**:
 
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
+- Every command exits 0 on every path, errors included (extension-wide invariant since spec 003).
+- A project that upgrades and changes nothing must observe identical behavior — new config keys are opt-in, with no default values applied.
+- Consumer config is never clobbered: `provides.config[].name` must end in `-config.yml`, the only pattern spec-kit preserves across `extension add --force`.
+- Additive config changes keep `schema_version` at `"1.0"`; breaking changes bump it.
+- No hook declares arguments, which keeps `--force` unreachable from an automatic trigger.
+- Command bodies use `__SPECKIT_COMMAND_*__` tokens, never a hard-coded agent-specific invocation.
+- Installation is delegated entirely to `specify extension add`; the repository ships no install script.
+- Must remain compatible with spec-kit `>= 0.10.0`.
 
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Scale/Scope**: Small package. `extension.yml#provides` is the source of truth for the inventory — currently 5 commands, 4 optional `before_*` sync hooks, 1 config template, no scripts. Changes are additive; breaking changes require a `MAJOR` version bump in `extension.yml` and a `feat!:` commit.
 
 ## Constitution Check
 
@@ -65,43 +68,26 @@ specs/[###-feature]/
 -->
 
 ```text
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+# Extension package layout (no src/ — the files are the deliverable)
+commands/
+└── speckit.knowledge.<verb>.md          # agent prompt per command (namespace: knowledge)
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+extension.yml                            # package manifest — source of truth for version, commands, hooks
+config-template.yml                      # user-facing config schema (scaffolded as knowledge-config.yml)
+README.md                                # user docs; must mirror extension.yml
+CHANGELOG.md                             # Keep a Changelog; one entry per released version
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+.github/
+├── workflows/                           # validate.yml, upstream-compat.yml — automated quality gates
+└── scripts/                             # CI helper scripts; excluded from the published archive
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+specs/NNN-<feature-name>/                # this feature's SDD docs
+├── spec.md
+├── plan.md
+└── tasks.md
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: This project has no compiled source. The deliverable is the files themselves. New features add or modify files in `commands/` or the root manifests (`extension.yml`, `config-template.yml`), and keep `README.md` and `CHANGELOG.md` in step. No `src/`, `tests/`, `scripts/`, `frontend/`, or `backend/` directories exist or are needed.
 
 ## Complexity Tracking
 

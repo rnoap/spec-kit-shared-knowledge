@@ -15,3 +15,7 @@ Thumbs.db
 .idea/
 .vscode/
 .claude/
+.code_puppy/
+
+# code-review-graph index (local only)
+.code-review-graph/

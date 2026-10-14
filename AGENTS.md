@@ -55,19 +55,46 @@ extension's arguments here, and skip any extension that is not in
 > until a human noticed.
 <!-- SPECKIT-HOOKS END -->
 
+<!-- SPECKIT-TINY-SPECS START -->
+## Tiny specs are numbered — `specs/tiny/NNN-<slug>.md`
+
+Reserve the number before you create a tiny spec, including one written by hand.
+Never invent, guess or reuse a number, and never use a PR number. The helper
+ships with the spec-kit-walmart plugin; unless `CLAUDE_PLUGIN_ROOT` is set, set
+`SPECKIT_RUNTIME` to `wibey` or `code_puppy` (yours, or whichever has the plugin
+on this machine):
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/skills/speckit-setup/scripts/next-tiny-number.sh" --slug "fix receipt preview"
+# -> specs/tiny/NNN-fix-receipt-preview.md
+```
+
+- The number is one above the highest `NNN-` prefix in this checkout, the other
+  worktrees and every local and remote-tracking branch — offline and local.
+- Before answering, the helper numbers any tiny spec still missing a prefix
+  (oldest first: by when git first recorded it, else its `**Date**:` line, else
+  by name) and rewrites links to it. Commit those renames with your change.
+  `--check` instead of `--slug` previews them without touching anything.
+- A tiny spec's number is its permanent ID: never renumber or reuse one.
+- Plugin not installed: one above the highest `NNN-` prefix in `specs/tiny/`,
+  zero-padded, after checking `git worktree list` for an uncommitted one
+  elsewhere. Leave unnumbered files to `/speckit-update`.
+<!-- SPECKIT-TINY-SPECS END -->
+
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
 
-- Active feature: `004-source-lifecycle-cache`
-- **Plan: [specs/004-source-lifecycle-cache/plan.md](specs/004-source-lifecycle-cache/plan.md)**
-- Spec: [specs/004-source-lifecycle-cache/spec.md](specs/004-source-lifecycle-cache/spec.md)
-- Research: [specs/004-source-lifecycle-cache/research.md](specs/004-source-lifecycle-cache/research.md)
-- Data model: [specs/004-source-lifecycle-cache/data-model.md](specs/004-source-lifecycle-cache/data-model.md)
-- Contracts: [config schema](specs/004-source-lifecycle-cache/contracts/knowledge-config.schema.md) · [command surface](specs/004-source-lifecycle-cache/contracts/commands.md)
-- Verification: [specs/004-source-lifecycle-cache/quickstart.md](specs/004-source-lifecycle-cache/quickstart.md)
+- Latest feature: `005-context-budget-trust`
+- **Plan: [specs/005-context-budget-trust/plan.md](specs/005-context-budget-trust/plan.md)**
+- Spec: [specs/005-context-budget-trust/spec.md](specs/005-context-budget-trust/spec.md)
+- Research: [specs/005-context-budget-trust/research.md](specs/005-context-budget-trust/research.md)
+- Data model: [specs/005-context-budget-trust/data-model.md](specs/005-context-budget-trust/data-model.md)
+- Contracts: [config schema](specs/005-context-budget-trust/contracts/knowledge-config.schema.md) · [command surface](specs/005-context-budget-trust/contracts/commands.md)
+- Tasks: [specs/005-context-budget-trust/tasks.md](specs/005-context-budget-trust/tasks.md)
+- Verification: [specs/005-context-budget-trust/quickstart.md](specs/005-context-budget-trust/quickstart.md)
 
-Status: planned. `tasks.md` does not exist yet — run `/speckit.tasks` next.
+Status: completed — shipped in v1.5.0. No feature is in progress.
 <!-- SPECKIT END -->
 
 <!-- CODE-GRAPH-GUIDE START -->
