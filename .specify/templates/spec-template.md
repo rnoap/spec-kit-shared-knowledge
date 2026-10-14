@@ -144,21 +144,24 @@
 
 | Field | Current Value | Proposed Value | Reason |
 |-------|--------------|----------------|--------|
-| `version` | `x.y.z` | `x.y.z+1` | [Why bump?] |
+| `version` | `x.y.z` | `x.y.z+1` or unchanged | [Bump only if this feature cuts the release; otherwise the change waits under `[Unreleased]`] |
+| `requires.speckit_version` | `>=x.y.z` | unchanged | [N/A unless the floor moves; a new floor is restated in the README badge and Prerequisites, the constitution and the plan template] |
 | `provides.commands` | — | `speckit.knowledge.<verb>` | [New command] |
-| `hooks` | — | `[hook name]` | [N/A if no hook change] |
+| `hooks` | — | `[hook name]` | [N/A if no hook change; a hook never declares arguments] |
 
 ### config-template.yml Changes
 
 ```yaml
 # New or modified config keys (include only deltas, not the full file):
-[new_project_wide_key]: [value]    # top-level key, if any (like max_cache_age)
+[new_project_wide_key]: [value]    # top-level key, if any (like max_cache_age, max_items)
 sources:
   - url: [source]                  # existing required key, shown for context
-    [new_per_source_key]: [value]  # per-source key, if any (like revision)
+    [new_per_source_key]: [value]  # per-source key, if any (like revision, max_bytes)
 ```
 
 **`schema_version` bump required?** [ ] Yes — breaking change &nbsp;&nbsp; [ ] No — additive only
+
+**Configuration Validation Rules changed?** [ ] Yes — all three copies (`configure`, `sync`, `status`) change together &nbsp;&nbsp; [ ] No
 
 ### New / Modified Commands
 
@@ -166,4 +169,4 @@ For each `commands/*.md` file being added or changed:
 
 | Command file | Command ID | Trigger | What it does |
 |-------------|-----------|---------|-------------|
-| `commands/speckit.knowledge.[verb].md` | `speckit.knowledge.[verb]` | `/speckit.knowledge.[verb]` | [One-line description] |
+| `commands/speckit.knowledge.[verb].md` | `speckit.knowledge.[verb]` | `/speckit.knowledge.[verb]` (skills agents: `/speckit-knowledge-[verb]`) | [One-line description] |
