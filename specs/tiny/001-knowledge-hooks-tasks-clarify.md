@@ -1,4 +1,4 @@
-# TinySpec: Hooks `before_tasks` y `before_clarify`
+# TinySpec: `before_tasks` and `before_clarify` hooks
 
 **Branch**: main
 **Date**: 2026-09-04
@@ -7,49 +7,49 @@
 
 ## What
 
-La extensión `knowledge` solo sincroniza en `before_specify` y `before_plan`. Los contratos y decisiones compartidas también son relevantes al desglosar tareas y al resolver ambigüedades, así que hoy `/speckit.tasks` y `/speckit.clarify` arrancan con una caché potencialmente obsoleta. Añadir esos dos puntos de enganche.
+The `knowledge` extension only syncs on `before_specify` and `before_plan`. Shared contracts and decisions matter just as much when breaking work into tasks and when resolving ambiguities, so today `/speckit.tasks` and `/speckit.clarify` start from a potentially stale cache. Add those two hook points.
 
 ## Context
 
 | File | Role |
-|------|------|
-| [extension.yml](../../extension.yml) | Modificar — 2 entradas nuevas bajo `hooks:` + bump de versión |
-| [README.md](../../README.md) | Modificar — § "Integration with /speckit-specify and /speckit-plan" cubre solo 2 hooks |
-| [CHANGELOG.md](../../CHANGELOG.md) | Modificar — sección `[1.3.0]` |
+| --- | --- |
+| [extension.yml](../../extension.yml) | Modify — 2 new entries under `hooks:`, plus the version bump |
+| [README.md](../../README.md) | Modify — § "Integration with /speckit-specify and /speckit-plan" covers only 2 hooks |
+| [CHANGELOG.md](../../CHANGELOG.md) | Modify — `[1.3.0]` section |
 
-`before_tasks` y `before_clarify` son puntos válidos: aparecen entre los 19 eventos que spec-kit registra en `.specify/extensions.yml` de este proyecto.
+`before_tasks` and `before_clarify` are valid hook points: they are among the 19 events spec-kit registers in this project's `.specify/extensions.yml`.
 
 ## Requirements
 
-1. `extension.yml#hooks` declara `before_tasks` y `before_clarify`, ambos con `command: speckit.knowledge.sync` y **sin argumentos** — FR-016 de la spec 003 exige que el auto-trigger no pueda pasar `--no-context-output`.
-2. Ambos usan `optional: true` + `prompt`, idéntico al patrón de los dos hooks existentes.
-3. `extension.version` pasa de `1.2.0` a `1.3.0` (feature nueva → minor).
-4. Tras `specify extension add <path> --dev` en un proyecto limpio, los **cuatro** hooks aparecen en el `.specify/extensions.yml` del consumidor.
-5. El README deja de describir la integración como exclusiva de specify/plan.
+1. `extension.yml#hooks` declares `before_tasks` and `before_clarify`, both with `command: speckit.knowledge.sync` and **no arguments** — FR-016 of spec 003 requires that an automatic trigger cannot pass `--no-context-output`.
+2. Both use `optional: true` plus a `prompt`, the same pattern as the two existing hooks.
+3. `extension.version` goes from `1.2.0` to `1.3.0` (new feature → minor).
+4. After `specify extension add <path> --dev` in a clean project, all **four** hooks appear in the consumer's `.specify/extensions.yml`.
+5. The README stops describing the integration as specific to specify and plan.
 
 ## Plan
 
-1. `extension.yml`: añadir las 2 entradas a `hooks:`, copiando la forma de `before_plan` (`command` / `optional` / `prompt` / `description`).
+1. `extension.yml`: add the 2 entries under `hooks:`, copying the shape of `before_plan` (`command` / `optional` / `prompt` / `description`).
 2. `extension.yml`: `version: "1.2.0"` → `"1.3.0"`.
-3. `README.md`: retitular la sección de integración a algo neutro y listar los cuatro puntos.
-4. `CHANGELOG.md`: sección `## [1.3.0] - 2026-09-04` + actualizar los links del pie.
-5. Verificar con instalación limpia.
+3. `README.md`: give the integration section a neutral title and list all four hook points.
+4. `CHANGELOG.md`: `## [1.3.0] - 2026-09-04` section, plus updated footer links.
+5. Verify with a clean install.
 
 ## Tasks
 
-- [x] T1 Añadir `before_tasks` a `extension.yml#hooks`
-- [x] T2 Añadir `before_clarify` a `extension.yml#hooks`
+- [x] T1 Add `before_tasks` to `extension.yml#hooks`
+- [x] T2 Add `before_clarify` to `extension.yml#hooks`
 - [x] T3 Bump `extension.version` → `1.3.0`
-- [x] T4 Retitular y ampliar la § de integración del README a los 4 hooks
-- [x] T5 Entrada `[1.3.0]` en CHANGELOG + links del pie
-- [x] T6 `specify extension add <path> --dev` en proyecto limpio → confirmar los 4 hooks
+- [x] T4 Retitle the README integration section and extend it to the 4 hooks
+- [x] T5 `[1.3.0]` CHANGELOG entry plus footer links
+- [x] T6 `specify extension add <path> --dev` in a clean project → confirm the 4 hooks
 
 ## Done When
 
-- [x] Todas las tareas marcadas
-- [x] El `.specify/extensions.yml` del proyecto de prueba lista los 4 hooks
-- [x] `specify extension list` reporta `knowledge 1.3.0`
+- [x] All tasks checked off
+- [x] The test project's `.specify/extensions.yml` lists the 4 hooks
+- [x] `specify extension list` reports `knowledge 1.3.0`
 
-## Nota — coste por ciclo
+## Note — cost per cycle
 
-Pasar de 2 a 4 hooks implica hasta 4 clone/fetch por ciclo de feature. Los cuatro son `optional: true` (el usuario puede declinar), pero el arreglo real es el TTL `max_age` que quedó diferido al SDD completo. Si ese trabajo entra pronto, considera publicar 1.3.0 junto con él en vez de por separado.
+Going from 2 to 4 hooks means up to 4 clones or fetches per feature cycle. All four are `optional: true` (the user can decline), but the real fix is the `max_age` TTL that was deferred to the full SDD workflow. If that work lands soon, consider releasing 1.3.0 together with it rather than on its own.

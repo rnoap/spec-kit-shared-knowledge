@@ -1,4 +1,4 @@
-# TinySpec: Quitar `sparse-checkout reapply` del warm path (git 2.25)
+# TinySpec: Drop `sparse-checkout reapply` from the warm path (git 2.25)
 
 **Branch**: main · **Commit**: e727748
 **Date**: 2026-10-15
@@ -7,47 +7,47 @@
 
 ## What
 
-Cuando hay `path_filter`, el warm path de `sync` ejecutaba `git sparse-checkout reapply` después de `set`. Ese subcomando no existe en git 2.25, el mínimo que declara la extensión. Allí sale con 129, y un agente puede tomar el warm sync como fallido y quedarse con la caché vieja.
+With a `path_filter`, the `sync` warm path ran `git sparse-checkout reapply` after `set`. That subcommand does not exist in git 2.25, the minimum the extension declares. There it exits 129, and an agent can read the warm sync as failed and keep the old cache.
 
-Lo encontró la primera ejecución de `test-sync-git.sh` en git 2.25.1, en `ubuntu:20.04` con Podman, después del PR #9.
+The first run of `test-sync-git.sh` on git 2.25.1, in `ubuntu:20.04` under Podman, found it after PR #9.
 
 ## Context
 
 | File | Role |
 | --- | --- |
-| [commands/speckit.knowledge.sync.md](../../commands/speckit.knowledge.sync.md) | Modificar: quitar `reapply` del warm path y añadir una nota para que no vuelva |
-| [.github/scripts/test-sync-git.sh](../../.github/scripts/test-sync-git.sh) | Modificar: 2 checks nuevos (de 35 a 38) |
-| [CHANGELOG.md](../../CHANGELOG.md) | Modificar: entrada `Fixed` en `[Unreleased]` |
-| [.specify/bugs/knowledge-sync-defects/fix.md](../../.specify/bugs/knowledge-sync-defects/fix.md) | Modificar: verificación en git 2.25 y follow-up cerrado |
+| [commands/speckit.knowledge.sync.md](../../commands/speckit.knowledge.sync.md) | Modify: drop `reapply` from the warm path and add a note so it does not come back |
+| [.github/scripts/test-sync-git.sh](../../.github/scripts/test-sync-git.sh) | Modify: 2 new checks (35 to 38) |
+| [CHANGELOG.md](../../CHANGELOG.md) | Modify: `Fixed` entry under `[Unreleased]` |
+| [.specify/bugs/knowledge-sync-defects/fix.md](../../.specify/bugs/knowledge-sync-defects/fix.md) | Modify: git 2.25 verification and the follow-up closed |
 
 ## Requirements
 
-1. El paso sparse del warm path sale con 0 en git 2.25.
-2. Una caché clonada en modo cone, que tiene archivos de la raíz, los pierde en su siguiente warm sync, igual que con `reapply`.
-3. El resto no cambia: los 35 checks previos siguen pasando en git 2.25 y en el git actual.
+1. The warm path's sparse step exits 0 on git 2.25.
+2. A cache cloned in cone mode, which holds root files, loses them on its next warm sync, as it did with `reapply`.
+3. Nothing else changes: the 35 existing checks still pass on git 2.25 and on current git.
 
 ## Plan
 
-1. Quitar `git sparse-checkout reapply` y su comentario. `sparse-checkout set`, que corre justo antes, ya actualiza el árbol de trabajo.
-2. Dejar una nota en el comando para que nadie lo vuelva a añadir.
-3. Añadir al script un escenario con una caché en modo cone.
-4. Ejecutar el script en macOS (git 2.54) y en `ubuntu:20.04` (git 2.25.1). Ejecutarlo también contra el `sync.md` anterior en 2.25, para comprobar que el check nuevo detecta el fallo.
+1. Drop `git sparse-checkout reapply` and its comment. `sparse-checkout set`, which runs just before it, already updates the working tree.
+2. Leave a note in the command so nobody adds it back.
+3. Add a cone-mode cache scenario to the script.
+4. Run the script on macOS (git 2.54) and in `ubuntu:20.04` (git 2.25.1). Also run it against the previous `sync.md` on 2.25, to confirm the new check catches the failure.
 
-## Decisiones
+## Decisions
 
-**Quitar la línea en lugar de tolerar el error** (`reapply 2>/dev/null || true`). La línea era redundante, porque `set` ya hace ese trabajo. Mantenerla solo serviría para ocultar un error en las versiones donde no existe.
+**Drop the line instead of tolerating the error** (`reapply 2>/dev/null || true`). The line was redundant, because `set` already does that work. Keeping it would only hide an error on the versions where the subcommand does not exist.
 
-**El check comprueba el código de salida del paso, no solo el resultado.** En 2.25 el resultado ya era correcto con la línea puesta: `set` había hecho el trabajo antes del error. Lo que fallaba era la salida 129, así que un check que solo mirara el resultado habría pasado con el bug.
+**The check asserts the step's exit code, not just the result.** On 2.25 the result was already correct with the line in place: `set` had done the work before the error. What failed was the 129 exit, so a check on the result alone would have passed with the bug.
 
 ## Tasks
 
-- [x] T1 Quitar `reapply` del warm path y añadir la nota
-- [x] T2 Checks nuevos: el paso sparse sale con 0, y una caché cone pierde sus archivos de la raíz
-- [x] T3 Entrada en `CHANGELOG.md` y actualización de `fix.md`
-- [x] T4 Commit `e727748` en `main`
+- [x] T1 Drop `reapply` from the warm path and add the note
+- [x] T2 New checks: the sparse step exits 0, and a cone-mode cache loses its root files
+- [x] T3 `CHANGELOG.md` entry and `fix.md` update
+- [x] T4 Commit `e727748` on `main`
 
 ## Done When
 
-- [x] `test-sync-git.sh` pasa 38/38 en git 2.54 (macOS) y en git 2.25.1 con GNU `timeout` (`ubuntu:20.04`)
-- [x] Con el `sync.md` anterior en git 2.25, falla el check del paso sparse
-- [x] `validate-extension.sh` pasa 13/13 (con un `python3` que tenga PyYAML)
+- [x] `test-sync-git.sh` passes 38/38 on git 2.54 (macOS) and on git 2.25.1 with GNU `timeout` (`ubuntu:20.04`)
+- [x] With the previous `sync.md` on git 2.25, the sparse-step check fails
+- [x] `validate-extension.sh` passes 13/13 (with a `python3` that has PyYAML)
