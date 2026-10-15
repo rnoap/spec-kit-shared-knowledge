@@ -676,13 +676,14 @@ Before pulling new content, **re-apply the sparse-checkout configuration in `--n
 cd .specify/extensions/knowledge/cache/<slug>
 if [ -n "<path_filter>" ]; then
   git sparse-checkout init --no-cone
-  # one or more patterns — same normalization as the cold path, same `--` (FR-034)
+  # one or more patterns — same normalization as the cold path, same `--` (FR-034);
+  # `set` also removes files an older --cone checkout left outside the filter
   git sparse-checkout set -- <pattern1> [<pattern2> ...]
-  # Remove any stray files outside the path_filter that an older --cone
-  # checkout may have left behind in the working tree.
-  git sparse-checkout reapply
 fi
 ```
+
+Do not add `git sparse-checkout reapply` here. It does not exist in git 2.25, the
+minimum this extension supports, and `set` already updates the working tree.
 
 **Remote URL** — check out the declared revision when one is pinned, and the
 remote's default when none is (FR-010, FR-012). `--` retained per FR-034.

@@ -207,6 +207,18 @@ run "$SYNC" "$WARM" "$WARM_LOCAL"
 expect "local path: deletion removed, additions written, manifest kept" \
        "$(exists warm-local docs/adr-002.md)|$(exists warm-local root.md)|$(exists warm-local .manifest.json)" "no|yes|yes"
 
+# Older caches were cloned in cone mode, which always checks out root files.
+URL=file://$W REV='' FILTER=docs/ DIRS=docs SLUG=cone
+c=$(cache cone)
+git clone -q --filter=blob:none --no-checkout --depth=1 -- "$URL" "$c" 2>/dev/null
+git -C "$c" sparse-checkout init --cone 2>/dev/null
+git -C "$c" sparse-checkout set docs 2>/dev/null; git -C "$c" checkout -q 2>/dev/null
+expect "a cone-mode cache starts with root files" "$(exists cone README.md)" yes
+run "$SYNC" "$WARM"; rc=$?
+check "the warm sparse step succeeds on this git" [ "$rc" -eq 0 ]
+run "$SYNC" "$WARM_REMOTE"
+expect "...and loses them on its next warm sync" "$(exists cone README.md)" no
+
 # The pre-fix Tier 2: the failed pathspec checkout left HEAD on the default branch.
 URL=file://$U REV=$C1 FILTER='' DIRS=. SLUG=legacy
 c=$(cache legacy)

@@ -98,10 +98,10 @@ Environment: macOS 26.7.1, git 2.54.0 (Apple Git-157), bash 3.2.57. There is no 
 - `bash .github/scripts/test-sync-git.sh` → 35 checks passed. `/bin/bash` (3.2) gives the same result.
 - Mutation check: the same script against `main`'s `sync.md` and `status.md` → 24 failed, 11 passed. Every defect is detected.
 - `bash .github/scripts/validate-extension.sh` → 13 checks passed.
-- Not run:
-  - git 2.25, because there is no Docker here (see Open Questions 6).
-  - Linux with GNU `timeout`.
-  - A real agent-driven `/speckit.knowledge.sync` and `status` run in a consumer project. That is the job of `/speckit-bug-test`.
+- Linux run (2026-10-15), in `ubuntu:20.04` under Podman with git 2.25.1 and GNU `timeout` 8.30: all checks passed, with `with_timeout` taking its `timeout` branch.
+  - That run showed `git sparse-checkout reapply` does not exist in git 2.25 (exit 129). The warm path dropped it, and the script gained two checks, bringing it to 38: the warm sparse step exits 0, and a cone-mode cache loses its stray root files.
+  - 38/38 pass on both git versions. Against the previous `sync.md` on 2.25, the new step check fails.
+- Not run: a real agent-driven `/speckit.knowledge.sync` and `status` run in a consumer project. That is the job of `/speckit-bug-test`.
 
 ## Deviations from Assessment
 
@@ -135,14 +135,14 @@ The six `[NEEDS CLARIFICATION]` items from the assessment, each with the recomme
    - The fixes share the same blocks. Each clone line carries both the bounded call and `core.symlinks=false`, and the warm block carries D2, D3 and D4. Splitting them would make the change conflict with itself.
    - 006 already plans a single release for all of it (`catalog-readiness.spec.md:150`).
 6. **git 2.25, the declared minimum.**
-   - **Recommended, not done here:** before release, run the script in `ubuntu:20.04`, which ships git 2.25.1:
+   - **Run on 2026-10-15:** the script passes in `ubuntu:20.04` (git 2.25.1). This Mac has Podman, not Docker:
 
      ```bash
-     docker run --rm -v "$PWD":/w -w /w ubuntu:20.04 sh -c \
+     podman run --rm -v "$PWD":/w -w /w docker.io/library/ubuntu:20.04 sh -c \
        'apt-get update -qq && apt-get install -yqq git perl procps >/dev/null && bash .github/scripts/test-sync-git.sh'
      ```
 
-   - Then add the script to CI through a `docs:` amendment to the constitution's § Quality Gates.
+   - **Still recommended:** add the script to CI through a `docs:` amendment to the constitution's § Quality Gates.
      - Jobs: `ubuntu-latest`, `macos-latest` (the runner without GNU `timeout`), and the `ubuntu:20.04` container.
      - Put it in a new workflow file so it cannot conflict with 006's edits to `validate.yml`.
      - It adds no required check name.
@@ -155,10 +155,7 @@ The six `[NEEDS CLARIFICATION]` items from the assessment, each with the recomme
   - `CHANGELOG.md` `[Unreleased]`: the three Fixed entries join 006's Fixed section, and Security follows it. The D3 entry no longer mentions the `status` separator, because 006's `fix(status): separate the source URL with --` entry records it.
   - 006's `contracts/commands.md:107-112` still describes the wrapper as `timeout 5`. That is a historical spec, so it is left unchanged.
   - The macOS status check that 006 requires before publication (`tasks.md:195`) is now unblocked.
-- **Possible git-floor issue, not changed here:**
-  - The warm path's `git sparse-checkout reapply` was likely added in git 2.27. On 2.25 and 2.26 it would error.
-  - That is harmless now, because `checkout --force --detach` honours the sparse patterns anyway.
-  - The 2.25 run in Open Questions 6 will confirm it.
+- **git-floor issue (fixed 2026-10-15):** the warm path's `git sparse-checkout reapply` does not exist in git 2.25 and exited 129 there. It was removed, because `sparse-checkout set` already updates the working tree.
 - **Upgrade note for users:** run `/speckit.knowledge.sync --force` once after upgrading. It heals SHA-pinned caches that hold default-branch content and prunes files deleted upstream. Manifests that list a link are rebuilt the first time the integrity check runs.
 - **Commits:** three, because the four fixes share the same lines and cannot be split per defect:
   - `fix(sync): repair SHA pins, deletions, timeouts and links`
