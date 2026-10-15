@@ -3,7 +3,7 @@
   "specName": "Catalog Readiness",
   "branch": "006-catalog-readiness",
   "currentStep": "implement",
-  "status": "implementing",
+  "status": "completed",
   "history": [
     {
       "step": "specify",
@@ -202,16 +202,42 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-10-15T11:22:29.244Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T017",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:24:16.046Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T018",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:45:56.331Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:45:56.393Z"
     }
   ],
   "telemetryInstanceId": "3960675e-5c4f-4a75-b2cf-83aca865be5d",
-  "last_action": "T001 and T002 complete; the exact manifest contract and 13/13 static checks pass. Phases 3-8 remain pending and status remains implementing.",
+  "last_action": "18/18 tasks; 13/13 static checks; smoke and smoke-minimum steps pass locally on 1.2.0 and 0.15.2; PR CI run and macOS timeout fix pending",
   "coverage": {
     "FR-001": {
       "title": "Manifest declares the minimum spec-kit version as >=0.15.2",
       "tasks": [
         "T002",
         "T009"
+      ],
+      "tests": [
+        ".github/workflows/validate.yml::smoke-minimum"
       ]
     },
     "FR-002": {
@@ -294,6 +320,9 @@
       "tasks": [
         "T015",
         "T016"
+      ],
+      "tests": [
+        ".github/workflows/validate.yml::smoke"
       ]
     },
     "FR-014": {
@@ -301,6 +330,9 @@
       "tasks": [
         "T015",
         "T016"
+      ],
+      "tests": [
+        ".github/workflows/validate.yml::smoke-minimum"
       ]
     },
     "FR-015": {
@@ -316,6 +348,9 @@
         "T013",
         "T014",
         "T016"
+      ],
+      "tests": [
+        ".github/scripts/assert-install.sh::commands registered"
       ]
     },
     "FR-017": {
@@ -324,6 +359,9 @@
         "T013",
         "T014",
         "T016"
+      ],
+      "tests": [
+        ".github/scripts/assert-install.sh::installed file count"
       ]
     },
     "FR-018": {
@@ -422,6 +460,31 @@
       "decision": "Limit this run to phases 1 and 2 (T001 and T002), both executed inline.",
       "why": "The user explicitly requested only these phases; the Foundational dispatcher assigns its single task inline.",
       "rejected": "Implement user-story phases or mark the full feature complete."
+    },
+    {
+      "decision": "Built every story phase inline and committed per phase, splitting phase 7 into fix(ci) and chore(ci)",
+      "why": "No story phase owns five or more files; the plan requires one Conventional Commit per concern",
+      "rejected": "Worker dispatch, or one mixed CI commit"
+    },
+    {
+      "decision": "Installed spec-kit 0.15.1, 0.15.2 and the CI 1.2.0 into isolated uv tool dirs and used throwaway consumers under /tmp/kn006",
+      "why": "Keeps the developer global specify 1.2.0 and real project catalogs untouched",
+      "rejected": "uv tool install over the global tool, or registering fixture catalogs in the repo"
+    },
+    {
+      "decision": "Ran the Linux reachability cases in the local Podman VM (Fedora CoreOS 41, GNU timeout 9.5)",
+      "why": "T012 and T018 require Linux with timeout and stock macOS has neither timeout nor gtimeout",
+      "rejected": "Substituting gtimeout or another command on macOS and calling it a pass"
+    },
+    {
+      "decision": "Confirmed the Untrusted Source prompts in T006 and T018 in an interactive terminal",
+      "why": "The tasks require confirming; the user asked to proceed autonomously; sources were the own v1.5.0 release and a loopback candidate, installed only into /tmp",
+      "rejected": "Piping yes past the TTY check"
+    },
+    {
+      "decision": "Recorded out-of-scope findings as concerns instead of fixing them",
+      "why": "Packaging leak, slug snippet and shell-metacharacter validation each touch files or rules outside 006",
+      "rejected": "Widening the feature"
     }
   ],
   "concerns": [
@@ -449,6 +512,22 @@
     {
       "note": "Outside 006, pre-existing: the Source Slug Generation snippet in commands/speckit.knowledge.sync.md (L24-L27, rendered into the sync and status skills) puts a # comment after each line-continuation backslash, so run literally it is a bash syntax error; an agent must strip comments to get the slug. Fix separately: move the comments above the pipeline.",
       "step": "implement"
+    },
+    {
+      "note": "Update to the .agents/ concern: 4a750a6 (same branch, not a 006 commit) also tracks skills-lock.json at the root. The T018 candidate built exactly like git archive therefore carries 19 files, 8 of them unrelated (.agents/skills/*/SKILL.md x7, skills-lock.json). Add .agents/ and skills-lock.json to .extensionignore and .gitattributes export-ignore, and to the validate-extension.sh leak regex, before the next release.",
+      "step": "implement"
+    },
+    {
+      "note": "SC-004 CI half pending: no pull request run exists yet, so Install smoke test and Install smoke test (minimum spec-kit) are verified only by running their validate.yml steps locally. Confirm both on the PR before merge, then add the new check to the main ruleset.",
+      "step": "implement"
+    },
+    {
+      "note": "Before publication (FR-010): stock macOS still lacks GNU timeout, so a real status reachability run on macOS stays blocked until the separately tracked portability fix lands and passes. Windows (WSL or Git Bash) remains an untested platform claim. At release, move the README --from tag to the manifest version.",
+      "step": "implement"
+    },
+    {
+      "note": "Security, pre-existing, outside 006, high priority: url and path_filter validation rejects only a leading - and checks the prefix, so shell metacharacters (; $( ) backticks, spaces) pass, and the command snippets interpolate <url>/<pattern> unquoted. A merged config change could then run commands on every teammate and hook-driven sync, an exposure the README trust model does not list. Fix in its own feature: quote every interpolated value in the snippets and reject shell metacharacters in all three validation blocks together.",
+      "step": "implement"
     }
   ],
   "step_summaries": {
@@ -460,7 +539,7 @@
       "summary": "18 tasks: a Setup gate (toolchain change lands first), 1 foundational manifest task, 5 story phases with disjoint files (US1 README, US2 constitution and template, US3 verify, US4 status, US5 CI with fail-first seeds), Polish (CHANGELOG and validation)"
     },
     "implement": {
-      "summary": "Completed phases 1 and 2: confirmed separately committed prerequisites and updated the manifest floor, category and effect."
+      "summary": "Feature 006 complete: floor >=0.15.2 everywhere, category/effect, README --from install with platforms and command names, constitution 1.3.0, status --, readable install check, CI pinned to v1.2.0 plus a minimum-version job, CHANGELOG"
     }
   },
   "approach": "Edit in place across the manifest, README, status command, constitution, plan template, validate.yml and assert-install.sh. The floor moves to >=0.15.2 in every restatement; CI pins v1.2.0 and adds a job that installs the floor read from the manifest; the README leads with --from and never suggests flipping the community catalog.",
@@ -611,9 +690,61 @@
       "exitCode": 0,
       "durationSeconds": 0.8,
       "result": "seed B: exit=1 fails=['config declared but not created: .specify/extensions/knowledge/knowledge-config.yml'] missing=['install copied 0 files — the extension directory is missing or empty', 'manifest declares 4 hooks, 0 registered (.specify/extensions.yml is missing)'] noise=['No such file or directory', 'Traceback', 'No such file or directory'] · FAILED · PASS the checker detects the unfixed defects"
+    },
+    {
+      "what": "T018 candidate ZIP from working-tree bytes: manifest floor, category, effect and payload hashes",
+      "command": "python3 /tmp/kn006/t018/build-candidate.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge /tmp/kn006/t018/serve/knowledge-candidate.zip",
+      "source": "derived",
+      "exitCode": 1,
+      "durationSeconds": 1.0,
+      "result": "    raise KeyError( ·         'There is no item named %r in the archive' % name) · KeyError: \"There is no item named 'spec-kit-shared-knowledge-candidate/.github/skills/build-graph' in the archive\"",
+      "warnings": [
+        "exited 1"
+      ]
+    },
+    {
+      "what": "T018 candidate ZIP from working-tree bytes, file set equal to git archive: floor, category, effect, hashes",
+      "command": "python3 /tmp/kn006/t018/build-candidate.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge /tmp/kn006/t018/serve/knowledge-candidate.zip",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "result": "PASS file set == git archive HEAD (no adds or deletes) · PASS no symlinks in payload · PASS commands, config template, README, LICENSE present"
+    },
+    {
+      "what": "T018 candidate --from install: prompt confirmed, fixed assert-install passes, installed payload == candidate, no unresolved tokens",
+      "command": "cd /tmp/kn006/t018/consumer && grep -q \"Untrusted Source\" install.log && bash /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge/.github/scripts/assert-install.sh /tmp/kn006/t018/consumer /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge && for f in extension.yml commands/speckit.knowledge.configure.md commands/speckit.knowledge.remove.md commands/speckit.knowledge.search.md commands/speckit.knowledge.status.md commands/speckit.knowledge.sync.md config-template.yml; do unzip -p ../serve/knowledge-candidate.zip \"spec-kit-shared-knowledge-candidate/$f\" | cmp -s - \".specify/extensions/knowledge/$f\" || { echo \"DIFF $f\"; exit 1; }; done && ! grep -l __SPECKIT_COMMAND_ .github/skills/speckit-knowledge-*/SKILL.md && echo \"PASS installed manifest and commands match the candidate; skills fully rendered\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.5,
+      "result": "  \u001b[32mPASS\u001b[0m  4 hooks registered, none carrying arguments · Smoke test passed. · PASS installed manifest and commands match the candidate; skills fully rendered"
+    },
+    {
+      "what": "T018 six floor declarations state >=0.15.2; 0.10.0 only in rationale quotes",
+      "command": "python3 /tmp/kn006/t018/floor-declarations.py",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.0,
+      "result": "PASS .specify/templates/plan-template.md: no current 0.10.0 outside rationale quotes [] · PASS README.md: no current 0.10.0 outside rationale quotes [] · PASS extension.yml: no current 0.10.0 outside rationale quotes []"
+    },
+    {
+      "what": "T018 static validation passes all 13 checks",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.8,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T018 agent executed the candidate rendered /speckit-knowledge-status: no sources, and on Linux against the reachable remote",
+      "command": "independent subagent followed .github/skills/speckit-knowledge-status/SKILL.md in /private/tmp/kn006/t018/consumer and /private/tmp/kn006/t018/remote; podman machine ssh -- timeout 5 git ls-remote --exit-code -- https://github.com/rnoap/spec-kit-shared-knowledge HEAD",
+      "result": "No sources: completed with 0 items from 0 sources. Remote on Fedora CoreOS 41 with GNU timeout: reported shared-knowledge reachable from ls-remote exit 0, not synced. No unresolved placeholders.",
+      "warnings": [
+        "Agent judgement plus agent-reported exit codes",
+        "The first candidate build recorded exit 1: check-attr did not apply the .github/ directory export-ignore to files inside it; fixed, and the rebuilt file set equals git archive HEAD"
+      ]
     }
   ],
-  "currentTask": "T016",
+  "currentTask": null,
   "task_summaries": {
     "T001": {
       "status": "DONE",
@@ -722,6 +853,20 @@
       "did": "Fixed script: seed A and seed B exit 1 with their readable FAIL lines and no shell or interpreter error (the first recorded seed check exited 1 only because its grep missed ANSI codes; the ANSI-stripped re-run passes and rejects the unfixed script). validate.yml run steps passed locally: smoke on spec-kit 1.2.0, smoke-minimum on the derived 0.15.2.",
       "files": [
         "/tmp/kn006/t016"
+      ]
+    },
+    "T017": {
+      "status": "DONE",
+      "did": "CHANGELOG [Unreleased]: Added category/effect; Changed floor, README install, platforms and command names, CI pin and minimum job, constitution 1.3.0 with the template floor; Fixed status -- and the install check. Version stays 1.5.0.",
+      "files": [
+        "CHANGELOG.md"
+      ]
+    },
+    "T018": {
+      "status": "DONE",
+      "did": "Candidate ZIP from working-tree bytes (file set == git archive HEAD, payload hashes match, >=0.15.2, integration, read-write) installed via loopback --from after Untrusted Source; fixed assert-install passed; agent ran its status skill with no sources and on Linux reachable; 6 floor declarations correct; 13/13 static checks; T006/T009/T010/T012/T016 passed; PR CI evidence and the macOS timeout fix recorded as pending.",
+      "files": [
+        "/tmp/kn006/t018"
       ]
     }
   }

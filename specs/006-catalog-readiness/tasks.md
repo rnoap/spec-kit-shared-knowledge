@@ -174,7 +174,7 @@ Written first, so they fail first.
 
 Files: `CHANGELOG.md`
 
-- [ ] **T017** Record each concern under `## [Unreleased]`, in the house style `` `type(scope): summary` `` plus the reason (FR-018):
+- [x] **T017** Record each concern under `## [Unreleased]`, in the house style `` `type(scope): summary` `` plus the reason (FR-018):
   - Changed: the floor, the README install, platforms and invocation note, the CI pin and minimum job, constitution 1.3.0 and the template floor.
   - Added: manifest `category` and `effect`.
   - Fixed: the status `--`, and the install check.
@@ -184,7 +184,7 @@ Files: `CHANGELOG.md`
 
 **⟶ Wait for T017 to finish, then:**
 
-- [ ] **T018** Validate against the Success Criteria (SC-001 to SC-007):
+- [x] **T018** Validate against the Success Criteria (SC-001 to SC-007):
   - After every story phase finishes, build a candidate ZIP from the current distributable working-tree bytes following [contracts/ci.md](./contracts/ci.md) § 5. Do not use v1.5.0 or an older `HEAD` as the source for this check.
   - Serve that ZIP on loopback and install it with `--from` after the source confirmation. Verify its manifest has `>=0.15.2`, `category: integration`, and `effect: read-write`, and its payload hashes match the working tree. The fixed `assert-install.sh` must pass against this installation.
   - Have the agent execute the candidate's rendered status skill with no sources and, on Linux with `timeout`, with the reachable remote from T012. Record actual command outcomes, not just skill-file existence.
