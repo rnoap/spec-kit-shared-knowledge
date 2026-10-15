@@ -219,15 +219,99 @@ No configuration value influences **which** items are chosen (FR-007a) — only 
 many. The rule is fixed and owned by this extension so that a user can reproduce
 their own index on paper (FR-007b).
 
+### Bounded Network Call
+
+Every `git` call that can wait on the network runs under a time bound: 10 s for a
+clone or fetch, 30 s for the Tier 3 history fetch, and 5 s for the reachability
+check in `status`. Define `with_timeout` once in the shell that runs them, then
+call it as `with_timeout <seconds> git …`:
+
+```bash
+with_timeout() {
+  if command -v timeout >/dev/null 2>&1; then
+    timeout "$@"
+  elif command -v gtimeout >/dev/null 2>&1; then
+    gtimeout "$@"
+  elif command -v perl >/dev/null 2>&1; then
+    perl -e '
+      my $secs = shift;
+      my $pid = fork // exit 125;
+      if (!$pid) { setpgrp(0, 0); exec { $ARGV[0] } @ARGV or exit 127 }
+      setpgrp($pid, $pid);
+      $SIG{ALRM} = sub { kill "TERM", -$pid; sleep 1; kill "KILL", -$pid; waitpid $pid, 0; exit 124 };
+      alarm $secs;
+      waitpid $pid, 0;
+      alarm 0;
+      exit($? & 127 ? 128 + ($? & 127) : $? >> 8);
+    ' "$@"
+  else
+    [ -n "${with_timeout_warned:-}" ] ||
+      echo "⚠️  No timeout, gtimeout or perl found — network calls run without a time bound." >&2
+    with_timeout_warned=1
+    shift
+    "$@"
+  fi
+}
+```
+
+**Why not plain `timeout`.** GNU `timeout` is not part of macOS, and `gtimeout`
+exists only after installing coreutils. Calling `timeout` directly made every
+network call on stock macOS exit 127: remote sources never synchronized, and
+`status` reported every one as `❌ timeout`. `perl` ships with macOS and with
+nearly every Linux distribution, so the fallback reproduces `timeout`'s contract:
+exit 124 when the bound expires, the command's own status otherwise, 127 when the
+command cannot run. Like `timeout`, it signals the whole process group — `alarm`
+plus `exec` alone would leave `git`'s transport helpers behind, still connected to
+a hung host. Callers distinguish only zero from non-zero.
+
+**With none of the three, calls run unbounded** and one warning says so. Failing
+the source instead would cost the project its knowledge over a missing safeguard —
+the same reasoning that serves an over-age cache when its source is unreachable
+(FR-027).
+
+### Indexable Items
+
+An **item** is a `.md` file under the source's `path_filter` (anywhere in the cache
+when there is none) that is a **regular file** on disk **and** that git does not
+record as a symbolic link. Step 5 indexes items and nothing else, and the Cache
+Integrity Check counts them the same way.
+
+Run from the cache root. `<dir1> [<dir2> ...]` are the `path_filter` entries
+without their trailing `/`, or `.` when there is no filter:
+
+```bash
+cd .specify/extensions/knowledge/cache/<slug>
+links=$(git -c core.quotePath=false ls-files -s -- <dir1> [<dir2> ...] \
+  | awk -F '\t' '$1 ~ /^120000 / { print $2 }')
+items=$(find <dir1> [<dir2> ...] -name .git -prune -o -type f -name '*.md' -print 2>/dev/null \
+  | sed 's|^\./||' | grep -vxF -e "$links")
+```
+
+`$items` is what step 5 indexes. Every path in `$links` is skipped and named in
+step 9, never read.
+
+**Both tests are needed, because each misses a case the other catches.** Every
+clone sets `core.symlinks=false`, so git writes a link as a small regular file
+holding the link text: `-type f` alone would index it, and `-type l` cannot see it
+— only git's recorded mode, `120000`, identifies it. A cache cloned before this
+rule still holds real links on disk, and `-type f` is what excludes those; `find`
+never follows one. A followed link hands the agent any file the user can read:
+`notes.md -> ../../../../../.env` at a source's root reaches the consuming
+project's `.env`.
+
 ### Cache Integrity Check (`.manifest.json`)
 
 Run this check before using an existing cache as fallback:
 
 1. `.manifest.json` exists AND is valid JSON → pass step 1
-2. `item_count` == `len(items)` == actual `.md` file count in directory (excluding `.manifest.json` and `.git/`) → pass step 2
+2. `item_count` == `len(items)` == the number of items in the directory, collected as in § Indexable Items → pass step 2
 3. Each item's `sha256` matches `sha256sum <file>` (or `shasum -a 256` on macOS) → pass step 3
 4. All three pass → cache is intact; use it
 5. Any failure → cache is corrupted; discard directory; attempt fresh sync
+
+A manifest written before § Indexable Items existed may list a symbolic link. It
+fails step 2 once and the cache is rebuilt — the intended outcome, since that
+manifest points the agent at a file outside the cache.
 
 ### `knowledge-index.md` Format
 
@@ -482,7 +566,8 @@ remote's default revision, byte-identically to 1.3.0 (FR-010).
 ```bash
 mkdir -p .specify/extensions/knowledge/cache/<slug>
 
-timeout 10 git clone \
+with_timeout 10 git clone \
+  -c core.symlinks=false \
   --filter=blob:none \
   --no-checkout \
   --depth=1 \
@@ -496,13 +581,19 @@ and fetch that one object. Escalate here only when Tier 1 failed **and**
 `<revision>` matches `^[0-9a-f]{40}$` (or `^[0-9a-f]{64}$` in a SHA-256 repository).
 
 ```bash
-timeout 10 git clone --filter=blob:none --no-checkout --depth=1 \
+with_timeout 10 git clone -c core.symlinks=false --filter=blob:none --no-checkout --depth=1 \
   -- <url> .specify/extensions/knowledge/cache/<slug>
 
 cd .specify/extensions/knowledge/cache/<slug>
-timeout 10 git fetch --depth=1 origin -- <revision>
-git checkout -- <revision>
+with_timeout 10 git fetch --depth=1 origin -- <revision>
+git update-ref --no-deref HEAD FETCH_HEAD
 ```
+
+**Move HEAD to the pin; do not check it out here.** `update-ref` points HEAD at the
+fetched commit without touching the working tree, so the sparse-checkout step below
+materializes the pin. `git checkout -- <revision>` would read the SHA as a *path*:
+it fails, HEAD stays on the default branch the clone selected, and the next checkout
+serves that branch under the pin's name.
 
 **Tier 3 — the server refuses an unadvertised object.** Fetching an arbitrary SHA
 requires the server to advertise `uploadpack.allowAnySHA1InWant`. GitHub and
@@ -513,9 +604,13 @@ a full history fetch.
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
-timeout 30 git fetch --unshallow origin
-git checkout -- <revision>
+with_timeout 30 git fetch --unshallow origin
+git update-ref --no-deref -- HEAD <revision>
 ```
+
+Name the revision itself here: after `--unshallow`, `FETCH_HEAD` is the default
+branch's tip, not the pin. A pin missing from the fetched history makes
+`update-ref` fail, which is a Tier 3 failure like any other.
 
 **All three tiers failed** → this is FR-015. Report the source `unreachable` with
 the declared revision named, fall back to its existing cache if the Cache
@@ -541,6 +636,7 @@ failure, as an unresolvable revision rather than degrading silently:
 mkdir -p .specify/extensions/knowledge/cache/<slug>
 
 git clone \
+  -c core.symlinks=false \
   --no-checkout \
   [--branch <revision>] \
   -- <expanded-path> \
@@ -593,28 +689,39 @@ remote's default when none is (FR-010, FR-012). `--` retained per FR-034.
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
+git config core.symlinks false
 
 if [ -z "<revision>" ]; then
-  timeout 10 git fetch --depth=1 origin
-  git checkout origin/HEAD -- .
+  with_timeout 10 git fetch --depth=1 origin
+  git checkout --quiet --force --detach origin/HEAD
 else
-  timeout 10 git fetch --depth=1 origin -- <revision>
-  git checkout FETCH_HEAD -- .
+  with_timeout 10 git fetch --depth=1 origin -- <revision>
+  git checkout --quiet --force --detach FETCH_HEAD
 fi
 ```
 
 **Local path** (fetch from local remote — also instant, no timeout needed):
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
+git config core.symlinks false
 
 if [ -z "<revision>" ]; then
   git fetch origin
-  git checkout origin/HEAD -- .
+  git checkout --quiet --force --detach origin/HEAD
 else
   git fetch origin -- <revision>
-  git checkout FETCH_HEAD -- .
+  git checkout --quiet --force --detach FETCH_HEAD
 fi
 ```
+
+**Move HEAD; do not overlay the tree.** `checkout --force --detach` makes the
+working tree match the fetched commit: paths deleted upstream are removed, and the
+sparse patterns hold, so nothing outside `path_filter` is written. `git checkout
+<ref> -- .` never removed a path — a file deleted upstream stayed cached and indexed
+indefinitely — and wrote files added upstream outside the filter. `--force` loses
+nothing: the cache holds no local edits, and untracked files such as
+`.manifest.json` are left alone. `git config core.symlinks false` gives caches
+cloned before § Indexable Items the same setting as new ones.
 
 > A revision **change** never reaches this path. Changing `revision` changes the
 > slug, so the next sync finds no cache at the new slug and takes the cold path
@@ -640,9 +747,11 @@ less available knowledge than it had before.
 
 ### 5. Index .md files per source
 
-After a successful sync (cold or warm), recursively find all `.md` files under the path_filter (or all `.md` files if no filter). For each file:
+After a successful sync (cold or warm), collect the source's items as § Indexable Items describes: the `.md` files under the path_filter (or all `.md` files if no filter) that are regular files git does not record as symbolic links. For each item:
 - Record relative path from cache root
 - Compute SHA-256: `sha256sum <file>` or `shasum -a 256 <file>` (macOS)
+
+Keep the skipped links (`$links`): step 9 names each one.
 
 ### 6. Write `.manifest.json` (last step)
 
@@ -826,6 +935,15 @@ Cache fallback:
 Unreachable with no cache:
 ```
   shared-contracts   ❌  unreachable — no cache available; source skipped
+```
+
+Symbolic links skipped by § Indexable Items get one more line under their source,
+naming each, so a source that relies on links can be fixed rather than silently
+thinned:
+
+```
+  payment-service    ✅ fresh    12 items  (synced 2026-06-11T14:00:00Z)
+                     🔗 2 symbolic links not followed: specs/notes.md, specs/shared
 ```
 
 Final summary line:
@@ -1061,6 +1179,8 @@ This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose
 | Abbreviated SHA pinned | `unreachable` with a message naming the cause | 0 |
 | Git timeout on cold sync | `cached` or `unreachable` | 0 |
 | Git timeout on warm sync | `cached` or `unreachable` | 0 |
+| None of `timeout`, `gtimeout`, `perl` installed | Network calls run unbounded; one warning | 0 |
+| A path under the filter is a symbolic link | Not indexed; named under the source's status line | 0 |
 | Over-age cache, source unreachable | `cached`, content still served | 0 |
 | Manifest corrupted | Discard + retry or `unreachable` | 0 |
 | Conflict between differing repository identities | `⚠️ CONFLICT` in index | 0 |

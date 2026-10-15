@@ -33,8 +33,6 @@
 #   1. prompt injection — fetched markdown enters the agent's context unchecked
 #   2. credential exposure — your git credential helper decides what to send to
 #      whatever host is configured here
-#   3. symlink following — a fetched .md may link to a file outside the repo,
-#      which the agent is then told to read
 #
 # Read the "Trust model" section of the README before adding a source you do not
 # control, and treat a change to this file as a security review, not a config
