@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-15
+
+Catalog readiness, and a sync command that keeps the README's promises. The
+package now states a spec-kit floor that is true and an install route that works
+on a default setup. Sync now serves a pinned SHA at that commit, drops files
+deleted upstream, runs on stock macOS and on git 2.25, and never follows a
+symbolic link.
+
 ### Added
 
 - `chore(manifest): category and effect` — `extension.yml` declares `category: integration` and `effect: read-write`, so `specify extension info knowledge` and the catalog can tell a user what kind of extension this is and that it writes to their project. It writes its configuration, its cache, its index and the project's `.gitignore`.
@@ -18,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs(readme): platforms and command names` — Prerequisites states the floor and the platforms: macOS and Linux, Windows through WSL or Git Bash. A note in Commands says the examples use the dot form, while agents that install skills show `/speckit-knowledge-sync` and Codex shows `$speckit-knowledge-sync`.
 - `chore(ci): pin spec-kit v1.2.0 and test the floor` — the gating smoke test pinned v1.0.4, older than what new users run and newer than the claimed floor, so neither end of the claim was tested. It now pins v1.2.0, and a new job, `Install smoke test (minimum spec-kit)`, installs the version in the `>=` clause of `requires.speckit_version` on every pull request. The required check names are unchanged. The new check gates merges once a maintainer adds it to the branch rules.
 - `docs(constitution): 1.3.0` — Requirements & Compatibility states spec-kit `>=0.15.2`, and the install smoke test runs against the pinned release and the manifest's floor. The project's plan template restates the floor and both smoke runs.
+- `extension.yml` `version` bumped from `1.5.0` to `1.6.0`. The command count stays at 5 and no hook changes.
 
 ### Fixed
 
@@ -33,6 +42,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - **Symbolic links are no longer followed.** This closes the exposure 1.5.0 documented as open. A `.md` symlink in a source was indexed, measured, hashed, previewed by `search`, and opened by the agent, so `notes.md -> ../../../../../.env` at a source's root read the consuming project's `.env` into the agent's context. Clones now set `core.symlinks=false`, and an item is indexed only if it is a regular file that git does not record as a link — both checks, because each misses a case the other catches. Skipped links are named under the source's status line. A cache whose manifest lists a link fails the Cache Integrity Check once and is rebuilt.
+
+### Compatibility
+
+- `knowledge-config.yml` is unchanged: `schema_version` stays `"1.0"`, and no key is added or removed.
+- spec-kit `>=0.15.2` is required. An older spec-kit refuses the install and names the version it needs.
+- Run `/speckit.knowledge.sync --force` once after upgrading. It brings SHA-pinned caches built by 1.5.0 back to the pinned commit, and removes files deleted upstream.
+- No tool becomes required. Network calls use `timeout` or `gtimeout` when present and `perl` otherwise; with none of the three they run unbounded, with one warning.
 
 ## [1.5.0] - 2026-09-28
 
@@ -219,7 +235,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.6.0
 [1.5.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.5.0
 [1.4.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.4.0
 [1.3.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.3.0
