@@ -142,7 +142,7 @@ echo "Published artifact"
 # --- .gitattributes export-ignore, every published zip shipped this repo's own
 # --- .specify/ workspace, including four vendored third-party extensions.
 leaked=$(git archive --format=tar HEAD 2>/dev/null | tar -tf - 2>/dev/null \
-         | grep -E '^\.specify/|^\.github/|^specs/|^\.claude/|^\.wibey/|^AGENTS\.md' || true)
+         | grep -E '^\.specify/|^\.github/|^specs/|^\.claude/|^\.wibey/|^\.agents/|^AGENTS\.md|^skills-lock\.json' || true)
 if [ -z "$leaked" ]; then
   ok "git archive contains no dev-only paths"
 else

@@ -23,7 +23,7 @@ env:
   # change into a red build on an unrelated PR — `specify init --ai` became
   # `--integration` mid-development, which would have done exactly that. Bump
   # this line on purpose, and let the smoke test tell you what broke.
-  SPEC_KIT_REF: v1.0.4
+  SPEC_KIT_REF: v1.2.0
 
 jobs:
   validate:
@@ -75,5 +75,56 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: install-log
+          path: /tmp/consumer/*.log
+          retention-days: 7
+
+  # A separate job, not a matrix: a matrix would rename the required check above.
+  smoke-minimum:
+    name: Install smoke test (minimum spec-kit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          enable-cache: false
+
+      - name: Read the minimum spec-kit version from extension.yml
+        id: floor
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import re, sys, yaml
+          spec = str((yaml.safe_load(open("extension.yml")).get("requires") or {}).get("speckit_version", ""))
+          bound = re.search(r">=\s*([0-9][0-9A-Za-z.+-]*)", spec)
+          if not bound:
+              sys.exit(f"requires.speckit_version has no >= bound to test: {spec!r}")
+          print(f"version={bound.group(1)}")
+          PY
+
+      - name: Install spec-kit at the declared minimum
+        env:
+          FLOOR: ${{ steps.floor.outputs.version }}
+        run: |
+          uv tool install specify-cli \
+            --from "git+https://github.com/github/spec-kit.git@v${FLOOR}"
+          specify --version
+
+      - name: Install the extension into a clean consumer project
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/consumer && cd /tmp/consumer
+          # The floor may predate --non-interactive; closed stdin plus --force lets init finish.
+          specify init . --integration copilot --force < /dev/null > init.log 2>&1
+          specify extension add "$GITHUB_WORKSPACE" --dev 2>&1 | tee install.log
+
+      - name: Assert the install produced what the manifest promised
+        run: bash "$GITHUB_WORKSPACE/.github/scripts/assert-install.sh" /tmp/consumer "$GITHUB_WORKSPACE"
+
+      - name: Upload install log on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: install-log-minimum
           path: /tmp/consumer/*.log
           retention-days: 7

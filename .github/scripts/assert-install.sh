@@ -50,7 +50,9 @@ fi
 # Quality Gate §2 — every declared command is registered. Match "• speckit."
 # specifically: the install output also bullets the scaffolded config, and
 # counting every bullet reports one too many (a false red on a correct install).
-got=$(grep -cE '• speckit\.' install.log || echo 0)
+# grep -c already prints 0 on no match; only a missing log leaves it empty.
+got=$(grep -cE '• speckit\.' install.log 2>/dev/null)
+got=${got:-0}
 [ "$got" -eq "$NCMD" ] \
   && ok "all $NCMD commands registered" \
   || bad "manifest declares $NCMD commands, install reported $got"
@@ -62,24 +64,31 @@ grep -q "v$VERSION" install.log \
 
 # BLOCKER v1.2.0 #3 — .extensionignore gaps once copied 110 files into the
 # consumer, 86 of them belonging to other extensions entirely.
-n=$(find "$DEST" -type f | wc -l | tr -d ' ')
-[ "$n" -lt 30 ] \
-  && ok "installed file count is sane ($n)" \
-  || { bad "install copied $n files — check .extensionignore"; \
-       find "$DEST" -type f | head -20; }
+n=$(find "$DEST" -type f 2>/dev/null | wc -l | tr -d ' ')
+if [ "$n" -eq 0 ]; then
+  bad "install copied 0 files — the extension directory is missing or empty"
+elif [ "$n" -lt 30 ]; then
+  ok "installed file count is sane ($n)"
+else
+  bad "install copied $n files — check .extensionignore"
+  find "$DEST" -type f | head -20
+fi
 
 # Hooks must auto-register, and must stay argument-free: that is what keeps
 # --force unreachable from an automatic trigger (FR-022), by construction rather
 # than by a runtime check.
 python3 - "$EXT_ID" "$NHOOK" <<'PY' || fail=1
-import sys, yaml
+import os, sys, yaml
 ext, expected = sys.argv[1], int(sys.argv[2])
-hooks = (yaml.safe_load(open('.specify/extensions.yml')) or {}).get('hooks') or {}
+path = '.specify/extensions.yml'
+missing = not os.path.isfile(path)
+hooks = {} if missing else (yaml.safe_load(open(path)) or {}).get('hooks') or {}
 mine = [(ev, e) for ev, es in hooks.items()
         for e in (es if isinstance(es, list) else [es])
         if e.get('extension') == ext]
 if len(mine) != expected:
-    print(f'  \033[31mFAIL\033[0m  manifest declares {expected} hooks, {len(mine)} registered')
+    why = f' ({path} is missing)' if missing else ''
+    print(f'  \033[31mFAIL\033[0m  manifest declares {expected} hooks, {len(mine)} registered{why}')
     sys.exit(1)
 armed = [ev for ev, e in mine if 'args' in e or 'arguments' in e]
 if armed:

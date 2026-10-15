@@ -33,7 +33,7 @@ When any two artifacts conflict, resolve using this order (highest → lowest au
 
 Every commit **must** follow [Conventional Commits](https://www.conventionalcommits.org/):
 
-```
+```text
 <type>[optional scope]: <description>
 
 Types: feat | fix | refactor | docs | chore | test | style
@@ -57,13 +57,14 @@ Types: feat | fix | refactor | docs | chore | test | style
 ## Code Boundaries
 
 | Directory / File | Purpose | Who touches it |
-|-----------------|---------|---------------|
+| --- | --- | --- |
 | `commands/` | Agent prompt Markdown files (the extension's deliverable) | Extension authors |
 | `extension.yml` | Package manifest | Extension authors; bump `version` on every release |
 | `config-template.yml` | User-facing config schema (no-clobber install) | Extension authors; bump `schema_version` on breaking changes |
 | `README.md` | User documentation | Extension authors; must mirror `extension.yml` commands list |
 | `CHANGELOG.md` | Release history (Keep a Changelog format) | Extension authors; update before every version tag |
-| `.specify/` | Spec-kit workspace for THIS project's own features | SDD tooling; do not hand-edit — **except `.specify/memory/`**, which § Governance requires amending by hand |
+| `.specify/` | Spec-kit workspace for THIS project's own features | SDD tooling; do not hand-edit except `.specify/memory/` and the project-owned templates listed below |
+| `.specify/templates/*-template.md` | Project-owned SDD templates | Extension authors may edit these files to reflect this constitution and the package contract. Review changes and preserve customizations across toolchain upgrades. This permission does not extend to scripts, installed extensions, presets, or generated agent files |
 | `.github/workflows/`, `.github/scripts/` | Automated quality gates (§ Quality Gates) | Extension authors. Excluded from both the published archive and the installed copy, so they cost consumers nothing |
 | `specs/` | Feature specs for THIS project | Extension authors via `/speckit-specify` |
 
@@ -71,7 +72,7 @@ Types: feat | fix | refactor | docs | chore | test | style
 
 ## Requirements & Compatibility
 
-- **spec-kit**: `>= 0.10.0`
+- **spec-kit**: `>=0.15.2`
 - **git**: `>= 2.25`
 - **License**: MIT
 
@@ -107,7 +108,9 @@ locally before you push:
     duplication is only safe while the copies cannot drift.
 
 **Install smoke test** — a real `specify extension add` into a clean consumer
-project, asserting against the manifest rather than hardcoded numbers:
+project, asserting against the manifest rather than hardcoded numbers. It runs
+twice: against the spec-kit release pinned in `SPEC_KIT_REF`, and against the
+minimum the manifest declares in `requires.speckit_version`. Each run checks:
 
 1. No "Config templates not scaffolded" warning, and the declared config file
    exists on disk afterwards.
@@ -130,7 +133,7 @@ package, not the prose.
   pull request. Everything else — principles, naming, boundaries, and whether a
   command actually behaves as its prose claims — is verified by human review.
 
-**Version**: 1.1.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-09-04
+**Version**: 1.3.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-14
 
 > **1.1.0 rationale.** §III previously stated "No CI/CD pipeline exists yet;
 > quality gates are manual." That principle was the root cause of the v1.2.0
@@ -140,3 +143,17 @@ package, not the prose.
 > request. Also folded in: Quality Gate §2 corrected from four commands to five,
 > and § Code Boundaries exempted `.specify/memory/` from its no-hand-edit rule,
 > which § Governance had always required contradicting.
+>
+> **1.2.0 rationale.** Project-owned templates restate the package contract and
+> need authored updates when it changes. Code Boundaries now permits those
+> updates explicitly instead of asking feature plans to justify a prohibited
+> edit. Scripts, installed extensions, presets and generated agent files remain
+> tooling-owned. The package compatibility floor and quality gates are unchanged.
+>
+> **1.3.0 rationale.** The stated floor, `>= 0.10.0`, was false. On spec-kit
+> 0.10.0 the install ran but never created `knowledge-config.yml`: spec-kit
+> scaffolds config templates only since 0.15.2, and skills render command
+> references only since 0.12.17. The floor is now `>=0.15.2`, the oldest release
+> verified to install correctly. A floor nothing tests drifts back into fiction,
+> so the install smoke test now also runs against the minimum the manifest
+> declares, on every pull request.

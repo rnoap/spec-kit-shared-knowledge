@@ -1,0 +1,968 @@
+{
+  "workflow": "companion",
+  "specName": "Catalog Readiness",
+  "branch": "006-catalog-readiness",
+  "currentStep": "implement",
+  "status": "completed",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-14T17:45:08.000Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-14T17:51:09.306Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-14T17:53:29.239Z"
+    },
+    {
+      "step": "plan",
+      "substep": "research",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:02:36.969Z"
+    },
+    {
+      "step": "plan",
+      "substep": "design",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:28:46.709Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:29:03.916Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-14T18:39:23.075Z"
+    },
+    {
+      "step": "tasks",
+      "substep": "generate",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:44:07.691Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T18:44:15.618Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-14T19:18:59.572Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T001",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:20:57.165Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T002",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:24:03.013Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T003",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:42:37.210Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T004",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:42:46.730Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T005",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:42:59.136Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T006",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:55:55.943Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T007",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:57:46.783Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T008",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T19:57:47.036Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T009",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:01:03.011Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T010",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:01:51.848Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T011",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:02:21.604Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T012",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:14:37.255Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T013",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:17:46.949Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T014",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:19:31.244Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T015",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:20:32.509Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T016",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:22:29.244Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T017",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:24:16.046Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T018",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:45:56.331Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:45:56.393Z"
+    }
+  ],
+  "telemetryInstanceId": "3960675e-5c4f-4a75-b2cf-83aca865be5d",
+  "last_action": "T019-T021 committed; 13/13 static checks; smoke on 1.2.0 and 0.15.2 pass with 15 installed files; T022 pending approval",
+  "coverage": {
+    "FR-001": {
+      "title": "Manifest declares the minimum spec-kit version as >=0.15.2",
+      "tasks": [
+        "T002",
+        "T009"
+      ],
+      "tests": [
+        ".github/workflows/validate.yml::smoke-minimum"
+      ]
+    },
+    "FR-002": {
+      "title": "All current minimum-version declarations agree; historical quotations keep their original values",
+      "tasks": [
+        "T003",
+        "T007",
+        "T008",
+        "T018"
+      ]
+    },
+    "FR-003": {
+      "title": "Constitution change follows Governance: docs: commit, rationale, version and amendment date",
+      "tasks": [
+        "T007"
+      ]
+    },
+    "FR-004": {
+      "title": "README says the community catalog is searchable but not installable by default",
+      "tasks": [
+        "T004",
+        "T006"
+      ]
+    },
+    "FR-005": {
+      "title": "README primary install works on a default setup via --from <release archive URL>",
+      "tasks": [
+        "T004",
+        "T006"
+      ]
+    },
+    "FR-006": {
+      "title": "README says spec-kit asks to confirm the source during that install",
+      "tasks": [
+        "T004",
+        "T006"
+      ]
+    },
+    "FR-007": {
+      "title": "README points teams that want to skip the prompt to a catalog they control",
+      "tasks": [
+        "T004"
+      ]
+    },
+    "FR-008": {
+      "title": "README does not suggest marking the community catalog install-allowed",
+      "tasks": [
+        "T004"
+      ]
+    },
+    "FR-009": {
+      "title": "README notes agents may show another command name, e.g. /speckit-knowledge-sync",
+      "tasks": [
+        "T005",
+        "T006"
+      ]
+    },
+    "FR-010": {
+      "title": "README states platforms: macOS and Linux; Windows through WSL or Git Bash",
+      "tasks": [
+        "T003"
+      ]
+    },
+    "FR-011": {
+      "title": "Manifest declares category: integration and effect: read-write",
+      "tasks": [
+        "T002",
+        "T010"
+      ]
+    },
+    "FR-012": {
+      "title": "Status reachability check puts -- between options and the source URL",
+      "tasks": [
+        "T011",
+        "T012"
+      ]
+    },
+    "FR-013": {
+      "title": "Gating install smoke test installs against spec-kit v1.2.0",
+      "tasks": [
+        "T015",
+        "T016"
+      ],
+      "tests": [
+        ".github/workflows/validate.yml::smoke"
+      ]
+    },
+    "FR-014": {
+      "title": "CI runs the install smoke test against the declared minimum v0.15.2 on every PR",
+      "tasks": [
+        "T015",
+        "T016"
+      ],
+      "tests": [
+        ".github/workflows/validate.yml::smoke-minimum"
+      ]
+    },
+    "FR-015": {
+      "title": "Required checks Static validation and Install smoke test keep their names",
+      "tasks": [
+        "T015",
+        "T018"
+      ]
+    },
+    "FR-016": {
+      "title": "Install check fails cleanly with count 0 when no commands registered",
+      "tasks": [
+        "T013",
+        "T014",
+        "T016"
+      ],
+      "tests": [
+        ".github/scripts/assert-install.sh::commands registered"
+      ]
+    },
+    "FR-017": {
+      "title": "Install check fails when the install copied no files",
+      "tasks": [
+        "T013",
+        "T014",
+        "T016"
+      ],
+      "tests": [
+        ".github/scripts/assert-install.sh::installed file count"
+      ]
+    },
+    "FR-018": {
+      "title": "Each change recorded under [Unreleased] in the CHANGELOG",
+      "tasks": [
+        "T017"
+      ]
+    }
+  },
+  "size": "normal",
+  "classification": {
+    "projectedFiles": 8,
+    "projectedTasks": 12,
+    "scopeSignal": "none",
+    "verdict": "normal"
+  },
+  "expectations": [
+    "Sync defects (full-SHA pin, warm-sync deletions, timeout on macOS, symlink indexing) go in a separate spec",
+    "No version bump, tag, release or catalog submission",
+    "No GitHub topics or homepage changes",
+    "README examples keep the canonical dot form"
+  ],
+  "context": [
+    "area: extension.yml (requires.speckit_version, extension.category/effect)",
+    "area: README.md (spec-kit badge, Prerequisites, Installation, Commands)",
+    "area: commands/speckit.knowledge.status.md L128 (git ls-remote)",
+    "area: .github/workflows/validate.yml (SPEC_KIT_REF v1.0.4, smoke job)",
+    "area: .github/scripts/assert-install.sh L53 (grep -c || echo 0), L66 (file count)",
+    "area: .specify/memory/constitution.md (Requirements & Compatibility, Quality Gates, Governance)",
+    "area: .specify/templates/plan-template.md L17, L38 (states >= 0.10.0)",
+    "constraint: main requires checks Static validation and Install smoke test by name",
+    "constraint: constitution amendments need a docs: commit with rationale",
+    "constraint: validate-extension.sh requires README to mention every /speckit.knowledge.* in dot form",
+    "evidence 2026-10-14: install OK on spec-kit 0.15.2, 1.1.2 (from release zip), 1.2.0; config not scaffolded on 0.10.0",
+    "evidence: spec-kit 1.1.2 ships the community catalog with install_allowed=False and refuses installs below requires.speckit_version",
+    "area: .specify/templates/overrides/plan-template.md L17, L42 (project template now lives in overrides/, untracked until the toolchain change lands)",
+    "area: .specify/templates/plan-template.md L17, L42 (overrides/ was temporary; 395c326 restored the project template in place)",
+    "Pre-implementation remediation: C1, I1, I2 and E1 are reflected in the existing plan, tasks, contracts and constitution. No implementation task was executed or closed.",
+    "Pending prerequisite commits: resolver compatibility fix and the separate docs: constitution 1.2.0 amendment. Preserve unrelated changes and keep these separate from feature implementation."
+  ],
+  "intent": "Make the package tell catalog users the truth (spec-kit floor, install path, invocation names, metadata) and make CI prove the floor",
+  "planBlocks": [],
+  "planBlocksPicked": [],
+  "decisions": [
+    {
+      "decision": "Declare requires.speckit_version >=0.15.2",
+      "why": "0.15.2 first scaffolds config templates on install; 0.10.0 verified missing the config; skills render tokens since 0.12.17",
+      "rejected": ">=0.12.17 (config not scaffolded) and >=1.0.4 (excludes working versions without evidence)"
+    },
+    {
+      "decision": "smoke-minimum reads the floor from the manifest >= clause",
+      "why": "tests whatever the manifest claims, no second copy to drift; matches assert-install.sh convention",
+      "rejected": "hardcoding v0.15.2 in the workflow"
+    },
+    {
+      "decision": "Separate job named Install smoke test (minimum spec-kit), not a matrix",
+      "why": "a matrix renames runs after matrix values, so the required check Install smoke test would stop reporting and block merges",
+      "rejected": "matrix over spec-kit versions"
+    },
+    {
+      "decision": "README documents only --from plus a team-controlled catalog; never --install-allowed on community",
+      "why": "spec-kit calls that flag the vetting boundary and catalog add replaces the built-in catalog list, dropping default",
+      "rejected": "FR-007/FR-008 as first written (flip community with a trust warning)"
+    },
+    {
+      "decision": "assert-install.sh: single-integer count, zero files fails, readable FAIL without extensions.yml",
+      "why": "an aborted install produced a [ error, a PASS at 0 files and a Python traceback",
+      "rejected": "|| true, which still leaves an empty count when the log is missing"
+    },
+    {
+      "decision": "Constitution 1.2.0 with rationale; hand-edit plan template as a justified violation",
+      "why": "a requirement changes and a gate gains a run; the template restates the floor and is project-owned in practice",
+      "rejected": "1.1.1 patch; leaving the template stale; amending Code Boundaries"
+    },
+    {
+      "decision": "Supersedes the plan-level justified template violation: constitution 1.2.0 explicitly authorizes project-owned template edits",
+      "why": "C1 requires an explicit governance amendment, not an exception inferred by the feature plan. The feature compatibility and CI amendment will advance constitution 1.2.0 to 1.3.0.",
+      "rejected": "Treating historical manual edits or Complexity Tracking as permission to override the constitution"
+    },
+    {
+      "decision": "Test discovery-only installation through an isolated loopback catalog fixture before publication",
+      "why": "I1: knowledge may not exist in the public catalog yet. The fixture is registered only in a temporary consumer with --no-install-allowed.",
+      "rejected": "Requiring the public marketplace entry or changing the real project catalog trust"
+    },
+    {
+      "decision": "Validate a candidate archive containing the current distributable working-tree bytes after all story phases join",
+      "why": "I2: the v1.5.0 ZIP is only a historical download check. T018 compares candidate manifest and payload hashes with the edited working tree.",
+      "rejected": "Using the previous release or stale HEAD to prove uncommitted feature changes"
+    },
+    {
+      "decision": "Execute installed agent commands rather than infer runtime behavior from skill files or standalone Git calls",
+      "why": "E1: T006 checks the unconfigured command, T012 checks real remote status on Linux, and T018 repeats against the candidate. macOS remains a publication dependency on its timeout fix.",
+      "rejected": "Recording command-file existence as runtime success"
+    },
+    {
+      "decision": "Limit this run to phases 1 and 2 (T001 and T002), both executed inline.",
+      "why": "The user explicitly requested only these phases; the Foundational dispatcher assigns its single task inline.",
+      "rejected": "Implement user-story phases or mark the full feature complete."
+    },
+    {
+      "decision": "Built every story phase inline and committed per phase, splitting phase 7 into fix(ci) and chore(ci)",
+      "why": "No story phase owns five or more files; the plan requires one Conventional Commit per concern",
+      "rejected": "Worker dispatch, or one mixed CI commit"
+    },
+    {
+      "decision": "Installed spec-kit 0.15.1, 0.15.2 and the CI 1.2.0 into isolated uv tool dirs and used throwaway consumers under /tmp/kn006",
+      "why": "Keeps the developer global specify 1.2.0 and real project catalogs untouched",
+      "rejected": "uv tool install over the global tool, or registering fixture catalogs in the repo"
+    },
+    {
+      "decision": "Ran the Linux reachability cases in the local Podman VM (Fedora CoreOS 41, GNU timeout 9.5)",
+      "why": "T012 and T018 require Linux with timeout and stock macOS has neither timeout nor gtimeout",
+      "rejected": "Substituting gtimeout or another command on macOS and calling it a pass"
+    },
+    {
+      "decision": "Confirmed the Untrusted Source prompts in T006 and T018 in an interactive terminal",
+      "why": "The tasks require confirming; the user asked to proceed autonomously; sources were the own v1.5.0 release and a loopback candidate, installed only into /tmp",
+      "rejected": "Piping yes past the TTY check"
+    },
+    {
+      "decision": "Recorded out-of-scope findings as concerns instead of fixing them",
+      "why": "Packaging leak, slug snippet and shell-metacharacter validation each touch files or rules outside 006",
+      "rejected": "Widening the feature"
+    },
+    {
+      "decision": "Did not push the branch or open the pull request for T022",
+      "why": "Pushing changes a shared repository and T022 requires explicit user approval; the user was unavailable",
+      "rejected": "Treating a work-autonomously answer as push approval"
+    },
+    {
+      "decision": "Left T019-T021 unchecked in tasks.md",
+      "why": "Companion refuses task journal entries on a completed spec and the skill forbids hand-editing the boxes; commits f3d2e43, cc3c81a and de865e9 hold the work",
+      "rejected": "Hand-editing the checkboxes"
+    },
+    {
+      "decision": "status reads absent, null and empty sources as unconfigured and reuses the existing message",
+      "why": "The duplicated validation rules already treat the three identically, and sync has the same empty-configuration path",
+      "rejected": "A second, distinct message for a scaffolded but empty config"
+    }
+  ],
+  "concerns": [
+    {
+      "note": "plan-blocks.py failed: installed companion 0.25.0 lacks presets/_parts (call-paths.md, code-pins.md); recorded none and wrote the CI flow and the grep -c note as prose"
+    },
+    {
+      "note": "Explore subagents have no terminal, so readers 1-4 could not check in; readers 1 and 3 returned nothing and their areas were covered inline"
+    },
+    {
+      "note": "A spec-kit integration upgrade (copilot --skills) ran outside this step at 15:08 local and left 119 staged changes plus unstaged template overwrites on this branch; not part of feature 006 and must not be swept into its commits"
+    },
+    {
+      "note": "Partial implementation only: README, constitution and template still state the previous floor until their owning phases run. Installation and end-to-end checks in later phases were not executed. This feature is not ready for release.",
+      "step": "implement"
+    },
+    {
+      "note": "Pre-existing, outside 006: status prints the not-configured message only when knowledge-config.yml is absent. A fresh install scaffolds the file with sources: null, so status shows an empty table plus a sync hint instead of pointing to configure.",
+      "step": "implement"
+    },
+    {
+      "note": "Outside 006, unreleased: a0e7287 tracks .agents/skills/* (7 files), but neither .extensionignore nor .gitattributes export-ignore lists .agents/. --dev installs copy them (CI included), and the next release archive would ship them to every consumer. validate-extension.sh leak regex does not cover .agents/. Fix: add .agents/ to both files and to the leak check. Local --dev installs also copy the untracked skills-lock.json and ignored .mcp.json.",
+      "step": "implement"
+    },
+    {
+      "note": "Outside 006, pre-existing: the Source Slug Generation snippet in commands/speckit.knowledge.sync.md (L24-L27, rendered into the sync and status skills) puts a # comment after each line-continuation backslash, so run literally it is a bash syntax error; an agent must strip comments to get the slug. Fix separately: move the comments above the pipeline.",
+      "step": "implement"
+    },
+    {
+      "note": "Update to the .agents/ concern: 4a750a6 (same branch, not a 006 commit) also tracks skills-lock.json at the root. The T018 candidate built exactly like git archive therefore carries 19 files, 8 of them unrelated (.agents/skills/*/SKILL.md x7, skills-lock.json). Add .agents/ and skills-lock.json to .extensionignore and .gitattributes export-ignore, and to the validate-extension.sh leak regex, before the next release.",
+      "step": "implement"
+    },
+    {
+      "note": "SC-004 CI half pending: no pull request run exists yet, so Install smoke test and Install smoke test (minimum spec-kit) are verified only by running their validate.yml steps locally. Confirm both on the PR before merge, then add the new check to the main ruleset.",
+      "step": "implement"
+    },
+    {
+      "note": "Before publication (FR-010): stock macOS still lacks GNU timeout, so a real status reachability run on macOS stays blocked until the separately tracked portability fix lands and passes. Windows (WSL or Git Bash) remains an untested platform claim. At release, move the README --from tag to the manifest version.",
+      "step": "implement"
+    },
+    {
+      "note": "Security, pre-existing, outside 006, high priority: url and path_filter validation rejects only a leading - and checks the prefix, so shell metacharacters (; $( ) backticks, spaces) pass, and the command snippets interpolate <url>/<pattern> unquoted. A merged config change could then run commands on every teammate and hook-driven sync, an exposure the README trust model does not list. Fix in its own feature: quote every interpolated value in the snippets and reject shell metacharacters in all three validation blocks together.",
+      "step": "implement"
+    },
+    {
+      "note": "T022 pending: 006-catalog-readiness is not pushed, so the CI half of SC-004 (Static validation, Install smoke test, Install smoke test (minimum spec-kit) on a pull request) is still unproven. Push and open the PR once approved.",
+      "step": "implement"
+    },
+    {
+      "note": "Companion shows the spec as completed while tasks.md lists T019-T022 unchecked. T019-T021 are done in commits f3d2e43, cc3c81a and de865e9; the doctor may flag them as unjournaled.",
+      "step": "implement"
+    }
+  ],
+  "step_summaries": {
+    "plan": {
+      "summary": "Plan for catalog readiness: floor >=0.15.2 everywhere, manifest category/effect, --from-only install docs, status --, CI pin v1.2.0 plus a manifest-derived minimum job, robust install assertions",
+      "key_finding": "spec-kit advises against flipping the community catalog to install_allowed and catalog add replaces the built-in catalog list, so the spec was clarified to drop that route"
+    },
+    "tasks": {
+      "summary": "18 tasks: a Setup gate (toolchain change lands first), 1 foundational manifest task, 5 story phases with disjoint files (US1 README, US2 constitution and template, US3 verify, US4 status, US5 CI with fail-first seeds), Polish (CHANGELOG and validation)"
+    },
+    "implement": {
+      "summary": "Convergence: package excludes dev-only skills, status reports a fresh install as unconfigured, the plan template names both smoke runs; T022 (push and PR CI) awaits approval"
+    }
+  },
+  "approach": "Edit in place across the manifest, README, status command, constitution, plan template, validate.yml and assert-install.sh. The floor moves to >=0.15.2 in every restatement; CI pins v1.2.0 and adds a job that installs the floor read from the manifest; the README leads with --from and never suggests flipping the community catalog.",
+  "verified": [
+    {
+      "what": "Phase 1 prerequisite gate",
+      "command": "git merge-base --is-ancestor 26b66be HEAD && git merge-base --is-ancestor febb4b2 HEAD && git merge-base --is-ancestor a17ac60 HEAD && git show a17ac60:.specify/memory/constitution.md | grep -Fq \"Extension authors may edit these files\" && test -z \"$(git status --short -- . \":(exclude)specs/006-catalog-readiness/**\" \":(exclude)extension.yml\")\" && printf \"PASS separate prerequisites, template authorship and clean scope\\n\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "PASS separate prerequisites, template authorship and clean scope"
+    },
+    {
+      "what": "T002 manifest contract",
+      "command": "python3 -c 'import subprocess, yaml; current = yaml.safe_load(open(\"extension.yml\")); expected = yaml.safe_load(subprocess.check_output([\"git\", \"show\", \"HEAD:extension.yml\"], text=True)); expected[\"requires\"][\"speckit_version\"] = \">=0.15.2\"; expected[\"extension\"].update(category=\"integration\", effect=\"read-write\"); assert current == expected, \"manifest differs outside T002\"; print(\"PASS T002: exact floor and metadata; every other field unchanged\")'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "PASS T002: exact floor and metadata; every other field unchanged"
+    },
+    {
+      "what": "Static extension validation",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T006 plain add refused as discovery-only (loopback fixture, spec-kit 1.2.0)",
+      "command": "cd /tmp/kn006/t006/discovery && if env -u SPECKIT_CATALOG_URL specify extension add knowledge > add.log 2>&1; then echo \"UNEXPECTED install\"; exit 1; fi; grep -q \"discovery-only\" add.log && test ! -e .specify/extensions/knowledge && ! grep -q \"extension: knowledge\" .specify/extensions.yml && echo \"PASS refused, nothing installed: $(grep -m1 \"discovery-only\" add.log | tr -s \" \")\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "result": "PASS refused, nothing installed: discovery-only — a search surface, not an install source. · grep: .specify/extensions.yml: No such file or directory"
+    },
+    {
+      "what": "T006 README --from v1.5.0 prompted then installed (spec-kit 1.2.0)",
+      "command": "cd /tmp/kn006/t006/release && grep -q \"Untrusted Source\" install.log && grep -q \"Continue with installation? \\[y/N\\]: y\" install.log && grep -q \"Extension installed successfully\" install.log && test -f .specify/extensions/knowledge/knowledge-config.yml && test \"$(ls -d .github/skills/speckit-knowledge-* | wc -l | tr -d \" \")\" = 5 && bash /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge/.github/scripts/assert-install.sh /tmp/kn006/t006/release /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.4,
+      "result": "  \u001b[32mPASS\u001b[0m  installed file count is sane (10) ·   \u001b[32mPASS\u001b[0m  4 hooks registered, none carrying arguments · Smoke test passed."
+    },
+    {
+      "what": "T006 agent executed installed /speckit-knowledge-status with no sources (spec-kit 1.2.0, v1.5.0 --from install)",
+      "command": "independent subagent loaded /tmp/kn006/t006/release/.github/skills/speckit-knowledge-status/SKILL.md and followed it",
+      "result": "Completed and exited 0: valid schema_version, sources null treated as no configured sources; printed a header-only table with Total: 0 items from 0 sources and the missing-index hint; no unresolved __SPECKIT_COMMAND_ tokens; no git call needed",
+      "warnings": [
+        "Agent judgement, not a recorded command exit code"
+      ]
+    },
+    {
+      "what": "T009 spec-kit v0.15.1 refuses the install naming >=0.15.2",
+      "command": "cd /tmp/kn006/t009/v0151 && S=/tmp/kn006/uv/v0.15.1/bin/specify && $S init . --integration copilot --force < /dev/null > init.log 2>&1 && if $S extension add /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge --dev > install.log 2>&1; then echo UNEXPECTED install; exit 1; fi; grep -q '>=0.15.2' install.log && test ! -e .specify/extensions/knowledge && ! grep -qs 'extension: knowledge' .specify/extensions.yml && echo \"PASS refused, nothing installed: $(tr -s ' \\n' ' ' < install.log | grep -oE 'Extension requires spec-kit[^.]*\\.[^.]*\\.[^.]*\\.[^.]*\\.')\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 1.7,
+      "result": "PASS refused, nothing installed: Extension requires spec-kit >=0.15.2, but 0.15."
+    },
+    {
+      "what": "T009 spec-kit v0.15.2 unattended init then install: 5 commands, 4 hooks, config",
+      "command": "cd /tmp/kn006/t009/v0152 && S=/tmp/kn006/uv/v0.15.2/bin/specify && $S --version && $S init . --integration copilot --force < /dev/null > init.log 2>&1 && $S extension add /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge --dev > install.log 2>&1 && bash /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge/.github/scripts/assert-install.sh /tmp/kn006/t009/v0152 /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 2.2,
+      "result": "  \u001b[32mPASS\u001b[0m  installed file count is sane (24) ·   \u001b[32mPASS\u001b[0m  4 hooks registered, none carrying arguments · Smoke test passed."
+    },
+    {
+      "what": "T010 spec-kit 1.2.0 extension info shows Category and Effect",
+      "command": "cd /tmp/kn006/t010 && specify --version && env -u SPECKIT_CATALOG_URL specify init . --integration copilot --non-interactive --force > init.log 2>&1 && env -u SPECKIT_CATALOG_URL specify extension add /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge --dev > install.log 2>&1 && env -u SPECKIT_CATALOG_URL specify extension info knowledge > info.log 2>&1; cat info.log; grep -qE '^Category: integration$' info.log && grep -qE '^Effect: read-write$' info.log && echo 'PASS Category: integration, Effect: read-write'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 4.8,
+      "result": "Priority: 10 · To remove: specify extension remove knowledge · PASS Category: integration, Effect: read-write"
+    },
+    {
+      "what": "T012 every config-derived git operand follows --",
+      "command": "python3 /tmp/kn006/t012/audit.py",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "sync: git fetch --depth=1 origin -- <revision> · sync: git fetch origin -- <revision> · 11 config-derived git calls, 0 without --: []"
+    },
+    {
+      "what": "T012 validation blocks still byte-identical (static validation)",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.9,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T012 agent executed rendered /speckit-knowledge-status against https://github.com/rnoap/spec-kit-shared-knowledge on Linux (Fedora CoreOS 41, GNU timeout 9.5, working-tree install on spec-kit 1.2.0)",
+      "command": "independent subagent followed /private/tmp/kn006/t012/consumer/.github/skills/speckit-knowledge-status/SKILL.md; podman machine ssh -- timeout 5 git ls-remote --exit-code -- https://github.com/rnoap/spec-kit-shared-knowledge HEAD",
+      "result": "Reported shared-knowledge as reachable from an ls-remote exit 0 (HEAD f565b60), status not synced, Total: 0 items from 1 source (1 reachable, 1 not synced)",
+      "warnings": [
+        "Agent judgement plus the agent-reported exit code; the stock-macOS reachability case remains blocked on the separately tracked timeout fix"
+      ]
+    },
+    {
+      "what": "T013 seeds A and B reproduce today's assert-install.sh defects",
+      "command": "cd /tmp/kn006/t013 && R=/Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge && git -C $R show HEAD:.github/scripts/assert-install.sh > assert-before.sh && { bash assert-before.sh seedA $R > A.before.out 2>&1; echo \"seedA exit=$?\"; bash assert-before.sh seedB $R > B.before.out 2>&1; echo \"seedB exit=$?\"; } && grep -q 'integer expression expected' A.before.out && grep -q 'installed file count is sane (0)' B.before.out && grep -q 'Traceback' B.before.out && echo 'PASS defects reproduced: integer expression expected (A); PASS at 0 files and a Traceback (B)'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "seedA exit=1 · seedB exit=1 · PASS defects reproduced: integer expression expected (A); PASS at 0 files and a Traceback (B)"
+    },
+    {
+      "what": "T016 seeds A and B fail readably with the fixed assert-install.sh",
+      "command": "cd /tmp/kn006/t013 && R=/Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge && for s in A B; do bash $R/.github/scripts/assert-install.sh seed$s $R > $s.after.out 2>&1; echo \"seed$s exit=$?\" >> exits.after; done; cat exits.after; grep -qx 'seedA exit=1' exits.after && grep -qx 'seedB exit=1' exits.after && grep -q 'FAIL  manifest declares 5 commands, install reported 0$' A.after.out && grep -q 'FAIL  install copied 0 files — the extension directory is missing or empty' B.after.out && grep -q 'FAIL  manifest declares 4 hooks, 0 registered (.specify/extensions.yml is missing)' B.after.out && ! grep -hE 'integer expression expected|Traceback|No such file or directory' A.after.out B.after.out && echo 'PASS both seeds print readable FAIL lines, exit 1, and no shell or interpreter error'",
+      "source": "derived",
+      "exitCode": 1,
+      "durationSeconds": 0.7,
+      "result": "seedA exit=1 · seedB exit=1",
+      "warnings": [
+        "exited 1"
+      ]
+    },
+    {
+      "what": "T016 smoke job steps from validate.yml at SPEC_KIT_REF v1.2.0 pass the fixed script",
+      "command": "python3 /tmp/kn006/t016/run-job.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge smoke /tmp/kn006/t016/smoke > /tmp/kn006/t016/smoke.out 2>&1; rc=$?; grep -E '^specify |^::|PASS|FAIL|Smoke test' /tmp/kn006/t016/smoke.out; exit $rc",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 21.4,
+      "result": "Smoke test passed. · ::step 'Assert the install produced what the manifest promised' exit=0 · ::job smoke (Install smoke test) passed"
+    },
+    {
+      "what": "T016 smoke-minimum job steps from validate.yml at the derived floor pass the fixed script",
+      "command": "python3 /tmp/kn006/t016/run-job.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge smoke-minimum /tmp/kn006/t016/minimum > /tmp/kn006/t016/minimum.out 2>&1; rc=$?; grep -E '^specify |^::|PASS|FAIL|Smoke test' /tmp/kn006/t016/minimum.out; exit $rc",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 7.4,
+      "result": "Smoke test passed. · ::step 'Assert the install produced what the manifest promised' exit=0 · ::job smoke-minimum (Install smoke test (minimum spec-kit)) passed"
+    },
+    {
+      "what": "T016 seeds A and B fail readably with the fixed assert-install.sh (ANSI-stripped exact FAIL text)",
+      "command": "python3 /tmp/kn006/t016/check-seeds.py",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "seed A: exit=1 fails=['manifest declares 5 commands, install reported 0'] missing=[] noise=[] · seed B: exit=1 fails=['config declared but not created: .specify/extensions/knowledge/knowledge-config.yml', 'install copied 0 files — the extension directory is missing or empty', 'manifest declares 4 hooks, 0 registered (.specify/extensions.yml is missing)'] missing=[] noise=[] · PASS both seeds print readable FAIL lines, exit 1, no shell or interpreter error"
+    },
+    {
+      "what": "T016 the same checker rejects the HEAD (unfixed) assert-install.sh",
+      "command": "cd /tmp/kn006/t016 && sed \"s#{REPO}/.github/scripts/assert-install.sh#/tmp/kn006/t013/assert-before.sh#\" check-seeds.py > check-seeds-before.py && ! python3 check-seeds-before.py && echo \"PASS the checker detects the unfixed defects\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.8,
+      "result": "seed B: exit=1 fails=['config declared but not created: .specify/extensions/knowledge/knowledge-config.yml'] missing=['install copied 0 files — the extension directory is missing or empty', 'manifest declares 4 hooks, 0 registered (.specify/extensions.yml is missing)'] noise=['No such file or directory', 'Traceback', 'No such file or directory'] · FAILED · PASS the checker detects the unfixed defects"
+    },
+    {
+      "what": "T018 candidate ZIP from working-tree bytes: manifest floor, category, effect and payload hashes",
+      "command": "python3 /tmp/kn006/t018/build-candidate.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge /tmp/kn006/t018/serve/knowledge-candidate.zip",
+      "source": "derived",
+      "exitCode": 1,
+      "durationSeconds": 1.0,
+      "result": "    raise KeyError( ·         'There is no item named %r in the archive' % name) · KeyError: \"There is no item named 'spec-kit-shared-knowledge-candidate/.github/skills/build-graph' in the archive\"",
+      "warnings": [
+        "exited 1"
+      ]
+    },
+    {
+      "what": "T018 candidate ZIP from working-tree bytes, file set equal to git archive: floor, category, effect, hashes",
+      "command": "python3 /tmp/kn006/t018/build-candidate.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge /tmp/kn006/t018/serve/knowledge-candidate.zip",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.3,
+      "result": "PASS file set == git archive HEAD (no adds or deletes) · PASS no symlinks in payload · PASS commands, config template, README, LICENSE present"
+    },
+    {
+      "what": "T018 candidate --from install: prompt confirmed, fixed assert-install passes, installed payload == candidate, no unresolved tokens",
+      "command": "cd /tmp/kn006/t018/consumer && grep -q \"Untrusted Source\" install.log && bash /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge/.github/scripts/assert-install.sh /tmp/kn006/t018/consumer /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge && for f in extension.yml commands/speckit.knowledge.configure.md commands/speckit.knowledge.remove.md commands/speckit.knowledge.search.md commands/speckit.knowledge.status.md commands/speckit.knowledge.sync.md config-template.yml; do unzip -p ../serve/knowledge-candidate.zip \"spec-kit-shared-knowledge-candidate/$f\" | cmp -s - \".specify/extensions/knowledge/$f\" || { echo \"DIFF $f\"; exit 1; }; done && ! grep -l __SPECKIT_COMMAND_ .github/skills/speckit-knowledge-*/SKILL.md && echo \"PASS installed manifest and commands match the candidate; skills fully rendered\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.5,
+      "result": "  \u001b[32mPASS\u001b[0m  4 hooks registered, none carrying arguments · Smoke test passed. · PASS installed manifest and commands match the candidate; skills fully rendered"
+    },
+    {
+      "what": "T018 six floor declarations state >=0.15.2; 0.10.0 only in rationale quotes",
+      "command": "python3 /tmp/kn006/t018/floor-declarations.py",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.0,
+      "result": "PASS .specify/templates/plan-template.md: no current 0.10.0 outside rationale quotes [] · PASS README.md: no current 0.10.0 outside rationale quotes [] · PASS extension.yml: no current 0.10.0 outside rationale quotes []"
+    },
+    {
+      "what": "T018 static validation passes all 13 checks",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.8,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T018 agent executed the candidate rendered /speckit-knowledge-status: no sources, and on Linux against the reachable remote",
+      "command": "independent subagent followed .github/skills/speckit-knowledge-status/SKILL.md in /private/tmp/kn006/t018/consumer and /private/tmp/kn006/t018/remote; podman machine ssh -- timeout 5 git ls-remote --exit-code -- https://github.com/rnoap/spec-kit-shared-knowledge HEAD",
+      "result": "No sources: completed with 0 items from 0 sources. Remote on Fedora CoreOS 41 with GNU timeout: reported shared-knowledge reachable from ls-remote exit 0, not synced. No unresolved placeholders.",
+      "warnings": [
+        "Agent judgement plus agent-reported exit codes",
+        "The first candidate build recorded exit 1: check-attr did not apply the .github/ directory export-ignore to files inside it; fixed, and the rebuilt file set equals git archive HEAD"
+      ]
+    },
+    {
+      "what": "T019 archive (working-tree attributes) carries only the extension payload",
+      "command": "test \"$(git archive --worktree-attributes --format=tar HEAD | tar -tf - | grep -vE \"/$\" | sort | tr \"\\n\" \" \")\" = \".extensionignore CHANGELOG.md LICENSE README.md commands/speckit.knowledge.configure.md commands/speckit.knowledge.remove.md commands/speckit.knowledge.search.md commands/speckit.knowledge.status.md commands/speckit.knowledge.sync.md config-template.yml extension.yml \" && echo \"PASS 11 payload files, no .agents/ or skills-lock.json\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "PASS 11 payload files, no .agents/ or skills-lock.json"
+    },
+    {
+      "what": "T019 --dev install (spec-kit 1.2.0) copies no .agents/, skills-lock.json or .mcp.json and passes assert-install",
+      "command": "cd /tmp/kn006/t019 && env -u SPECKIT_CATALOG_URL specify init . --integration copilot --non-interactive --force > init.log 2>&1 && env -u SPECKIT_CATALOG_URL specify extension add /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge --dev > install.log 2>&1 && bash /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge/.github/scripts/assert-install.sh /tmp/kn006/t019 /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge && ! (cd .specify/extensions/knowledge && find . -type f | grep -E '^\\./(\\.agents/|skills-lock\\.json|\\.mcp\\.json)') && echo \"PASS installed: $(cd .specify/extensions/knowledge && find . -type f | sort | tr '\\n' ' ')\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 3.1,
+      "result": "  \u001b[32mPASS\u001b[0m  4 hooks registered, none carrying arguments · Smoke test passed. · PASS installed: ./.specify-dev/extension-skills/speckit-knowledge-configure/SKILL.md ./.specify-dev/extension-skills/speckit-knowledge-remove/SKILL.md ./.specify-dev/extension-skills/speckit-knowledge-search/SKILL.md ./.specify-dev/extension-skills/speckit-knowledge-status/SKILL.md ./.specify-dev/extension-skills/speckit-knowledge-sync/SKILL.md ./LICENSE ./README.md ./commands/speckit.knowledge.configure.md ./commands/speckit.knowledge.remove.md ./commands/speckit.knowledge.search.md ./commands/speckit.knowledge.status.md ./commands/speckit.knowledge.sync.md ./config-template.yml ./extension.yml ./knowledge-config.yml"
+    },
+    {
+      "what": "T019 static validation on the committed archive (13 checks, widened leak check)",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.9,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T020 static validation after the status edit (blocks byte-identical, tokens agent-neutral)",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.9,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T020 agent executed the rendered /speckit-knowledge-status on a fresh working-tree install (spec-kit 1.2.0, scaffolded sources: null)",
+      "command": "independent subagent followed /private/tmp/kn006/t020/.github/skills/speckit-knowledge-status/SKILL.md",
+      "result": "Printed the not-configured message pointing to /speckit-knowledge-configure, decided by the new sources absent/null/[] rule in step 1; exit 0; no unresolved placeholders",
+      "warnings": [
+        "Agent judgement, not a recorded command exit code"
+      ]
+    },
+    {
+      "what": "T021 plan template Testing line names both smoke runs, matching validate.yml jobs",
+      "command": "sed -n 21p .specify/templates/plan-template.md | grep -q \"run twice: against the spec-kit release pinned in .SPEC_KIT_REF. and against the minimum in the manifest.s .requires.speckit_version.\" && python3 -c \"import yaml; j = yaml.safe_load(open(\\\".github/workflows/validate.yml\\\"))[\\\"jobs\\\"]; assert {\\\"smoke\\\", \\\"smoke-minimum\\\"} <= set(j), j.keys(); print(\\\"PASS template names both runs; validate.yml has smoke and smoke-minimum\\\")\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "PASS template names both runs; validate.yml has smoke and smoke-minimum"
+    },
+    {
+      "what": "Phase 9 static validation on final HEAD",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.8,
+      "result": "  \u001b[32mPASS\u001b[0m  no hook declares arguments (keeps --force unreachable) ·   \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · \u001b[32m13 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Phase 9 smoke job steps (validate.yml, SPEC_KIT_REF v1.2.0) with the new exclusions",
+      "command": "python3 /tmp/kn006/t016/run-job.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge smoke /tmp/kn006/t016/smoke > /tmp/kn006/t016/smoke9.out 2>&1; rc=$?; grep -E '^specify |^::job|installed file count|Smoke test' /tmp/kn006/t016/smoke9.out; exit $rc",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 14.8,
+      "result": "  \u001b[32mPASS\u001b[0m  installed file count is sane (15) · Smoke test passed. · ::job smoke (Install smoke test) passed"
+    },
+    {
+      "what": "Phase 9 smoke-minimum job steps (derived floor 0.15.2) with the new exclusions",
+      "command": "python3 /tmp/kn006/t016/run-job.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge smoke-minimum /tmp/kn006/t016/minimum > /tmp/kn006/t016/minimum9.out 2>&1; rc=$?; grep -E '^specify |^::job|installed file count|Smoke test' /tmp/kn006/t016/minimum9.out; exit $rc",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 6.1,
+      "result": "  \u001b[32mPASS\u001b[0m  installed file count is sane (15) · Smoke test passed. · ::job smoke-minimum (Install smoke test (minimum spec-kit)) passed"
+    }
+  ],
+  "currentTask": null,
+  "task_summaries": {
+    "T001": {
+      "status": "DONE",
+      "did": "Verified separate toolchain (26b66be), resolver (febb4b2), and constitution 1.2.0 (a17ac60) commits; no pending changes outside the requested scope."
+    },
+    "T002": {
+      "status": "DONE",
+      "did": "Set spec-kit >=0.15.2, category integration and effect read-write; the exact manifest contract and all 13 static package checks pass.",
+      "files": [
+        "extension.yml"
+      ]
+    },
+    "T003": {
+      "status": "DONE",
+      "did": "README badge and Prerequisites state spec-kit >=0.15.2; Prerequisites lists macOS and Linux, Windows through WSL or Git Bash.",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T004": {
+      "status": "DONE",
+      "did": "Installation leads with the v1.5.0 --from archive, states the community catalog is searchable not installable, names the Untrusted Source confirmation, and points teams to a catalog they control.",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T005": {
+      "status": "DONE",
+      "did": "Commands opens with a note: dot form in examples, /speckit-knowledge-sync for skills agents, $speckit-knowledge-sync for Codex; every dot-form example kept and static validation passes.",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T006": {
+      "status": "DONE",
+      "did": "spec-kit 1.2.0: loopback discovery-only catalog refused plain add with nothing installed; README v1.5.0 --from showed Untrusted Source and installed once confirmed (assert-install passed); an independent agent executed the installed status skill with no sources and it completed.",
+      "files": [
+        "/tmp/kn006/t006"
+      ]
+    },
+    "T007": {
+      "status": "DONE",
+      "did": "Constitution 1.3.0: Requirements & Compatibility states spec-kit >=0.15.2, the install smoke test runs against SPEC_KIT_REF and the manifest floor, and a 1.3.0 rationale explains why >= 0.10.0 was false; 1.2.0 rationale kept.",
+      "files": [
+        ".specify/memory/constitution.md"
+      ]
+    },
+    "T008": {
+      "status": "DONE",
+      "did": "Plan template states spec-kit >=0.15.2 in Primary Dependencies (L17) and the compatibility constraint (L42).",
+      "files": [
+        ".specify/templates/plan-template.md"
+      ]
+    },
+    "T009": {
+      "status": "DONE",
+      "did": "spec-kit 0.15.1 refused --dev install with 'Extension requires spec-kit >=0.15.2, but 0.15.1 is installed.' and installed nothing; 0.15.2 ran init --integration copilot --force < /dev/null, then installed 5 commands, 4 hooks and knowledge-config.yml (assert-install passed).",
+      "files": [
+        "/tmp/kn006/t009"
+      ]
+    },
+    "T010": {
+      "status": "DONE",
+      "did": "spec-kit 1.2.0: after extension add <repo> --dev, specify extension info knowledge printed Category: integration and Effect: read-write.",
+      "files": [
+        "/tmp/kn006/t010"
+      ]
+    },
+    "T011": {
+      "status": "DONE",
+      "did": "status § 3 reachability call is now timeout 5 git ls-remote --exit-code -- <url> HEAD; validation block untouched.",
+      "files": [
+        "commands/speckit.knowledge.status.md"
+      ]
+    },
+    "T012": {
+      "status": "DONE",
+      "did": "All 11 config-derived git calls carry -- (audit flags the pre-T011 status); an independent agent ran the rendered status skill on Linux with GNU timeout and it reported the remote reachable; validation blocks byte-identical, 13/13 static checks.",
+      "files": [
+        "/tmp/kn006/t012"
+      ]
+    },
+    "T013": {
+      "status": "DONE",
+      "did": "Against HEAD assert-install.sh, seed A (no command bullets) tripped '[: 0 0: integer expression expected'; seed B (no extension dir, no extensions.yml) printed a find error, PASS installed file count is sane (0), and a FileNotFoundError traceback.",
+      "files": [
+        "/tmp/kn006/t013"
+      ]
+    },
+    "T014": {
+      "status": "DONE",
+      "did": "assert-install.sh: command count is one integer (empty -> 0), 0 files fails 'install copied 0 files — the extension directory is missing or empty' with find errors silenced, and a missing .specify/extensions.yml fails as '... 0 registered (.specify/extensions.yml is missing)'.",
+      "files": [
+        ".github/scripts/assert-install.sh"
+      ]
+    },
+    "T015": {
+      "status": "DONE",
+      "did": "validate.yml pins SPEC_KIT_REF v1.2.0 (single declaration) and adds job smoke-minimum 'Install smoke test (minimum spec-kit)': derives v<floor> from requires.speckit_version (fails naming the field without a >= bound), init with --force < /dev/null, --dev install teed to install.log, assert-install.sh, install-log-minimum artifact.",
+      "files": [
+        ".github/workflows/validate.yml"
+      ]
+    },
+    "T016": {
+      "status": "DONE",
+      "did": "Fixed script: seed A and seed B exit 1 with their readable FAIL lines and no shell or interpreter error (the first recorded seed check exited 1 only because its grep missed ANSI codes; the ANSI-stripped re-run passes and rejects the unfixed script). validate.yml run steps passed locally: smoke on spec-kit 1.2.0, smoke-minimum on the derived 0.15.2.",
+      "files": [
+        "/tmp/kn006/t016"
+      ]
+    },
+    "T017": {
+      "status": "DONE",
+      "did": "CHANGELOG [Unreleased]: Added category/effect; Changed floor, README install, platforms and command names, CI pin and minimum job, constitution 1.3.0 with the template floor; Fixed status -- and the install check. Version stays 1.5.0.",
+      "files": [
+        "CHANGELOG.md"
+      ]
+    },
+    "T018": {
+      "status": "DONE",
+      "did": "Candidate ZIP from working-tree bytes (file set == git archive HEAD, payload hashes match, >=0.15.2, integration, read-write) installed via loopback --from after Untrusted Source; fixed assert-install passed; agent ran its status skill with no sources and on Linux reachable; 6 floor declarations correct; 13/13 static checks; T006/T009/T010/T012/T016 passed; PR CI evidence and the macOS timeout fix recorded as pending.",
+      "files": [
+        "/tmp/kn006/t018"
+      ]
+    }
+  }
+}

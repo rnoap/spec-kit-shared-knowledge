@@ -9,6 +9,11 @@ CHANGELOG.md
 # Code knowledge graph (local dev tool state)
 .code-review-graph/
 
+# Agent skills for developing THIS repo, their lockfile, and local MCP config
+.agents/
+skills-lock.json
+.mcp.json
+
 # Local tool / editor state
 .specify/
 .claude/

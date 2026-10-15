@@ -19,3 +19,5 @@ Thumbs.db
 
 # code-review-graph index (local only)
 .code-review-graph/
+
+.mcp.json

@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `chore(manifest): category and effect` — `extension.yml` declares `category: integration` and `effect: read-write`, so `specify extension info knowledge` and the catalog can tell a user what kind of extension this is and that it writes to their project. It writes its configuration, its cache, its index and the project's `.gitignore`.
+
+### Changed
+
+- `chore(manifest): require spec-kit >=0.15.2` — the declared floor, `>=0.10.0`, was false. On spec-kit 0.10.0 the install ran but never created `knowledge-config.yml`: config templates are scaffolded only since 0.15.2, and skills render command references only since 0.12.17. A spec-kit below the floor now refuses the install and names the version it needs, instead of producing an install that looks like an extension bug.
+- `docs(readme): install with --from` — spec-kit's community catalog is searchable but not installable by default, so `specify extension add knowledge` fails on a default setup. The README leads with the release archive and the `Untrusted Source` prompt spec-kit shows for it, and points teams that want no prompt to a catalog they control. It never suggests marking the community catalog install-allowed: spec-kit calls that flag the vetting boundary, and adding it with `catalog add` drops the built-in `default` catalog.
+- `docs(readme): platforms and command names` — Prerequisites states the floor and the platforms: macOS and Linux, Windows through WSL or Git Bash. A note in Commands says the examples use the dot form, while agents that install skills show `/speckit-knowledge-sync` and Codex shows `$speckit-knowledge-sync`.
+- `chore(ci): pin spec-kit v1.2.0 and test the floor` — the gating smoke test pinned v1.0.4, older than what new users run and newer than the claimed floor, so neither end of the claim was tested. It now pins v1.2.0, and a new job, `Install smoke test (minimum spec-kit)`, installs the version in the `>=` clause of `requires.speckit_version` on every pull request. The required check names are unchanged. The new check gates merges once a maintainer adds it to the branch rules.
+- `docs(constitution): 1.3.0` — Requirements & Compatibility states spec-kit `>=0.15.2`, and the install smoke test runs against the pinned release and the manifest's floor. The project's plan template restates the floor and both smoke runs.
+
+### Fixed
+
+- `fix(status): separate the source URL with --` — the reachability check was the only `git` call that passed a configured value without `--`, although the README trust model promises it for every one. Validation already rejects a leading `-`, so this restores the second defense rather than closing an open hole.
+- `fix(ci): fail broken installs readably` — `assert-install.sh` crashed on an install that registered no commands (`integer expression expected`), passed one that copied no files, and ended in a Python traceback when `.specify/extensions.yml` was absent. Each case now fails with a readable message, so a broken install can no longer pass the smoke test.
+- `fix(package): keep dev-only skills out of the package` — the code-review-graph skills under `.agents/` and their `skills-lock.json` reached the published archive and every install, and the static check for dev-only paths missed them. Both are now excluded from the archive and the installed copy, along with a local `.mcp.json`, and the check covers them.
+- `fix(status): report a project with no sources as unconfigured` — installing scaffolds `knowledge-config.yml` with `sources:` empty, so status never printed its not-configured message: a fresh project got an empty table and a hint to run sync. Absent, null and empty `sources` now read as unconfigured.
+
 ## [1.5.0] - 2026-09-28
 
 A ceiling on how much the agent is told to read, and a written trust model for the

@@ -106,6 +106,9 @@ Read `.specify/extensions/knowledge/knowledge-config.yml`.
   ```
   Exit 0.
 - If YAML invalid: print error and exit 0.
+- If `sources` is absent, null, or `[]`: print the same not-configured message and
+  exit 0. Installing the extension scaffolds the file with `sources:` empty, so
+  this is how a freshly installed project reads.
 
 ### 2. Read manifests
 
@@ -125,7 +128,7 @@ Cache age is computed from `synced_at` to now:
 
 **Remote URL**:
 ```bash
-timeout 5 git ls-remote --exit-code <url> HEAD
+timeout 5 git ls-remote --exit-code -- <url> HEAD
 ```
 - Exit 0 → `✅ reachable`
 - Non-zero / timeout → `❌ timeout`

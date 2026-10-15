@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-  <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.10.0-7d4cdb">
+  <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.15.2-7d4cdb">
   <img alt="Status" src="https://img.shields.io/badge/status-v1.5.0-success">
 </p>
 
@@ -28,21 +28,22 @@ When working in a microservices or multi-repo environment, architectural decisio
 ## 📋 Prerequisites
 
 - `git >= 2.25` (sparse-checkout support required)
-- spec-kit `>= 0.10.0`
+- spec-kit `>=0.15.2`
+- Platforms: macOS and Linux; Windows through WSL or Git Bash
 
 ## 📦 Installation
 
-### 🌐 Published (once available in the catalog)
+### 🌐 Published release
 
-```bash
-specify extension add knowledge
-```
-
-Or from a release archive:
+`specify extension search` finds extensions in spec-kit's community catalog, but that catalog is searchable, not installable, by default. Install the published release from its archive:
 
 ```bash
 specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.5.0.zip
 ```
+
+spec-kit first shows an `Untrusted Source` prompt naming the URL. Confirm it to install.
+
+A team that wants no prompt can list the extension in a catalog it controls and marks install-allowed. `specify extension add knowledge` then installs from that catalog without asking.
 
 ### 💻 Local / Development Install
 
@@ -84,6 +85,8 @@ Then reload your editor / AI agent so it picks up the new commands.
 ```
 
 ## 🧰 Commands
+
+The examples use spec-kit's canonical dot form, such as `/speckit.knowledge.sync`. Your agent may show the commands under another name: agents that install commands as skills show `/speckit-knowledge-sync`, and Codex shows `$speckit-knowledge-sync`. The other four commands follow the same pattern.
 
 | Command | What it does |
 |---------|--------------|
