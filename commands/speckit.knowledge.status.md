@@ -106,6 +106,9 @@ Read `.specify/extensions/knowledge/knowledge-config.yml`.
   ```
   Exit 0.
 - If YAML invalid: print error and exit 0.
+- If `sources` is absent, null, or `[]`: print the same not-configured message and
+  exit 0. Installing the extension scaffolds the file with `sources:` empty, so
+  this is how a freshly installed project reads.
 
 ### 2. Read manifests
 
