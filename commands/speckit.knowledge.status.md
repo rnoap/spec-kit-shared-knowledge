@@ -13,7 +13,7 @@ description: "Show reachability, last-sync timestamp, item count, and cache age 
 
 ## Algorithm Reference
 
-Uses the same **Source Slug Generation**, **Repository Identity**, and **Cache Integrity Check** algorithms defined in `speckit.knowledge.sync.md` § Algorithm Reference.
+Uses the same **Source Slug Generation**, **Repository Identity**, **Bounded Network Call**, and **Cache Integrity Check** algorithms defined in `speckit.knowledge.sync.md` § Algorithm Reference.
 
 > **The slug depends on `revision`.** A source that pins one hashes
 > `<normalized-url>\n<revision>`; a source that pins none hashes the normalized URL
@@ -126,9 +126,9 @@ Cache age is computed from `synced_at` to now:
 
 **Detect source type**: `url` starts with `/`, `~/`, `./` → local path; otherwise remote URL.
 
-**Remote URL**:
+**Remote URL** (`with_timeout` is the Bounded Network Call function — define it first):
 ```bash
-timeout 5 git ls-remote --exit-code -- <url> HEAD
+with_timeout 5 git ls-remote --exit-code -- <url> HEAD
 ```
 - Exit 0 → `✅ reachable`
 - Non-zero / timeout → `❌ timeout`

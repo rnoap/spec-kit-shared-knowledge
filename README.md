@@ -28,6 +28,7 @@ When working in a microservices or multi-repo environment, architectural decisio
 ## 📋 Prerequisites
 
 - `git >= 2.25` (sparse-checkout support required)
+- `timeout`, `gtimeout`, or `perl`, to bound network calls. Stock macOS ships `perl`, which is enough; with none of the three, calls run unbounded and sync warns once.
 - spec-kit `>=0.15.2`
 - Platforms: macOS and Linux; Windows through WSL or Git Bash
 
@@ -426,8 +427,9 @@ Fetched content is read as **data**. It is never executed.
 | `--` before every config-derived `git` operand | The same, if validation is ever bypassed | As above |
 | Validation runs on **read**, not just write | Values arriving by hand-edit, by PR, or from an older version | Values that are valid but unwanted |
 | `--no-checkout` + `--filter=blob:none` | Fetching a working tree wholesale | The subsequent checkout, which does write the filtered files |
-| `timeout 10` / `timeout 30` on network calls | A hung or tarpitting host | A fast host serving hostile content |
+| Every network call is time-bounded: 10 s, 30 s for a full-history fetch, 5 s in `status` | A hung or tarpitting host | A fast host serving hostile content |
 | `path_filter` | Corpus size and blast radius | Anything inside the filtered paths |
+| Symbolic links are never followed: clones write them as plain files, and only regular files git does not record as links are indexed | A source pointing the agent at a file outside the cache, such as `~/.ssh/id_rsa` or the project's `.env` | Hostile content in an ordinary `.md` file |
 | Hooks are `optional: true` | Unattended fetches — you are prompted | A prompt you accept |
 | Manifest SHA-256 integrity check | Local cache corruption | Content that was hostile when fetched |
 
@@ -442,13 +444,6 @@ none:
 2. **Credential exposure.** Your local git credential helper decides what to send
    to a configured host. The extension neither scopes nor filters it. A URL
    pointing at an attacker-controlled host may be offered credentials.
-3. **Symlink following.** A fetched `.md` may be a **symbolic link**. `git checkout`
-   recreates links faithfully, and nothing here resolves, rejects, or flags one — so
-   a source containing `notes.md -> ~/.ssh/id_rsa` produces an index entry the agent
-   is instructed to open and read into its context, and from there potentially into
-   a committed spec. **This is a real data-exfiltration path and it is currently
-   open.** Refusing to index links that escape the cache root is the intended fix;
-   it is not implemented yet.
 
 ### 👀 Reviewing a change to `knowledge-config.yml`
 
