@@ -9,6 +9,8 @@
 .wibey/             export-ignore
 .vscode/            export-ignore
 .code-review-graph/ export-ignore
+.agents/            export-ignore
+skills-lock.json    export-ignore
 specs/              export-ignore
 AGENTS.md           export-ignore
 .gitattributes      export-ignore
