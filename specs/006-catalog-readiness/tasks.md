@@ -133,7 +133,7 @@ Files: `.github/workflows/validate.yml`, `.github/scripts/assert-install.sh`
 
 Written first, so they fail first.
 
-- [ ] **T013** [US5] Run seeds A and B from [contracts/ci.md](./contracts/ci.md) § 4.2 against today's script:
+- [x] **T013** [US5] Run seeds A and B from [contracts/ci.md](./contracts/ci.md) § 4.2 against today's script:
   - Seed A: a good install with every `• speckit.` line removed from `install.log`.
   - Seed B: `install.log` present, with neither `.specify/extensions/knowledge/` nor `.specify/extensions.yml`.
   - Confirm the defects: `integer expression expected`, `PASS installed file count is sane (0)`, and a `Traceback` (FR-016, FR-017).
@@ -144,13 +144,13 @@ Written first, so they fail first.
 
 **Wave 1 — independent (different files):**
 
-- [ ] **T014** [P] [US5] Fix the install check per [contracts/ci.md](./contracts/ci.md) § 4.1 (FR-016, FR-017):
+- [x] **T014** [P] [US5] Fix the install check per [contracts/ci.md](./contracts/ci.md) § 4.1 (FR-016, FR-017):
   - The command count is one integer: drop `|| echo 0`, and default an empty result to `0`.
   - 0 files fails with `install copied 0 files — the extension directory is missing or empty`. 30 or more files still fails, and `find` errors stay silent.
   - A missing `.specify/extensions.yml` fails with `manifest declares <n> hooks, 0 registered (.specify/extensions.yml is missing)` instead of a traceback.
 
   · `.github/scripts/assert-install.sh`
-- [ ] **T015** [P] [US5] Update the workflow per [contracts/ci.md](./contracts/ci.md) §§ 1–3 (FR-013, FR-014, FR-015):
+- [x] **T015** [P] [US5] Update the workflow per [contracts/ci.md](./contracts/ci.md) §§ 1–3 (FR-013, FR-014, FR-015):
   - Set `SPEC_KIT_REF: v1.2.0`, keeping exactly one `SPEC_KIT_REF` declaration in the file.
   - Add job `smoke-minimum`, named `Install smoke test (minimum spec-kit)`.
   - The new job reads the version in the `>=` clause of `requires.speckit_version`, and fails, naming the field, when there is none.
@@ -162,7 +162,7 @@ Written first, so they fail first.
 
 **⟶ Wait for Wave 1 to finish, then:**
 
-- [ ] **T016** [US5] Verify (SC-004, SC-005):
+- [x] **T016** [US5] Verify (SC-004, SC-005):
   - Re-run seeds A and B. Each prints its readable FAIL line, with no shell or interpreter error, and exits 1.
   - Run the `smoke` and `smoke-minimum` steps locally at v1.2.0 and at the derived v0.15.2. Both pass the fixed script.
 

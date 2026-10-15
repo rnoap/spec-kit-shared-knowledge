@@ -170,6 +170,38 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-10-14T20:14:37.255Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T013",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-14T20:17:46.949Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T014",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:19:31.244Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T015",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:20:32.509Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T016",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-15T11:22:29.244Z"
     }
   ],
   "telemetryInstanceId": "3960675e-5c4f-4a75-b2cf-83aca865be5d",
@@ -528,9 +560,60 @@
       "warnings": [
         "Agent judgement plus the agent-reported exit code; the stock-macOS reachability case remains blocked on the separately tracked timeout fix"
       ]
+    },
+    {
+      "what": "T013 seeds A and B reproduce today's assert-install.sh defects",
+      "command": "cd /tmp/kn006/t013 && R=/Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge && git -C $R show HEAD:.github/scripts/assert-install.sh > assert-before.sh && { bash assert-before.sh seedA $R > A.before.out 2>&1; echo \"seedA exit=$?\"; bash assert-before.sh seedB $R > B.before.out 2>&1; echo \"seedB exit=$?\"; } && grep -q 'integer expression expected' A.before.out && grep -q 'installed file count is sane (0)' B.before.out && grep -q 'Traceback' B.before.out && echo 'PASS defects reproduced: integer expression expected (A); PASS at 0 files and a Traceback (B)'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "seedA exit=1 · seedB exit=1 · PASS defects reproduced: integer expression expected (A); PASS at 0 files and a Traceback (B)"
+    },
+    {
+      "what": "T016 seeds A and B fail readably with the fixed assert-install.sh",
+      "command": "cd /tmp/kn006/t013 && R=/Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge && for s in A B; do bash $R/.github/scripts/assert-install.sh seed$s $R > $s.after.out 2>&1; echo \"seed$s exit=$?\" >> exits.after; done; cat exits.after; grep -qx 'seedA exit=1' exits.after && grep -qx 'seedB exit=1' exits.after && grep -q 'FAIL  manifest declares 5 commands, install reported 0$' A.after.out && grep -q 'FAIL  install copied 0 files — the extension directory is missing or empty' B.after.out && grep -q 'FAIL  manifest declares 4 hooks, 0 registered (.specify/extensions.yml is missing)' B.after.out && ! grep -hE 'integer expression expected|Traceback|No such file or directory' A.after.out B.after.out && echo 'PASS both seeds print readable FAIL lines, exit 1, and no shell or interpreter error'",
+      "source": "derived",
+      "exitCode": 1,
+      "durationSeconds": 0.7,
+      "result": "seedA exit=1 · seedB exit=1",
+      "warnings": [
+        "exited 1"
+      ]
+    },
+    {
+      "what": "T016 smoke job steps from validate.yml at SPEC_KIT_REF v1.2.0 pass the fixed script",
+      "command": "python3 /tmp/kn006/t016/run-job.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge smoke /tmp/kn006/t016/smoke > /tmp/kn006/t016/smoke.out 2>&1; rc=$?; grep -E '^specify |^::|PASS|FAIL|Smoke test' /tmp/kn006/t016/smoke.out; exit $rc",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 21.4,
+      "result": "Smoke test passed. · ::step 'Assert the install produced what the manifest promised' exit=0 · ::job smoke (Install smoke test) passed"
+    },
+    {
+      "what": "T016 smoke-minimum job steps from validate.yml at the derived floor pass the fixed script",
+      "command": "python3 /tmp/kn006/t016/run-job.py /Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge smoke-minimum /tmp/kn006/t016/minimum > /tmp/kn006/t016/minimum.out 2>&1; rc=$?; grep -E '^specify |^::|PASS|FAIL|Smoke test' /tmp/kn006/t016/minimum.out; exit $rc",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 7.4,
+      "result": "Smoke test passed. · ::step 'Assert the install produced what the manifest promised' exit=0 · ::job smoke-minimum (Install smoke test (minimum spec-kit)) passed"
+    },
+    {
+      "what": "T016 seeds A and B fail readably with the fixed assert-install.sh (ANSI-stripped exact FAIL text)",
+      "command": "python3 /tmp/kn006/t016/check-seeds.py",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "seed A: exit=1 fails=['manifest declares 5 commands, install reported 0'] missing=[] noise=[] · seed B: exit=1 fails=['config declared but not created: .specify/extensions/knowledge/knowledge-config.yml', 'install copied 0 files — the extension directory is missing or empty', 'manifest declares 4 hooks, 0 registered (.specify/extensions.yml is missing)'] missing=[] noise=[] · PASS both seeds print readable FAIL lines, exit 1, no shell or interpreter error"
+    },
+    {
+      "what": "T016 the same checker rejects the HEAD (unfixed) assert-install.sh",
+      "command": "cd /tmp/kn006/t016 && sed \"s#{REPO}/.github/scripts/assert-install.sh#/tmp/kn006/t013/assert-before.sh#\" check-seeds.py > check-seeds-before.py && ! python3 check-seeds-before.py && echo \"PASS the checker detects the unfixed defects\"",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.8,
+      "result": "seed B: exit=1 fails=['config declared but not created: .specify/extensions/knowledge/knowledge-config.yml'] missing=['install copied 0 files — the extension directory is missing or empty', 'manifest declares 4 hooks, 0 registered (.specify/extensions.yml is missing)'] noise=['No such file or directory', 'Traceback', 'No such file or directory'] · FAILED · PASS the checker detects the unfixed defects"
     }
   ],
-  "currentTask": "T012",
+  "currentTask": "T016",
   "task_summaries": {
     "T001": {
       "status": "DONE",
@@ -611,6 +694,34 @@
       "did": "All 11 config-derived git calls carry -- (audit flags the pre-T011 status); an independent agent ran the rendered status skill on Linux with GNU timeout and it reported the remote reachable; validation blocks byte-identical, 13/13 static checks.",
       "files": [
         "/tmp/kn006/t012"
+      ]
+    },
+    "T013": {
+      "status": "DONE",
+      "did": "Against HEAD assert-install.sh, seed A (no command bullets) tripped '[: 0 0: integer expression expected'; seed B (no extension dir, no extensions.yml) printed a find error, PASS installed file count is sane (0), and a FileNotFoundError traceback.",
+      "files": [
+        "/tmp/kn006/t013"
+      ]
+    },
+    "T014": {
+      "status": "DONE",
+      "did": "assert-install.sh: command count is one integer (empty -> 0), 0 files fails 'install copied 0 files — the extension directory is missing or empty' with find errors silenced, and a missing .specify/extensions.yml fails as '... 0 registered (.specify/extensions.yml is missing)'.",
+      "files": [
+        ".github/scripts/assert-install.sh"
+      ]
+    },
+    "T015": {
+      "status": "DONE",
+      "did": "validate.yml pins SPEC_KIT_REF v1.2.0 (single declaration) and adds job smoke-minimum 'Install smoke test (minimum spec-kit)': derives v<floor> from requires.speckit_version (fails naming the field without a >= bound), init with --force < /dev/null, --dev install teed to install.log, assert-install.sh, install-log-minimum artifact.",
+      "files": [
+        ".github/workflows/validate.yml"
+      ]
+    },
+    "T016": {
+      "status": "DONE",
+      "did": "Fixed script: seed A and seed B exit 1 with their readable FAIL lines and no shell or interpreter error (the first recorded seed check exited 1 only because its grep missed ANSI codes; the ANSI-stripped re-run passes and rejects the unfixed script). validate.yml run steps passed locally: smoke on spec-kit 1.2.0, smoke-minimum on the derived 0.15.2.",
+      "files": [
+        "/tmp/kn006/t016"
       ]
     }
   }
