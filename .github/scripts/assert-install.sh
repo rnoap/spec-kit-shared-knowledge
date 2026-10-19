@@ -48,10 +48,11 @@ else                            bad "config declared but not created: $DEST/$CFG
 fi
 
 # Quality Gate §2 — every declared command is registered. Match "• speckit."
+# or "• speckit-", as skills-mode integrations register dashed names.
 # specifically: the install output also bullets the scaffolded config, and
 # counting every bullet reports one too many (a false red on a correct install).
 # grep -c already prints 0 on no match; only a missing log leaves it empty.
-got=$(grep -cE '• speckit\.' install.log 2>/dev/null)
+got=$(grep -cE '• speckit[.-]' install.log 2>/dev/null)
 got=${got:-0}
 [ "$got" -eq "$NCMD" ] \
   && ok "all $NCMD commands registered" \
