@@ -131,3 +131,30 @@ Finally, in an empty scratch consumer, configure with a valid source must create
 ## 3. Agent guidance
 
 **SC-008**: the spec-kit sections of `AGENTS.md` and `.github/copilot-instructions.md` both name `007-shell-safe-config`, and `AGENTS.md` states the status recorded in `.spec-context.json`.
+
+## 4. Verification record: 2026-10-19
+
+Both macOS and Ubuntu 20.04 passed `validate-extension.sh` (15 checks) and
+`test-sync-git.sh` (206 checks). Linux used git 2.25, GNU `timeout`, dash as `sh`,
+and zsh. A real working-tree development install also passed its smoke assertions.
+
+| Criterion | Verified evidence |
+| --- | --- |
+| SC-001 | 64 real-agent observations: 16 configure, 16 manual sync, 16 hook sync and 16 status. Each of the four hooks supplied four observations; no injection marker appeared. |
+| SC-002 | Agent-applied character/form checks accepted the documented values and all supported address forms. Existing local Git fixtures supplied existence checks; remote example hosts were not fetched. |
+| SC-003 | Refusals named the field and first disallowed character, including escaped line feeds and escape characters. Valid companion sources progressed, and hook parents continued. |
+| SC-004 | All 128 hostile-placeholder cases preserved argument bytes. Hostile fetched-name tests passed, and a real agent searched and read `specs/$(touch pwned).md` through the file tool without a marker. |
+| SC-005 | Six scripted spaced-path checks and native configure/sync/status passed. The agent parsed `'~/My Repos/kb' specs/` as two arguments and reported local reachability. |
+| SC-006 | Two scratch mutations, an unquoted URL and a double-quoted single-quote lookalike, each failed only check 12 and named the status command and line. |
+| SC-007 | Nine reference rows passed in sh, bash and zsh on both platforms. Pinned and unpinned healthy caches updated twice with zero clones and unchanged directories. Two broken-cache sources cloned into distinct documented slugs, then only the old shared cache was pruned. |
+| SC-008 | Both agent pointers name 007; all eight guidance links resolve. The guidance status follows the recorded lifecycle. |
+| SC-009 | All 18 schema-gate observations passed: five commands and a hook for each of legacy, missing and unknown versions. Manual migration changed one scalar byte, preserved parsed sources/settings, reused the cache without cloning and retained orphan sentinels. Empty configure created schema 1.1. |
+
+The scripts' actual exits and results are recorded by `--verify-run` in
+`.spec-context.json`. Raw local agent transcripts, snapshots and command ledgers
+are retained under `/Users/r0n0352/spec-kit-007.qcNrgr/acceptance/` and
+`/Users/r0n0352/spec-kit-007.qcNrgr/final-checks/`.
+
+Markdown commands run inline in the agent and have no independent process exit
+code. Their records distinguish normal return and parent continuation from the
+actual subprocess exits; an enclosing CLI exit alone was not counted as a pass.
