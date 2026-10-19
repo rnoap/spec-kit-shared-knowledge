@@ -1,0 +1,341 @@
+{
+  "workflow": "companion",
+  "specName": "Shell-Safe Configuration",
+  "branch": "007-shell-safe-config",
+  "currentStep": "tasks",
+  "status": "ready-to-implement",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-16T13:53:48.000Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-16T14:01:02.333Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-19T11:36:07.225Z"
+    },
+    {
+      "step": "plan",
+      "substep": "research",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T11:58:51.480Z"
+    },
+    {
+      "step": "plan",
+      "substep": "design",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T12:31:49.840Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T12:32:47.850Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-19T12:51:08.446Z"
+    },
+    {
+      "step": "tasks",
+      "substep": "generate",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T13:06:36.923Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T13:07:16.317Z"
+    }
+  ],
+  "telemetryInstanceId": "b15432d8-ea32-4ff8-8c19-33e942addd4a",
+  "last_action": "living specs evaluated — skipped (not configured)",
+  "coverage": {
+    "FR-001": {
+      "title": "Refuse url and path_filter characters outside letters, digits and . _ ~ : / @ % + - on every read; local paths (/ ./ ../ ~/) also admit spaces, never one followed by -; a path_filter must not begin with ~",
+      "tasks": [
+        "T003",
+        "T005",
+        "T006",
+        "T017",
+        "T018",
+        "T019"
+      ]
+    },
+    "FR-002": {
+      "title": "Every command that reads the configuration checks a value before any other use (local-path check, reachability, slug), so a refused value never reaches a command",
+      "tasks": [
+        "T003",
+        "T005",
+        "T006",
+        "T010",
+        "T011",
+        "T015",
+        "T019"
+      ]
+    },
+    "FR-003": {
+      "title": "Configure refuses to write a failing value, naming the field and the first disallowed character",
+      "tasks": [
+        "T005",
+        "T019"
+      ]
+    },
+    "FR-004": {
+      "title": "Sync and status skip only the refused source, name source, field and character, continue and exit 0",
+      "tasks": [
+        "T006",
+        "T015",
+        "T019"
+      ]
+    },
+    "FR-005": {
+      "title": "Messages quoting a configuration value, a label or a fetched file name show control characters escaped, never raw",
+      "tasks": [
+        "T003",
+        "T005",
+        "T006",
+        "T010",
+        "T011",
+        "T013",
+        "T019"
+      ]
+    },
+    "FR-006": {
+      "title": "Every value handed to the shell (config values, expanded local paths, fetched file names) arrives as one literal argument",
+      "tasks": [
+        "T003",
+        "T007",
+        "T008",
+        "T009",
+        "T011",
+        "T012",
+        "T013",
+        "T016",
+        "T021"
+      ]
+    },
+    "FR-007": {
+      "title": "Automated checks fail when a shell step hands a configuration value to the shell unquoted",
+      "tasks": [
+        "T002",
+        "T020",
+        "T021"
+      ]
+    },
+    "FR-008": {
+      "title": "Source Slug Generation runs as written in sh, bash and zsh",
+      "tasks": [
+        "T007",
+        "T014",
+        "T022"
+      ]
+    },
+    "FR-009": {
+      "title": "The slug procedure yields the slug the documented algorithm yields today for every source",
+      "tasks": [
+        "T007",
+        "T014",
+        "T022"
+      ]
+    },
+    "FR-010": {
+      "title": "README trust model lists the new defense, what it covers and what it does not",
+      "tasks": [
+        "T018"
+      ]
+    },
+    "FR-011": {
+      "title": "README configuration reference and configuration template state the characters url and path_filter accept",
+      "tasks": [
+        "T017",
+        "T018"
+      ]
+    },
+    "FR-012": {
+      "title": "CHANGELOG [Unreleased] records the security fix, the slug fix, the docs, the new check and the constitution amendment",
+      "tasks": [
+        "T020",
+        "T024"
+      ]
+    },
+    "FR-013": {
+      "title": "AGENTS.md spec-kit section names the same latest feature as .github/copilot-instructions.md with its true status",
+      "tasks": [
+        "T023"
+      ]
+    }
+  },
+  "size": "normal",
+  "classification": {
+    "projectedFiles": 10,
+    "projectedTasks": 16,
+    "scopeSignal": "none",
+    "verdict": "normal"
+  },
+  "expectations": [
+    "No version bump, tag, release or catalog submission",
+    "No defense against prompt injection or credential exposure",
+    "No change to the revision rule",
+    "The commands shell steps are not run in CI",
+    "The ../ local-path detection mismatch in sync and status is left as is",
+    "No repository settings changes"
+  ],
+  "context": [
+    "area: commands/speckit.knowledge.{configure,sync,status}.md Configuration Validation Rules, three byte-identical copies (static check 11)",
+    "area: commands/speckit.knowledge.sync.md cold/warm path, sparse-checkout and Indexable Items steps interpolate <url>, <expanded-path>, <revision>, <pattern...>, <dir...> unquoted and <path_filter> in double quotes",
+    "area: commands/speckit.knowledge.status.md L131-L138 ls-remote takes <url> unquoted; the local check takes <expanded-path> in double quotes",
+    "area: commands/speckit.knowledge.sync.md L22-L27 Source Slug Generation puts # comments after line continuations and reads url/revision from shell variables",
+    "area: commands/speckit.knowledge.remove.md L67 reuses the slug procedure without the validation block",
+    "area: README.md Trust model defenses table",
+    "area: .github/scripts/test-sync-git.sh fills placeholders with sed and runs the bash blocks offline; it does not run the slug block",
+    "area: AGENTS.md SPECKIT block is hand-maintained and export-ignored; agent-context manages only .github/copilot-instructions.md",
+    "constraint: constitution I, the validation block stays duplicated verbatim in three commands, never extracted",
+    "constraint: constitution Code Boundaries, .specify/ is tooling-owned except memory/ and templates",
+    "constraint: constitution Quality Gates lists static checks 1-11; a new check needs a docs: amendment",
+    "constraint: slug bytes unchanged (004 FR-024 backward compatibility)",
+    "constraint: config-template.yml schema_version stays 1.0"
+  ],
+  "intent": "Stop knowledge-config values and fetched file names from running shell commands, make the slug procedure run as written, and point AGENTS.md at the current feature",
+  "decisions": [
+    {
+      "decision": "Accept spaces in a local-path url; remote addresses and path_filter keep refusing them; a space followed by - stays refused",
+      "why": "User decision 2026-10-19: folders with spaces are common on macOS and FR-006 quoting makes them safe; the dash guard keeps the leading - rule true for every piece the shell would see if a quote were missed",
+      "rejected": "Refusing spaces everywhere and pointing users to a symbolic link"
+    },
+    {
+      "decision": "Single-quote every configuration placeholder in the bash blocks; a quote inside a value is written as close-quote, backslash-quote, reopen",
+      "why": "Single quotes stop all expansion and splitting in sh, bash and zsh, and the escape keeps that true when validation is bypassed",
+      "rejected": "Double quotes (still run command substitution), a quoted heredoc per value, a temp file per value, environment variables"
+    },
+    {
+      "decision": "State the quoting rule inside the duplicated Configuration Validation Rules block",
+      "why": "configure, sync and status all carry it, static check 11 keeps the copies identical, and it extends the existing leading-dash account",
+      "rejected": "One copy in the sync Algorithm Reference; a shared file, which constitution I forbids"
+    },
+    {
+      "decision": "The agent applies the character rule in its own reasoning; no validation snippet",
+      "why": "A snippet would hand the unchecked value to a shell in order to check it",
+      "rejected": "A case pattern or a tr filter run in the shell"
+    },
+    {
+      "decision": "Accept letters, digits and . _ ~ : / @ % + - in url and path_filter; spaces only in local paths and never before a dash; local paths start with ~/ (not ~user/); a path_filter must not begin with ~; wildcards refused",
+      "why": "Covers every git remote form, and no accepted character can run, redirect, glob, comment out or split; ~user and wildcards only ever worked through unquoted expansion",
+      "rejected": "A deny-list of known metacharacters"
+    },
+    {
+      "decision": "A refused value never reaches a shell: status shows invalid, sync prunes nothing that run, remove deletes the entry and leaves the cache to the next prune, search skips the source",
+      "why": "Computing a slug is the one place quoting would have to hold for a value that really contains a quote or a line break",
+      "rejected": "Computing the slug of a refused value under the quoting rule"
+    },
+    {
+      "decision": "Use a slug only when it is 12 lowercase hex characters, and delete only directories so named, only when every expected slug has that form",
+      "why": "Run as written in zsh the slug procedure yields an empty slug, which turns cache/<slug>/ into the cache root",
+      "rejected": "Trusting the fixed procedure"
+    },
+    {
+      "decision": "Fetched file names travel only through variables and redirection; find starting points get ./; item lines with a .. segment or a leading / are dropped; manifest and index are written with the file tool",
+      "why": "File names come from whoever controls the source and no configuration rule sees them",
+      "rejected": "NUL-separated lists, which are not POSIX and which dash cannot read"
+    },
+    {
+      "decision": "Every message is agent output, never echo or printf, with control characters escaped in any quoted value, label or file name",
+      "why": "echo around a refused value runs its command substitution, and labels and file names can carry terminal escapes",
+      "rejected": "A character rule for labels only"
+    },
+    {
+      "decision": "Fix the slug procedure: comments off the continuation lines, explicit url and revision assignments, printf instead of echo, the real worked example",
+      "why": "As written, zsh fails and sh and bash hash an empty address, so unpinned sources share e3b0c44298fc; output for every accepted value is unchanged",
+      "rejected": "Keeping echo, whose backslash handling differs by shell"
+    },
+    {
+      "decision": "Static check 12 removes single-quoted segments in bash blocks and fails on any placeholder left other than <slug>",
+      "why": "A double-quoted placeholder counts as unquoted, and a placeholder added later is checked without being listed",
+      "rejected": "A list of placeholders to check; running the snippets in CI"
+    },
+    {
+      "decision": "Extend the local behaviour test: literal quoting-aware substitution, 8 hostile seeds, a local path with a space, slug runs in sh, bash and zsh, hostile file names",
+      "why": "sed reads a pipe, an ampersand, a backslash or a line break in a value as syntax, so seeds would pass for the wrong reason",
+      "rejected": "Running the test in CI, which needs its own constitution amendment"
+    },
+    {
+      "decision": "schema_version stays 1.0",
+      "why": "No field, type or form changes; only values with shell syntax, or that never worked as written, are refused",
+      "rejected": "Bumping to 1.1, which fails every existing configuration"
+    },
+    {
+      "decision": "configure keeps a quoted argument whole",
+      "why": "Otherwise a local path with a space can only be added by editing the YAML",
+      "rejected": "Plain whitespace splitting"
+    },
+    {
+      "decision": "AGENTS.md stays hand-maintained: pointed at 007 once the after-plan hook has run, marked completed by the last implement task, no CHANGELOG line",
+      "why": "Precedent a774934; the file is export-ignored and nothing rewrites it at completion",
+      "rejected": "Adding AGENTS.md to the agent-context targets"
+    },
+    {
+      "decision": "All runtime edits and the tests live in Foundational; story phases document and verify",
+      "why": "Every story touches sync, status and configure, which share a byte-identical block, and one file may have only one owner phase",
+      "rejected": "Story phases editing the same command files in turn"
+    },
+    {
+      "decision": "AGENTS.md gets one edit whose status stays true until the release; the release flips it to shipped",
+      "why": "A second edit at completion would give the file two owner phases; precedent a774934 wrote the shipped status at release",
+      "rejected": "A last implement task marking it completed"
+    }
+  ],
+  "concerns": [
+    {
+      "note": "plan-blocks.py failed again: the installed companion lacks presets/_parts (call-paths.md), so the call-path block is prose in plan.md",
+      "step": "plan"
+    },
+    {
+      "note": "Planning found 13 touched files, above the 10-file oversized threshold; all are one package of command prose, so size stays normal and plan.md carries a Scale note",
+      "step": "plan"
+    },
+    {
+      "note": "The spec was amended during planning (research 16): FR-001, FR-002, FR-005, FR-012, User Story 3, SC-007 and four edge cases",
+      "step": "plan"
+    },
+    {
+      "note": "The character rule is applied in agent reasoning, so only the quickstart walkthrough verifies it; the scripts verify quoting, slugs and file names",
+      "step": "plan"
+    },
+    {
+      "note": "Caches named e3b0c44298fc, or by a hand-repaired slug variant, are replaced once after the upgrade; SC-007 holds only for caches named by the documented algorithm",
+      "step": "plan"
+    }
+  ],
+  "step_summaries": {
+    "plan": {
+      "summary": "Two-layer plan: an agent-applied character rule plus single-quoted placeholders; refused values never reach a shell; slug procedure fixed; static check 12 and a local behaviour test",
+      "key_finding": "Run as written, the slug procedure hashes an empty address in sh and bash, so every unpinned source shared cache e3b0c44298fc, and in zsh it yields an empty slug that would make remove purge the whole cache root"
+    },
+    "tasks": {
+      "summary": "25 tasks: a setup gate, a 5-wave Foundational phase (5 command files, check 12, the test script), US1 docs and agent walkthrough, US2 constitution and verification, US3 verification, US4 AGENTS.md, Polish CHANGELOG and validation",
+      "key_finding": "Shared command files force all runtime work into Foundational; the story phases own disjoint files, so they can run in parallel after it"
+    }
+  },
+  "approach": "Refuse url and path_filter values outside an explicit character list, applied by the agent before any shell use, and never hand a refused value to a shell. Single-quote every configuration placeholder in the bash blocks, route fetched file names through variables, and fix the slug procedure. Static check 12 and an extended local behaviour test keep it that way."
+}
