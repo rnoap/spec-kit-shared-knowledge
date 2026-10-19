@@ -83,18 +83,8 @@ bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/sk
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan:
-
-- Latest feature: `005-context-budget-trust`
-- **Plan: [specs/005-context-budget-trust/plan.md](specs/005-context-budget-trust/plan.md)**
-- Spec: [specs/005-context-budget-trust/spec.md](specs/005-context-budget-trust/spec.md)
-- Research: [specs/005-context-budget-trust/research.md](specs/005-context-budget-trust/research.md)
-- Data model: [specs/005-context-budget-trust/data-model.md](specs/005-context-budget-trust/data-model.md)
-- Contracts: [config schema](specs/005-context-budget-trust/contracts/knowledge-config.schema.md) · [command surface](specs/005-context-budget-trust/contracts/commands.md)
-- Tasks: [specs/005-context-budget-trust/tasks.md](specs/005-context-budget-trust/tasks.md)
-- Verification: [specs/005-context-budget-trust/quickstart.md](specs/005-context-budget-trust/quickstart.md)
-
-Status: completed — shipped in v1.5.0. No feature is in progress.
+shell commands, and other important information, read the current plan
+at specs/007-shell-safe-config/plan.md
 <!-- SPECKIT END -->
 
 <!-- CODE-GRAPH-GUIDE START -->
