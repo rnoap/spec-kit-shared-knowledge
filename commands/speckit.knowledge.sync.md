@@ -19,12 +19,21 @@ description: "Refresh local cache for all configured knowledge sources"
 
 Every source is reduced to a stable 12-character slug used as its cache directory name.
 
+Use the URL as configured, including an unexpanded `~` in a local path, and an empty
+revision when none is pinned. Fill both placeholders using the quoting rule in
+[Configuration Validation Rules](#configuration-validation-rules). The block prints
+only the slug followed by one line feed.
+
 ```bash
+url='<url>'
+revision='<revision>'
+
 # 1. Normalize URL
-normalized=$(echo "$url" \
-  | sed 's/\.git$//' \           # strip trailing .git
-  | sed 's|/$||' \               # strip trailing slash
-  | tr '[:upper:]' '[:lower:]')  # lowercase
+#    Strip trailing .git, then trailing slash, then lowercase.
+normalized=$(printf '%s\n' "$url" \
+  | sed 's/\.git$//' \
+  | sed 's|/$||' \
+  | tr '[:upper:]' '[:lower:]')
 
 # 2. Fold in the revision ONLY when one is pinned.
 #
@@ -58,17 +67,20 @@ else
   # macOS fallback
   slug=$(printf '%s' "$hash_input" | shasum -a 256 | cut -c1-12)
 fi
+
+printf '%s\n' "$slug"
 ```
 
 **Example — unpinned** (identical to 1.3.0):
 - Input: `https://GitHub.com/org/payment-service.git`
 - Normalized: `https://github.com/org/payment-service`
-- Slug: first 12 hex chars of SHA-256 → `abc123def456`
-- Cache dir: `.specify/extensions/knowledge/cache/abc123def456/`
+- Slug: first 12 hex chars of SHA-256 → `18dbb51ec4eb`
+- Cache dir: `.specify/extensions/knowledge/cache/18dbb51ec4eb/`
 
 **Example — pinned**: the same URL with `revision: v2.4.1` hashes
-`https://github.com/org/payment-service\nv2.4.1` and lands in a **different**
-directory. That is what keeps two revisions of one repository from contaminating
+`https://github.com/org/payment-service\nv2.4.1` to `5e8b13c49fbe` and lands in a
+**different** directory, `.specify/extensions/knowledge/cache/5e8b13c49fbe/`.
+That is what keeps two revisions of one repository from contaminating
 each other (FR-011), and what makes a revision change serve new content on the
 next sync with no invalidation logic at all (FR-012) — the old slug is simply no
 longer looked up.
