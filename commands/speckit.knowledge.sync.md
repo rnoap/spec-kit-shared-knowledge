@@ -288,19 +288,23 @@ when there is none) that is a **regular file** on disk **and** that git does not
 record as a symbolic link. Step 5 indexes items and nothing else, and the Cache
 Integrity Check counts them the same way.
 
-Run from the cache root. `<dir1> [<dir2> ...]` are the `path_filter` entries
-without their trailing `/`, or `.` when there is no filter:
+Run from the cache root. `'<dir1>' ['<dir2>' ...]` are the `path_filter` entries
+without their trailing `/`, or `'.'` when there is no filter. Prefix every
+`find` starting point with `./`; with no filter its one argument is `'./.'`:
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
-links=$(git -c core.quotePath=false ls-files -s -- <dir1> [<dir2> ...] \
+links=$(git -c core.quotePath=false ls-files -s -- '<dir1>' ['<dir2>' ...] \
   | awk -F '\t' '$1 ~ /^120000 / { print $2 }')
-items=$(find <dir1> [<dir2> ...] -name .git -prune -o -type f -name '*.md' -print 2>/dev/null \
-  | sed 's|^\./||' | grep -vxF -e "$links")
+items=$(find './<dir1>' ['./<dir2>' ...] -name .git -prune -o -type f -name '*.md' -print 2>/dev/null \
+  | sed -e ':again' -e 's|^\./||' -e 't again' | grep -vE '(^|/)\.\.(/|$)|^/' | grep -vxF -e "$links")
 ```
 
 `$items` is what step 5 indexes. Every path in `$links` is skipped and named in
-step 9, never read.
+step 9, never read. Strip every leading `./` and drop any line with a `..` path
+segment or a leading `/`. A directory name containing a line break must never
+forge an item outside the cache (007 FR-006). Read each item only as `"$file"`,
+never paste its name into command text.
 
 **Both tests are needed, because each misses a case the other catches.** Every
 clone sets `core.symlinks=false`, so git writes a link as a small regular file
@@ -317,7 +321,7 @@ Run this check before using an existing cache as fallback:
 
 1. `.manifest.json` exists AND is valid JSON → pass step 1
 2. `item_count` == `len(items)` == the number of items in the directory, collected as in § Indexable Items → pass step 2
-3. Each item's `sha256` matches `sha256sum <file>` (or `shasum -a 256` on macOS) → pass step 3
+3. Each item's `sha256` matches `sha256sum < "$file"` (or `shasum -a 256 < "$file"` on macOS), with its name held only in the double-quoted shell variable → pass step 3
 4. All three pass → cache is intact; use it
 5. Any failure → cache is corrupted; discard directory; attempt fresh sync
 
@@ -327,7 +331,7 @@ manifest points the agent at a file outside the cache.
 
 ### `knowledge-index.md` Format
 
-Written to `.specify/extensions/knowledge/knowledge-index.md`. This is the **only file** that the spec-kit commands behind the four hooks — `specify`, `clarify`, `plan`, and `tasks` — read directly.
+Written with the agent's file-writing tool to `.specify/extensions/knowledge/knowledge-index.md`, never through a shell. This is the **only file** that the spec-kit commands behind the four hooks — `specify`, `clarify`, `plan`, and `tasks` — read directly.
 
 ```markdown
 <!-- knowledge-index-meta: schema_version=1.0 generated_at=<ISO8601> sources=<N> items=<N>
@@ -381,17 +385,44 @@ command writes it (FR-029). Configuration reaches a project by hand-editing, by
 pull request, and from older versions of this extension — validating only on write
 leaves all three routes unchecked.
 
+Apply every rule in the agent's own reasoning, never by sending an unchecked value
+to a shell. After the schema gate, check the character rule first, then the other
+syntax rules, then local existence or any other use. Check `url`, then each
+`path_filter` entry, before the remaining source fields. No value of a source
+that is not accepted reaches a shell, not even for its slug or a message
+(007 FR-001, FR-002).
+
+**Schema gate (007 FR-014):** before using any source, accept only configuration
+schema `"1.1"`. For `"1.0"`, print as agent output:
+
+```text
+Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, review the README migration notes, then change only schema_version. No sources or caches were used or changed.
+```
+
+For a missing or unknown version, print the following, substituting `<missing>`
+when absent and escaping the value under the message rule below:
+
+```text
+Error: Unrecognized knowledge-config.yml schema_version "<value>". Expected "1.1". No sources or caches were used or changed.
+```
+
+Both paths exit 0 before computing slugs, reading source manifests, checking
+reachability, pruning, or writing configuration or caches. A hook finishes and
+its parent command continues. Never migrate or downgrade automatically. configure
+uses `"1.1"` when creating a missing file and preserves it on edits. This gate
+does not change the separate manifest or index schema versions.
+
 `sources:` written with no value parses as **null**, not as an empty list. Treat
 absent, null, and `[]` identically: the project has no configured sources.
 
 | Field | Rule |
 |-------|------|
-| `schema_version` | Required. Exactly `"1.0"`. |
+| `schema_version` | Required. Exactly `"1.1"`. Check before using any source; missing, `"1.0"` and unknown versions stop with the schema diagnostic, exit 0 and no configuration or cache changes (007 FR-014). |
 | `max_cache_age` (top level and per source) | Optional. Matches `^[0-9]+[mhd]$` — `30m`, `4h`, `7d`. |
-| `url` | Required, non-empty. Either a local path (`/`, `./`, `../`, `~`) that exists and contains `.git`, or a remote URL matching `^(https?://\|ssh://\|git\+ssh://\|git@)`. **Must not begin with `-`.** |
+| `url` | Required, non-empty. Either a local path (`/`, `./`, `../`, `~/`) that exists and contains `.git`, or a remote URL matching `^(https?://\|ssh://\|git\+ssh://\|git@)`. **Must not begin with `-`.** **Only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`**; a local path may also contain spaces, but **no space followed by `-`** (007 FR-001). |
 | `label` | Optional in the file, derived when absent. Non-empty, no whitespace, **unique across `sources`** (FR-028). |
 | `revision` | Optional. Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. |
-| `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/`**, **no `..`**, and **must not begin with `-`**. |
+| `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/` or `~`**, **no `..`**, **must not begin with `-`**, and **only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`** (007 FR-001). |
 | `enabled` | Optional, default `true`. Exactly `true` or `false` — `"yes"` and `1` are rejected. |
 | `max_items` (top level and per source) | Optional. Matches `^[0-9]+$` and is `>= 1`. |
 | `max_bytes` (top level and per source) | Optional. Matches `^[0-9]+(kb\|mb)$` — `512kb`, `2mb`. |
@@ -409,20 +440,31 @@ Neither `max_items` nor `max_bytes` is ever handed to `git`, so the leading-`-`
 ban below does not apply to them. Their anchored patterns reject an option-shaped
 value regardless.
 
-### Why no value may begin with `-`
+### Two layers against option injection and shell syntax
 
-Every `url`, `revision`, and `path_filter` is interpolated into a `git` command
-line. A value beginning with `-` is parsed by `git` as an **option**, not as data.
-A `revision` of `--upload-pack=<command>` handed to `git fetch` is remote code
-execution on the developer's machine, triggered by nothing more than a pull
-request that edits a YAML file.
+1. **Refuse** with both the leading-`-` rule and the character rule. A local path
+  is recognized by its prefix alone: `/`, `./`, `../` or `~/`. Only that form
+  admits spaces, never a space followed by `-`. A `path_filter` cannot start
+  with `~`. Report the first disallowed character from left to right.
+2. **Neutralize** with `--` before every configuration-derived git operand
+  (FR-034) and single quotes around every configuration placeholder in a shell
+  command (007 FR-006), including commands the agent composes itself. Copy the
+  value literally, replacing each `'` with `'\''`. For `<expanded-path>`,
+  expand `~/` to the actual home directory before quoting. `$HOME` and `~` do
+  not expand inside single quotes. `with_timeout` forwards only through `"$@"`.
 
-FR-034 therefore requires **two** defenses, and neither is sufficient alone:
+Fetched file names enter commands only through the double-quoted shell variable
+`"$file"`, never pasted into command text. Read through redirection:
+`wc -c < "$file"`, `sha256sum < "$file"`, or `shasum -a 256 < "$file"` on macOS.
+Labels and messages never reach a shell.
 
-1. **Reject** — any value beginning with `-` fails its rule above.
-2. **Neutralize** — every `git` invocation that consumes a configuration value
-   places `--` before it, so a value that bypassed defense 1 still cannot be read
-   as an option.
+### Values in messages (007 FR-005)
+
+Every message quoting a configuration value, source label or fetched file name
+is agent output, never `echo` or `printf`. Escape line feed as `\n`, tab as `\t`,
+carriage return as `\r`, escape U+001B as `\e`, and other characters below U+0020
+or from U+007F to U+009F as `\xHH`. Show backslash as `\\` and a double quote
+inside a quoted value as `\"`. Leave other characters unchanged.
 
 ### On failure
 
@@ -430,11 +472,17 @@ A value that violates its rule skips **only its own source** (FR-030):
 
 ```
 ⚠️  payments-v2: skipped — invalid `revision` value "-u" (must not begin with "-")
+⚠️  source 3: skipped — invalid `url` value "https://example.com/$(touch /tmp/pwned)" ("$" is not allowed)
 ```
 
 Every other source is processed normally and the command exits **0** (FR-023).
 Always name the field and the offending value, so the user can fix it without
-guessing.
+guessing. Emit only the first failure per source, on one escaped line. Use its
+label; without one, derive a label only from an accepted URL, otherwise use
+`source <n>`, its 1-based position. A character-rule failure names `"<c>" is not
+allowed`; a local space followed by `-` names `a space followed by "-" is not
+allowed`; a leading `~` filter names `must not begin with "~"`. A URL matching no
+accepted form names `not a Git URL, nor a local path starting /, ./, ../ or ~/`.
 
 ---
 
@@ -449,7 +497,7 @@ safe to iterate over:
 
 - If file absent: print `❌ Error: knowledge-config.yml not found. Run __SPECKIT_COMMAND_KNOWLEDGE_CONFIGURE__ to initialize.` and exit 0.
 - If YAML invalid: print `❌ Error: knowledge-config.yml contains invalid YAML: <parse error>` and exit 0.
-- If `schema_version` missing or unknown: print `❌ Error: Unrecognized schema_version. Expected "1.0".` and exit 0.
+- If `schema_version` is not exactly `"1.1"`: apply the schema gate in § Configuration Validation Rules and exit 0 before any source use or configuration/cache change.
 - If the `sources` key is entirely absent: print `❌ Error: knowledge-config.yml is missing the required "sources" key.` and exit 0.
 
 **`sources` present but empty** — written as `sources:` with no value (which parses
@@ -466,6 +514,12 @@ each entry **before using any of its values** (FR-029). Then:
 - Label uniqueness is checked across the whole list. On a collision, skip **all**
   sources sharing that label — there is no safe way to tell which one a later
   command means (FR-028).
+
+Validate enabled and disabled sources alike. Print each escaped refusal line
+before `🔄 Syncing cross-repo knowledge sources...`, with no shell involved
+(007 FR-004). Do not compute a failing source's slug, read its manifest or check
+its reachability. Keep track of any source that is not accepted: step 8a must
+then prune nothing.
 
 ```
 ⚠️  payments-v2: skipped — invalid `revision` value "-u" (must not begin with "-")
@@ -544,7 +598,17 @@ Skip sources where `enabled: false`. A disabled source is not fetched, contribut
 no items to the index, and appears in no status line (FR-008) — but its cache
 directory is left intact so that re-enabling it costs no download (FR-004).
 
-For each enabled source, compute the slug using the Source Slug Generation algorithm above.
+For each accepted, enabled source, compute the slug using the Source Slug
+Generation algorithm above. Before **any** use of the result, confirm it is
+exactly 12 lowercase hexadecimal characters, `^[0-9a-f]{12}$` (007 FR-002).
+Otherwise skip that source, keep its cache untouched, prune nothing this run,
+and print as escaped agent output:
+
+```text
+⚠️  <source>: skipped — the slug procedure returned "<value>", not 12 lowercase hex characters
+```
+
+An empty or malformed slug must never become a cache path or a working directory.
 
 **Apply the Cache Freshness Gate first — before choosing a sync path and before
 any network access** (FR-018).
@@ -583,8 +647,8 @@ with_timeout 10 git clone \
   --filter=blob:none \
   --no-checkout \
   --depth=1 \
-  [--branch <revision>] \
-  -- <url> \
+  [--branch '<revision>'] \
+  -- '<url>' \
   .specify/extensions/knowledge/cache/<slug>
 ```
 
@@ -594,16 +658,16 @@ and fetch that one object. Escalate here only when Tier 1 failed **and**
 
 ```bash
 with_timeout 10 git clone -c core.symlinks=false --filter=blob:none --no-checkout --depth=1 \
-  -- <url> .specify/extensions/knowledge/cache/<slug>
+  -- '<url>' .specify/extensions/knowledge/cache/<slug>
 
 cd .specify/extensions/knowledge/cache/<slug>
-with_timeout 10 git fetch --depth=1 origin -- <revision>
+with_timeout 10 git fetch --depth=1 origin -- '<revision>'
 git update-ref --no-deref HEAD FETCH_HEAD
 ```
 
 **Move HEAD to the pin; do not check it out here.** `update-ref` points HEAD at the
 fetched commit without touching the working tree, so the sparse-checkout step below
-materializes the pin. `git checkout -- <revision>` would read the SHA as a *path*:
+materializes the pin. `git checkout -- '<revision>'` would read the SHA as a *path*:
 it fails, HEAD stays on the default branch the clone selected, and the next checkout
 serves that branch under the pin's name.
 
@@ -617,7 +681,7 @@ a full history fetch.
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
 with_timeout 30 git fetch --unshallow origin
-git update-ref --no-deref -- HEAD <revision>
+git update-ref --no-deref -- HEAD '<revision>'
 ```
 
 Name the revision itself here: after `--unshallow`, `FETCH_HEAD` is the default
@@ -644,18 +708,24 @@ failure, as an unresolvable revision rather than degrading silently:
 ```
 
 **Local path** (no network flags needed — clone is instant):
+
+For `<expanded-path>`, replace a leading `~/` with the actual home directory
+written out, for example `/Users/alice/My Repos/kb`; leave any other local path
+unchanged. Expand before quoting: `$HOME` and `~` do not expand inside single
+quotes (007 FR-006).
+
 ```bash
 mkdir -p .specify/extensions/knowledge/cache/<slug>
 
 git clone \
   -c core.symlinks=false \
   --no-checkout \
-  [--branch <revision>] \
-  -- <expanded-path> \
+  [--branch '<revision>'] \
+  -- '<expanded-path>' \
   .specify/extensions/knowledge/cache/<slug>
 ```
 
-After clone (both remote and local), apply sparse-checkout if `path_filter` is set. The `path_filter` field may be either a single string (`specs/`) or a YAML list (`[specs/, docs/decisions/]`); normalize to a space-separated argument list for `git sparse-checkout set`:
+After clone (both remote and local), apply sparse-checkout if `path_filter` is set. The `path_filter` field may be either a single string (`specs/`) or a YAML list (`[specs/, docs/decisions/]`); normalize to separately single-quoted arguments for `git sparse-checkout set`:
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
@@ -666,9 +736,9 @@ git sparse-checkout init --no-cone
 # Normalize each pattern: ensure trailing slash so git treats it as a directory match.
 # `--` before the patterns keeps a pattern beginning with "-" from being read as an
 # option (FR-034).
-# For a single string  → one arg:    git sparse-checkout set -- "specs/"
-# For a YAML list      → multi-arg:  git sparse-checkout set -- "specs/" "docs/decisions/"
-git sparse-checkout set -- <pattern1> [<pattern2> ...]
+# For a single string  → one arg:    git sparse-checkout set -- 'specs/'
+# For a YAML list      → multi-arg:  git sparse-checkout set -- 'specs/' 'docs/decisions/'
+git sparse-checkout set -- '<pattern1>' ['<pattern2>' ...]
 git checkout
 ```
 
@@ -686,11 +756,11 @@ Before pulling new content, **re-apply the sparse-checkout configuration in `--n
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
-if [ -n "<path_filter>" ]; then
+if [ -n '<path_filter>' ]; then
   git sparse-checkout init --no-cone
   # one or more patterns — same normalization as the cold path, same `--` (FR-034);
   # `set` also removes files an older --cone checkout left outside the filter
-  git sparse-checkout set -- <pattern1> [<pattern2> ...]
+  git sparse-checkout set -- '<pattern1>' ['<pattern2>' ...]
 fi
 ```
 
@@ -704,11 +774,11 @@ remote's default when none is (FR-010, FR-012). `--` retained per FR-034.
 cd .specify/extensions/knowledge/cache/<slug>
 git config core.symlinks false
 
-if [ -z "<revision>" ]; then
+if [ -z '<revision>' ]; then
   with_timeout 10 git fetch --depth=1 origin
   git checkout --quiet --force --detach origin/HEAD
 else
-  with_timeout 10 git fetch --depth=1 origin -- <revision>
+  with_timeout 10 git fetch --depth=1 origin -- '<revision>'
   git checkout --quiet --force --detach FETCH_HEAD
 fi
 ```
@@ -718,11 +788,11 @@ fi
 cd .specify/extensions/knowledge/cache/<slug>
 git config core.symlinks false
 
-if [ -z "<revision>" ]; then
+if [ -z '<revision>' ]; then
   git fetch origin
   git checkout --quiet --force --detach origin/HEAD
 else
-  git fetch origin -- <revision>
+  git fetch origin -- '<revision>'
   git checkout --quiet --force --detach FETCH_HEAD
 fi
 ```
@@ -762,13 +832,16 @@ less available knowledge than it had before.
 
 After a successful sync (cold or warm), collect the source's items as § Indexable Items describes: the `.md` files under the path_filter (or all `.md` files if no filter) that are regular files git does not record as symbolic links. For each item:
 - Record relative path from cache root
-- Compute SHA-256: `sha256sum <file>` or `shasum -a 256 <file>` (macOS)
+- Hold the name in `file`, never paste it into command text; measure with `wc -c < "$file"` and compute SHA-256 with `sha256sum < "$file"` or `shasum -a 256 < "$file"` (macOS)
 
 Keep the skipped links (`$links`): step 9 names each one.
 
 ### 6. Write `.manifest.json` (last step)
 
-Write `.specify/extensions/knowledge/cache/<slug>/.manifest.json` **as the final step** after all `.md` files are written:
+Write `.specify/extensions/knowledge/cache/<slug>/.manifest.json` with the agent's
+file-writing tool, never a shell, **as the final step** after all `.md` files are
+written. Escape every string as JSON requires, including file names and source
+values; keep the existing format and schema version (007 FR-005, FR-006):
 
 ```json
 {
@@ -880,7 +953,8 @@ everything else.
 
 Assemble `knowledge-index.md` using the format defined in the Algorithm Reference above.
 
-Write to `.specify/extensions/knowledge/knowledge-index.md`.
+Write to `.specify/extensions/knowledge/knowledge-index.md` with the agent's
+file-writing tool, never by pasting fetched names into a shell command.
 
 Include a conflict section footer if any conflicts were detected.
 
@@ -898,12 +972,20 @@ identities instead.
 
 ### 8a. Prune orphaned caches
 
-After the per-source loop, delete every cache directory that belongs to no
-configured source (FR-032):
+After the per-source loop, delete an orphaned cache directory only when all
+three conditions hold (FR-032, 007 FR-002, FR-004):
+
+1. Every configured source, enabled or disabled, was accepted this run.
+2. Every expected slug is exactly 12 lowercase hexadecimal characters.
+3. The directory's own name is exactly 12 lowercase hexadecimal characters.
+
+If condition 1 or 2 fails, prune nothing and emit no additional message. Never
+hash a source that failed validation to try to identify its cache. Names that
+fail condition 3 are always left untouched.
 
 ```text
 expected = { slug(s) : s ∈ sources }        # ALL sources — enabled AND disabled
-actual   = { directory names under cache/ }
+actual   = { directory names under cache/ matching ^[0-9a-f]{12}$ }
 prune      actual − expected
 ```
 
@@ -925,7 +1007,9 @@ Report each removal on its own line:
 
 ### 9. Print summary
 
-For each source, print one status line:
+For each source, print one status line. All source labels and names in symbolic-link
+and conflict lines use § Values in messages, with control characters escaped
+(007 FR-005):
 
 ```
   payment-service    ✅ fresh    12 items  (synced 2026-06-11T14:00:00Z)

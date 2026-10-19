@@ -1,5 +1,5 @@
 # knowledge-config.yml
-# Schema version: 1.0
+# Schema version: 1.1
 #
 # This file declares which Git repositories are knowledge sources for this project.
 # Commit this file to share knowledge source configuration with your team.
@@ -16,9 +16,14 @@
 #   2. A LOCAL path to a Git repository on your machine — useful when you have
 #      the repo cloned and updated locally and want to avoid network roundtrips,
 #      or when the repo is on a private network and not yet pushed.
+# url accepts only ASCII letters, digits and . _ ~ : / @ % + -.
+# A local path starts with /, ./, ../ or ~/ and may also contain spaces,
+# but no space followed by -. Remote addresses write a space as %20.
 #
 # Path filters are optional. With zero filters, every .md file in the repository
 # is indexed. With one or more filters, indexing is scoped to ONLY those folders.
+# Each path_filter is a folder name using only ASCII letters, digits and
+# . _ ~ : / @ % + -, with no leading /, ~ or -, no .. and no spaces or wildcards.
 #
 # ─────────────────────────────────────────────────────────────────────────────
 # SECURITY — READ BEFORE ADDING A SOURCE
@@ -40,7 +45,7 @@
 #
 # See: README.md in the spec-kit-shared-knowledge repository for full documentation.
 
-schema_version: "1.0"   # required; must be exactly "1.0"
+schema_version: "1.1"   # required; must be exactly "1.1"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Optional — project-wide cache freshness policy
