@@ -12,13 +12,13 @@
 
 ## Technical Context
 
-**Language/Version**: Markdown (CommonMark) for command prompts and docs; YAML 1.2 for `extension.yml` and `config-template.yml`. Bash appears only as illustrative pseudocode inside prompts and in the CI scripts under `.github/scripts/` (not shipped to consumers). No compiled code, no shipped scripts.
+**Language/Version**: Markdown (CommonMark) for command prompts and docs; YAML 1.2 for `extension.yml` and `config-template.yml`. Bash appears only as blocks inside prompts, which the agent runs with their placeholders filled in, and in the dev-only scripts under `.github/scripts/` (not shipped to consumers). No compiled code, no shipped scripts.
 
-**Primary Dependencies**: spec-kit `>=0.15.2` and git `>= 2.25` (constitution § Requirements & Compatibility) — no compiled runtime, no package manager lock file. Prompts assume `find`, `wc`, and `sha256sum` or `shasum` are present. `sync` and `status` also call GNU `timeout`, which stock macOS lacks — a known gap tracked separately, so do not add another GNU-only dependency.
+**Primary Dependencies**: spec-kit `>=0.15.2` and git `>= 2.25` (constitution § Requirements & Compatibility) — no compiled runtime, no package manager lock file. Prompts assume `find`, `wc`, and `sha256sum` or `shasum` are present. `sync` and `status` route their time-bounded `git` network calls through `with_timeout` (`sync` § Bounded Network Call), which uses `timeout`, then `gtimeout`, then `perl` — stock macOS ships `perl` — and runs the call unbounded with one warning when none exists. No command calls `timeout` directly; do not add a GNU-only dependency.
 
 **Storage**: Files only. The deliverable is `commands/*.md`, `extension.yml` and `config-template.yml`. Consumer state is written by the commands at run time under the consumer's `.specify/extensions/knowledge/`: `knowledge-config.yml` (committed), plus local-only `cache/<slug>/` (with a per-source `.manifest.json`) and `knowledge-index.md`. No install script writes anything.
 
-**Testing**: CI enforces the packaging contract on every pull request — `.github/workflows/validate.yml` runs static validation (`bash .github/scripts/validate-extension.sh`, also runnable locally) and an install smoke test into a clean consumer project, run twice: against the spec-kit release pinned in `SPEC_KIT_REF` and against the minimum in the manifest's `requires.speckit_version`, both asserted by `.github/scripts/assert-install.sh`; `upstream-compat.yml` repeats the smoke test weekly against spec-kit `main` as an advisory check that never blocks a merge. Command *behavior* has no automated test (agent prompts are interpreted by a model at runtime): the `quickstart.md` walkthrough of each feature, run in a real consumer project, is the only behavioral check (constitution § III, § Quality Gates).
+**Testing**: CI enforces the packaging contract on every pull request — `.github/workflows/validate.yml` runs static validation (`bash .github/scripts/validate-extension.sh`, also runnable locally) and an install smoke test into a clean consumer project, run twice: against the spec-kit release pinned in `SPEC_KIT_REF` and against the minimum in the manifest's `requires.speckit_version`, both asserted by `.github/scripts/assert-install.sh`; `upstream-compat.yml` repeats the smoke test weekly against spec-kit `main` as an advisory check that never blocks a merge. Command *behavior* has no automated test in CI (agent prompts are interpreted by a model at runtime): the `quickstart.md` walkthrough of each feature, run in a real consumer project, is the only behavioral check the constitution recognizes (§ III, § Quality Gates). Locally, `bash .github/scripts/test-sync-git.sh` also runs the bash blocks of `sync` and `status` against offline `file://` fixtures, so a regression in those blocks fails it; it is not wired into CI, which needs a constitution amendment first.
 
 **Target Platform**: Any POSIX environment with spec-kit and git installed (macOS, Linux). GNU and BSD userland must behave identically — an active design constraint, not an assumption.
 
@@ -85,14 +85,14 @@ CHANGELOG.md                             # Keep a Changelog; changes wait under 
 
 .github/                                 # dev-only — never shipped
 ├── workflows/                           # validate.yml (required checks), upstream-compat.yml (advisory)
-└── scripts/                             # validate-extension.sh, assert-install.sh
+└── scripts/                             # validate-extension.sh, assert-install.sh (CI); test-sync-git.sh (local)
 
 .specify/                                # this repo's own spec-kit workspace — dev-only
 ├── memory/constitution.md               # project-owned, amended by hand (§ Governance)
 └── templates/                           # spec/plan/tasks customized in place — never upgrade with --force
 
 specs/NNN-<feature-name>/                # this feature's SDD docs
-├── spec.md
+├── spec.md                              # or <name>.spec.md when Companion writes it
 ├── plan.md
 └── tasks.md
 specs/tiny/NNN-<slug>.md                 # single-file specs for small changes

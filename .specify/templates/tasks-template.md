@@ -9,7 +9,7 @@ description: "Task list template for feature implementation"
 
 **Prerequisites**: plan.md (required), spec.md (required for user stories), research.md, data-model.md, contracts/
 
-**Tests**: No automated test tasks for command behavior — a model interprets agent prompts at runtime, and constitution § III waives a test framework for them. Behavior is verified by the feature's `quickstart.md` walkthrough in a clean consumer project (final phase); the packaging contract by `validate-extension.sh` and the install smoke test. Exception: a change to `.github/scripts/` proves each new check by reintroducing the defect it guards and watching it fail.
+**Tests**: No automated test tasks for command behavior — a model interprets agent prompts at runtime, and constitution § III waives a test framework for them. Behavior is verified by the feature's `quickstart.md` walkthrough in a clean consumer project (final phase); the packaging contract by `validate-extension.sh` and the install smoke test. Exception: a change to `.github/scripts/` proves each new check by reintroducing the defect it guards and watching it fail. The git steps of `sync` and `status` also have a local regression script, `bash .github/scripts/test-sync-git.sh`, which runs those commands' bash blocks against offline `file://` fixtures; it is not wired into CI.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
