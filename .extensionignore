@@ -20,6 +20,9 @@ skills-lock.json
 .wibey/
 .vscode/
 .idea/
+.venv/
+.venv-*/
+venv/
 
 # Agent command/prompt surfaces generated for THIS repo's own spec-kit workspace.
 # These belong to other extensions (git, brownfield, companion) — copying them
