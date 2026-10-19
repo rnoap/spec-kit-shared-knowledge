@@ -2,8 +2,8 @@
   "workflow": "companion",
   "specName": "Shell-Safe Configuration",
   "branch": "007-shell-safe-config",
-  "currentStep": "tasks",
-  "status": "ready-to-implement",
+  "currentStep": "implement",
+  "status": "implementing",
   "history": [
     {
       "step": "specify",
@@ -67,6 +67,13 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-10-19T13:07:16.317Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-19T15:56:58.516Z"
     }
   ],
   "telemetryInstanceId": "b15432d8-ea32-4ff8-8c19-33e942addd4a",
@@ -357,5 +364,15 @@
       "key_finding": "Shared command files force all runtime work into Foundational; the story phases own disjoint files, so they can run in parallel after it"
     }
   },
-  "approach": "Refuse url and path_filter values outside an explicit character list, applied by the agent before any shell use, and never hand a refused value to a shell. Single-quote every configuration placeholder in the bash blocks, route fetched file names through variables, and fix the slug procedure. Static check 12 and an extended local behaviour test keep it that way."
+  "approach": "Refuse url and path_filter values outside an explicit character list, applied by the agent before any shell use, and never hand a refused value to a shell. Single-quote every configuration placeholder in the bash blocks, route fetched file names through variables, and fix the slug procedure. Static check 12 and an extended local behaviour test keep it that way.",
+  "verified": [
+    {
+      "what": "Baseline sync behavior",
+      "command": "bash .github/scripts/test-sync-git.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 10.5,
+      "result": "  \u001b[32mPASS\u001b[0m  no timeout tool at all: the call still runs ·   \u001b[32mPASS\u001b[0m  no timeout tool at all: one warning says so · \u001b[32m38 checks passed.\u001b[0m"
+    }
+  ]
 }
