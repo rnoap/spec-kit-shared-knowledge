@@ -38,6 +38,19 @@ not run is a missed step.
    the user confirms.
 4. Confirm in one line which mandatory hooks you executed.
 
+**Exception: Companion pipeline commands.** `speckit.companion.specify`,
+`speckit.companion.plan`, `speckit.companion.tasks` and
+`speckit.companion.implement` (the dash form `speckit-companion-*` where the
+project registers skills, and every step `speckit.companion.auto` runs) do the
+`.specify/extensions.yml` pass themselves and skip Companion's own capture
+hooks. Execute each `EXECUTE_COMMAND:` block such a command prints, once, offer
+its optional blocks, and add no pass of your own. Never dispatch the capture
+hooks around the outer Companion command. A stock gate invoked inside an
+approved node hook still owns its own configured hook pass, including converge's
+before/after capture hooks, once per gate invocation. These are not an extra
+outer-pipeline pass. A second outer pass creates a second branch and rewrites
+the recorded state.
+
 **Worked example — `speckit.git.commit`** (the `git` extension is always installed):
 
 > markdown: `.specify/extensions/git/commands/speckit.git.commit.md`
