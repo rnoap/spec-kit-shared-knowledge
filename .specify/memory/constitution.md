@@ -106,6 +106,11 @@ locally before you push:
 11. The Configuration Validation Rules block is byte-identical across the three
     commands that duplicate it. §I forbids extracting it to a shared file, so
     duplication is only safe while the copies cannot drift.
+12. Every configuration placeholder in a ```` ```bash ```` block under `commands/`
+   sits inside single quotes opened in an unquoted context, so a configured
+   value reaches the shell as one literal argument. Double-quoted, escaped and
+   ambiguous quote contexts fail the check; inert scanner fixtures enforce this
+   distinction. `<slug>`, which the extension computes, is the only exemption.
 
 **Install smoke test** — a real `specify extension add` into a clean consumer
 project, asserting against the manifest rather than hardcoded numbers. It runs
@@ -133,7 +138,7 @@ package, not the prose.
   pull request. Everything else — principles, naming, boundaries, and whether a
   command actually behaves as its prose claims — is verified by human review.
 
-**Version**: 1.3.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-14
+**Version**: 1.4.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-19
 
 > **1.1.0 rationale.** §III previously stated "No CI/CD pipeline exists yet;
 > quality gates are manual." That principle was the root cause of the v1.2.0
@@ -157,3 +162,8 @@ package, not the prose.
 > verified to install correctly. A floor nothing tests drifts back into fiction,
 > so the install smoke test now also runs against the minimum the manifest
 > declares, on every pull request.
+>
+> **1.4.0 rationale.** Configuration values must reach the shell as literal
+> arguments even when validation is bypassed. Static check 12 tracks effective
+> quote context, and inert fixtures reject double-quoted and escaped lookalikes.
+> This extends the packaging gates without executing command prose in CI.
