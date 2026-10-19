@@ -2,7 +2,9 @@
 
 **Feature**: [shell-safe-config.spec.md](shell-safe-config.spec.md) · **Plan**: [plan.md](plan.md) · **Research**: [research.md](research.md)
 
-No data file changes shape. `knowledge-config.yml`, `.manifest.json` and `knowledge-index.md` keep their fields, and `schema_version` stays `"1.0"`, since no field, type or form changes (research § 12). What changes is which characters a source's values may hold, the route every value takes to a shell, what each command does with a source it refuses, and the slug that names each cache. Outside the runtime, the documentation, the CHANGELOG, the constitution and the agent guidance pointer move with them (§ 8).
+No data file changes shape. `knowledge-config.yml` keeps its fields but moves to configuration schema `"1.1"` because narrowing accepted values is a breaking schema change (research § 12, FR-014). `.manifest.json` and `knowledge-index.md` keep both their fields and their existing schema versions. What changes is which characters a source's values may hold, the route every value takes to a shell, what each command does with a source it refuses, and the slug that names each cache. Outside the runtime, the documentation, the CHANGELOG, the constitution and the agent guidance pointer move with them (§ 8).
+
+The flow below applies only after the file-level schema gate accepts `"1.1"`. A legacy `"1.0"`, missing or unknown configuration version stops the whole command before source use or configuration/cache changes and exits 0. A manual migration backs up the file and changes only its version scalar; the sources, slug inputs and caches are not rewritten ([configuration contract § 5](contracts/knowledge-config.schema.md#5-compatibility)).
 
 ```text
 knowledge-config.yml (committed, shared; read by every command, and by sync before specify, clarify, plan, tasks)
@@ -87,7 +89,7 @@ The prefixes that make a `url` a local path:
 
 ## 2. The check
 
-The agent applies § 1 in its own reasoning, to every source, every time a command reads the file (research § 3). There is no validation snippet: running one would hand the unchecked value to a shell.
+The agent first checks the configuration version, in its own reasoning (FR-014). An unsupported version follows the whole-file error contract, not the per-source refusal flow below. After accepting `"1.1"`, the agent applies § 1 in its own reasoning, to every source, every time a command reads the file (research § 3). There is no validation snippet: running one would hand the unchecked value to a shell.
 
 Order of use, per value (FR-002):
 

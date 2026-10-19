@@ -10,6 +10,8 @@
 
 `knowledge-config.yml` is committed and shared, so a merged change to it is read on every teammate's machine and in every automatic sync. The commands paste `url` and `path_filter` values into shell commands, unquoted or inside double quotes, and validation refuses only a leading `-`. A merged line such as `url: https://example.com/x.git;touch /tmp/pwned` therefore runs a command everywhere the configuration is read. This feature refuses values that carry shell syntax and makes every command hand values to the shell as literal data. It also repairs the slug procedure and points `AGENTS.md` at the current feature.
 
+Narrowing accepted values is a breaking configuration-schema change, including for previously accepted bracketed IPv6 addresses. The configuration schema therefore becomes `1.1`, as constitution Principle I requires. A `1.0` file is not silently rewritten or used: the user backs it up, reviews the compatibility changes and changes only its schema version before commands process its sources. The cache manifest and index formats do not change.
+
 ## Clarifications
 
 ### Session 2026-10-19
@@ -31,7 +33,7 @@ A teammate merges a pull request that edits `knowledge-config.yml`. Everyone els
 1. **Given** a source whose `url` contains `$(touch /tmp/pwned)`, **When** sync runs, manually or from a hook, **Then** it skips that source, names the field and the character `$`, runs nothing from the value, and synchronizes the other sources.
 2. **Given** a `path_filter` entry containing `;`, **When** status runs, **Then** it reports the source as skipped with the same kind of message and runs no reachability check for it.
 3. **Given** a user running configure with an address that contains a backtick, **When** configure validates it, **Then** it writes nothing and names the character.
-4. **Given** a value in any form the commands accept today, written without shell syntax, **When** any command reads it, **Then** it is accepted as before.
+4. **Given** a `1.1` configuration using a supported address or folder form listed in SC-002, **When** any command reads it, **Then** its values are accepted; discontinued forms are refused as the migration reference documents.
 
 ---
 
@@ -84,6 +86,7 @@ Agents read `AGENTS.md` first. Its spec-kit section still names feature 005, say
 
 ### Edge Cases
 
+- A command reads a legacy `1.0` configuration. It reports the required migration and exits 0 before using sources or changing configuration or caches; a hook lets its parent command continue. The upgrade is manual, never an automatic rewrite.
 - A configuration already holds a value the new rule refuses, such as a `path_filter` written as a wildcard pattern, `docs/*.md`. That source is skipped on every read until the value is edited. Its cache stays in place and nothing is deleted.
 - A local path has a space followed by `-`, such as a copied folder named `kb - Copy`. It is refused, since a piece of it would read as an option if a quote were ever missed. Renaming the folder or linking to it under another name works.
 - A refused value contains a control character, such as a line break or an escape sequence. The message shows it escaped, never raw, so it cannot rewrite the terminal.
@@ -110,9 +113,10 @@ Agents read `AGENTS.md` first. Its spec-kit section still names feature 005, say
 - **FR-008**: The Source Slug Generation procedure MUST run as written in sh, bash and zsh.
 - **FR-009**: The procedure MUST yield, for every source, the slug the documented algorithm yields today.
 - **FR-010**: The README's trust model MUST list the new defense: what it covers, a merged configuration change running commands on teammates' machines, and what it does not, a well-formed value pointing somewhere hostile.
-- **FR-011**: The README's configuration reference and the configuration template MUST state the characters `url` and `path_filter` accept.
+- **FR-011**: The README's configuration reference and the configuration template MUST state schema version `1.1` and the characters `url` and `path_filter` accept. The README MUST explain the manual `1.0` to `1.1` migration and the previously accepted values that stop being accepted.
 - **FR-012**: The security fix, the slug fix, the documentation changes, the new check and the constitution amendment MUST each be recorded under `[Unreleased]` in the CHANGELOG.
 - **FR-013**: The spec-kit section of `AGENTS.md` MUST name the same latest feature as `.github/copilot-instructions.md` and state that feature's status truthfully.
+- **FR-014**: Every command MUST check `knowledge-config.yml`'s schema version before using its sources. Only `"1.1"` is accepted. A missing, `"1.0"` or unknown version MUST produce an escaped diagnostic and exit 0 without shell use of source values or configuration/cache writes or deletions. configure MUST create and preserve version `"1.1"`. Migration from `"1.0"` MUST be manual: back up the file, review the changed validation rules, and change only the schema-version scalar; source values and cache identities are preserved and then checked by the normal per-source rules. The manifest and index schema versions MUST remain unchanged.
 
 ### Key Entities
 
@@ -132,23 +136,24 @@ Agents read `AGENTS.md` first. Its spec-kit section still names feature 005, say
 - **SC-006**: A seeded unquoted value in a command's shell step fails the automated checks: 1 of 1.
 - **SC-007**: The slug procedure, copied verbatim, yields the expected slug in sh, bash and zsh for 100% of a reference set covering HTTPS and SSH addresses, with and without a revision, a trailing `.git` or `/`, and mixed case. After the upgrade, 0 caches named by the documented algorithm are cloned again.
 - **SC-008**: `AGENTS.md` and `.github/copilot-instructions.md` name the same feature.
+- **SC-009**: With a `1.0` configuration holding one valid and one hostile source, all five commands and a hook-driven sync report migration, exit 0, run 0 commands from source values and leave configuration and cache bytes unchanged. After a backup and a version-only edit to `1.1`, sync uses the valid source's existing documented cache, refuses only the hostile source and prunes nothing. Missing and unknown versions also stop before any source use; configure creates `1.1` when the file is absent.
 
 ## Assumptions
 
-- The allowed characters cover every address form the commands accept, including ports, user names, percent-encoding and a server-side `~user` path, and the folder names the README documents for `path_filter`. Letters means ASCII letters. A bracketed IPv6 address is refused; a host name works instead.
+- The allowed characters cover the supported address forms SC-002 lists, including ports, user names, percent-encoding and a server-side `~user` path, and the folder names the README documents for `path_filter`. Letters means ASCII letters. A previously accepted bracketed IPv6 address is refused under schema `1.1`; a host name works instead.
 - A local path written `~user/` is refused. It worked only because an unquoted shell expanded it, and sync and status never recognized it as local.
 - Spaces are accepted only in a local-path `url`, where folder names often contain them. A remote address writes a space as `%20`, and configure splits `path_filter` entries at spaces, so neither needs one. A local path with a space works only because every command quotes it (FR-006).
 - A space followed by `-` stays refused. It is the leading-`-` rule applied to every piece the shell would see if a quote were ever missed.
 - `path_filter` is documented as folder names, so wildcard and negation patterns (`*`, `?`, `[ ]`, `!`) are refused. Once quoted, a pattern would index nothing.
 - `revision` keeps its rule, which already admits only letters, digits, `.`, `_`, `/` and `-`.
 - No command hands a source's label to the shell. The code readers confirmed this during planning.
-- `schema_version` stays `1.0`. No field, type or form changes; only values carrying shell syntax, or forms the documentation never offered, are refused.
+- The configuration `schema_version` becomes `1.1` because the accepted value domain narrows, even though fields and types do not change. `.manifest.json` and `knowledge-index.md` retain their existing versions and formats. There is no automatic migration or cache invalidation based only on the configuration version.
 - `AGENTS.md` stays hand-maintained. Making the agent-context refresh manage it would edit `.specify/`, which the constitution reserves for tooling.
-- This feature bumps no version and tags nothing. Its changes wait under `[Unreleased]`.
+- This feature bumps no package version and tags nothing. Its configuration-schema bump and other changes wait under `[Unreleased]`.
 
 ## Out of Scope
 
-- Version bump, tag, release, and the catalog submission.
+- Package version bump, tag, release, and the catalog submission. The configuration-schema bump is in scope.
 - Prompt injection through fetched content, and credential exposure to a configured host: the README's stated non-defenses.
 - Running the commands' shell steps in CI. The behaviour test stays a local check.
 - `../` local paths, which configure accepts but sync and status treat as remote addresses.

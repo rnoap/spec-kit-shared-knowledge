@@ -109,11 +109,13 @@ Each entry records what was chosen, why, and what was turned down. Four code rea
 
 ## 10. Static check 12
 
-**Decision**: In every ```` ```bash ```` block of `commands/*.md`, skip comment lines, delete single-quoted segments from each line, and fail when any `<name>` placeholder other than `<slug>` remains. Report `file:line`.
+**Decision**: In every ```` ```bash ```` block of `commands/*.md`, track ordinary single quotes, double quotes and escapes across physical lines. Check every `<name>` placeholder other than `<slug>` in its original context. It passes only inside ordinary single quotes opened from an unquoted context; double-quoted, escaped, unterminated and ambiguous contexts fail. Report `file:line`. Inert scanner fixtures run with static validation, including `"'<url>'"`, escaped quotes and multiline contexts ([contracts/ci.md § 1.4](./contracts/ci.md#14-scanner-fixtures)). No fixture is shell-executed.
 
-**Rationale**: Deleting single-quoted segments makes a double-quoted placeholder count as unquoted, which it is for `$(…)`. Checking every placeholder but an explicit exemption also catches one added later. `<slug>` is twelve hex characters the extension computed.
+**Rationale**: Removing apparent single-quoted segments without tracking their outer context incorrectly accepts `"'<url>'"`, where `$(…)` still runs. A small context-aware scanner fails closed without adding a shell-parser dependency. Checking every placeholder but an explicit exemption also catches one added later. `<slug>` is twelve hex characters the extension computed.
 
 **Alternatives considered**:
+
+- Deleting pairs of single quotes with a regular expression. It cannot distinguish an effective quote from one inside double quotes or preceded by an escape.
 - A list of placeholders to check. A new one would pass silently.
 - Running the snippets in CI. The constitution keeps CI on the package, not the prose.
 
@@ -129,13 +131,13 @@ Each entry records what was chosen, why, and what was turned down. Four code rea
 
 **Alternatives considered**: Running the test in CI. That needs its own `docs:` amendment and is out of scope.
 
-## 12. schema_version stays 1.0
+## 12. Configuration schema 1.1 and manual migration
 
-**Decision**: No bump.
+**Decision**: Set `knowledge-config.yml`'s `schema_version` to `"1.1"` in the template, every configuration example and the three validation-block copies. All five commands check the version before source use; a legacy `"1.0"`, missing or unknown version prints an escaped diagnostic and exits 0 without using source values or changing configuration or caches. configure creates and preserves `"1.1"`. The README describes a manual, version-only migration after backing up the file and reviewing the narrowed value rules. The manifest and index keep their existing schema versions and formats (FR-014, SC-009).
 
-**Rationale**: No field, type or form changes. The values now refused either carry shell syntax or never worked as written: a `~user/` local path, a `path_filter` beginning with `~`, a wildcard filter. A bump would make every existing file fail the `schema_version` rule.
+**Rationale**: Constitution Principle I requires a schema bump on any breaking schema change, not only on field or type changes. The compatibility contract explicitly changes a bracketed IPv6 address from accepted to refused, so retaining `"1.0"` is not compliant. An explicit migration makes the break visible. Changing only the version preserves source values and slug inputs: once migrated, invalid sources are refused individually while valid sources retain their caches. Migration never evaluates a stored value and never deletes a cache.
 
-**Alternatives considered**: `1.1`. Breaks every consumer's configuration to announce a narrowing that affects almost none.
+**Alternatives considered**: Retaining `"1.0"` because the shape is unchanged contradicts Principle I. Automatically rewriting consumers' files conceals the compatibility break and is unnecessary; a documented manual scalar edit needs no new command, flag, runtime script or dependency. Supporting legacy files under the new rules without an explicit migration would silently reinterpret their schema.
 
 ## 13. configure keeps a quoted argument whole
 

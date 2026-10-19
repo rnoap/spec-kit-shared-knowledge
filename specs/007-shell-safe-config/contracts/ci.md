@@ -17,11 +17,18 @@ workflow, job or check name changes, so the `main` ruleset needs no edit.
 
 1. Every ```` ```bash ```` block in `commands/*.md`: from a line that is exactly ```` ```bash ````,
    trailing spaces allowed, to the next line that is exactly ```` ``` ````.
-2. Every line in those blocks except comment lines, whose first non-blank character is `#`.
-3. Each line with every pair of single quotes, and what they enclose, removed. An unpaired `'`
-   removes nothing.
-4. What is left, searched for placeholders: `<`, a letter, any letters, digits, `_` or `-`, then
-   `>`.
+2. Every placeholder in the original text: `<`, a letter, any letters, digits, `_` or `-`, then
+  `>`. Ignore a whole-line comment only when the scanner is unquoted at the start of the line
+  and its first non-blank character is `#`.
+3. Track unquoted, ordinary single-quoted and double-quoted contexts, including backslash escapes,
+  across lines within each block. A placeholder is safe only inside an ordinary single-quoted
+  segment opened from an unquoted context. A `'` inside double quotes is a literal character,
+  not a quoting boundary; an escaped quote is not a boundary either. `$'...'` and `$"..."` do
+  not qualify as ordinary single quotes. An escape never suppresses placeholder detection.
+4. Reject a non-exempt placeholder in any other, unterminated or ambiguous quoting context.
+  The scanner need not accept every valid shell construct: nested quoting it cannot establish
+  as literal fails closed instead of being treated as safe. Reset state only between blocks,
+  not between physical lines.
 
 ### 1.2 Result
 
@@ -41,8 +48,9 @@ Passes when no placeholder but `<slug>` is left. Otherwise it fails, naming each
 - A double-quoted placeholder fails: `$(…)` and backticks still run inside double quotes.
 - `<slug>` is exempt by exact name, and nothing else is. A placeholder added later is checked
   without anyone listing it ([research § 10](../research.md#10-static-check-12)).
-- The check reads text, not shell grammar. A single-quoted segment inside double quotes counts as
-  quoted, and inline code outside ```` ```bash ```` blocks is not read. Review covers both.
+- The check reads quoting context, not full shell grammar. `"'<url>'"` fails: its apparent single
+  quotes do not stop shell expansion. Inline code outside ```` ```bash ```` blocks is not read;
+  review still covers those sites.
 
 ### 1.3 Baseline
 
@@ -63,6 +71,26 @@ the calling shell instead; after the change it holds two, both quoted.
 Run the new check against this baseline before editing the commands: it must name exactly these
 lines. After the change it passes, and re-seeding one unquoted placeholder fails it, naming that
 file and line (SC-006).
+
+### 1.4 Scanner fixtures
+
+Static validation also checks the scanner against these inert strings. They are never executed
+as shell commands, need no test framework or extra file, and a wrong classification fails the
+static validation script.
+
+| Fixture | Expected |
+| --- | --- |
+| `git clone -- '<url>'` | Pass |
+| `test -d '<expanded-path>/.git'` | Pass |
+| `url='<url>'` | Pass |
+| `git clone -- <url>` | Fail |
+| `git clone -- "<url>"` | Fail |
+| `git clone -- "'<url>'"` | Fail |
+| `git clone -- \'<url>\'` | Fail |
+| `git clone -- $'<url>'` | Fail |
+
+Repeat the double-quoted and escaped-quote cases with line continuations and a quote context
+that spans physical lines. The placeholder remains unsafe; a newline must not reset that context.
 
 ---
 
@@ -135,7 +163,8 @@ podman run --rm -v "$PWD":/w -w /w docker.io/library/ubuntu:20.04 sh -c 'apt-get
 1.4.0, in a `docs:` commit with a rationale note. Item 12 reads:
 
 > Every configuration placeholder in a ```` ```bash ```` block under `commands/` sits inside single
-> quotes, so a configured value reaches the shell as one literal argument. `<slug>`, which the
-> extension computes, is the only exemption.
+> quotes opened in an unquoted context, so a configured value reaches the shell as one literal
+> argument. Double-quoted, escaped and ambiguous quote contexts fail the check; inert scanner
+> fixtures enforce this distinction. `<slug>`, which the extension computes, is the only exemption.
 
 The paragraph `Still manual, and honestly so` stays true: check 12 reads text and runs nothing.

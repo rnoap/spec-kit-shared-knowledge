@@ -19,6 +19,33 @@ not accepted prints. Command prose cites this feature's requirements as `007 FR-
 | `speckit.knowledge.remove` | A target that is not accepted has its entry deleted or toggled, and keeps its cache for the next prune; slug form checked before purge |
 | `speckit.knowledge.search` | Sources that are not accepted are left out; item content read with the file tool |
 
+### 1.1 Schema gate
+
+All five commands check the existing configuration's version before using any source (FR-014).
+Only `schema_version: "1.1"` is accepted. For `"1.0"`, the agent prints:
+
+```text
+Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, review the README migration notes, then change only schema_version. No sources or caches were used or changed.
+```
+
+For a missing or unknown version it prints the following, with `<missing>` for a missing value:
+
+```text
+Error: Unrecognized knowledge-config.yml schema_version "<value>". Expected "1.1". No sources or caches were used or changed.
+```
+
+The value is escaped under § 2.3. Both paths exit 0 without handing source values to a shell,
+computing slugs, reading source manifests, checking reachability, pruning or writing configuration
+or caches. A hook finishes and its parent command continues. This gate precedes every per-source
+rule, including remove's entry-only handling of a refused source. No unknown version is silently
+downgraded.
+
+If the file is absent, configure follows its existing creation flow using schema `"1.1"`. On a
+successful edit it preserves `"1.1"`; every template, creation example, write instruction and
+schema-error row in configure must agree. The old unknown-version warning that proceeds with
+caution is replaced by this gate. Migration is the manual version-only procedure of
+[knowledge-config.schema.md § 5](./knowledge-config.schema.md#5-compatibility), not a new flag.
+
 ---
 
 ## 2. Refusal
@@ -353,6 +380,7 @@ text is interpreted: no `$`, no backslash escape.
 
 | Condition | Behaviour | Exit |
 | --- | --- | --- |
+| Missing, legacy `"1.0"` or unknown configuration schema version | § 1.1 diagnostic; no source use, configuration write or cache change | 0 |
 | A `url` or `path_filter` value fails the character rule on read | § 2.1 line; source skipped; every other source continues | 0 |
 | The same value given to configure | § 2.2 error; nothing written | 0 |
 | A local-path `url` holds a space followed by `-` | As above, with its own reason | 0 |
@@ -375,9 +403,9 @@ text is interpreted: no `$`, no backslash escape.
 | Commands (5), flags, hooks (4, no arguments) | Unchanged |
 | Exit codes | `0` on every path |
 | `extension.yml` `version` | Unchanged. This feature tags nothing; its changes wait under `[Unreleased]` |
-| `schema_version` | `"1.0"` ([knowledge-config.schema.md](./knowledge-config.schema.md)) |
+| Configuration `schema_version` | `"1.1"`; explicit manual migration from `"1.0"`, no automatic rewriting ([knowledge-config.schema.md](./knowledge-config.schema.md#5-compatibility)) |
 | Slug algorithm | Unchanged: caches named by it are reused (§ 4.4) |
 | Caches named by the broken procedure | Replaced on the next sync, then pruned (§ 4.4) |
-| `.manifest.json`, `knowledge-index.md` | Formats unchanged |
-| § Configuration Validation Rules, three copies | Two rows replaced, the quoting rule and an `On failure` example added; still byte-identical (Quality Gate 11) |
+| `.manifest.json`, `knowledge-index.md` | Formats and schema versions unchanged |
+| § Configuration Validation Rules, three copies | Three rows replaced (`schema_version`, `url`, `path_filter`), the quoting rule, schema gate and an `On failure` example added; still byte-identical (Quality Gate 11) |
 | status table | New `⚠️ invalid` cell; `invalid` count in the `Total` line |

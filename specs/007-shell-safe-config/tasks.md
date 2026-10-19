@@ -18,9 +18,10 @@ Every story changes the same command files, and three of them carry the validati
 
 **Wave 1 — independent (different files):**
 
-- [ ] **T002** [P] [US2] Add static check 12 under `Repository invariants`, after check 11, as [contracts/ci.md § 1](./contracts/ci.md#1-static-check-12) specifies. Run it on the unchanged commands: it fails naming exactly the 18 lines of § 1.3 (FR-007) · `.github/scripts/validate-extension.sh`
-- [ ] **T003** [P] [US1] Rewrite § Configuration Validation Rules (FR-001, FR-002, FR-005, FR-006):
-  - Replace the `url` and `path_filter` rows with the two rows of [knowledge-config.schema.md § 3](./contracts/knowledge-config.schema.md#3-validation-block-rows), copied exactly.
+- [ ] **T002** [P] [US2] Add static check 12 under `Repository invariants`, after check 11, as [contracts/ci.md § 1](./contracts/ci.md#1-static-check-12) specifies: track quote context and escapes across physical lines, reject double-quoted, escaped and ambiguous lookalikes, and run the inert scanner fixtures of § 1.4 as part of static validation without shell-executing them. Run it on the unchanged commands: it fails naming exactly the 18 lines of § 1.3 (FR-007) · `.github/scripts/validate-extension.sh`
+- [ ] **T003** [P] [US1] Rewrite § Configuration Validation Rules (FR-001, FR-002, FR-005, FR-006, FR-014):
+  - Replace the `schema_version`, `url` and `path_filter` rows with the three rows of [knowledge-config.schema.md § 3](./contracts/knowledge-config.schema.md#3-validation-block-rows), copied exactly.
+  - Gate on configuration schema `"1.1"` before any source use. A missing, `"1.0"` or unknown version follows [commands.md § 1.1](./contracts/commands.md#11-schema-gate), exits 0 and leaves configuration and caches unchanged. Update sync's early schema error; do not change the separate manifest or index schema versions.
   - Turn "Why no value may begin with `-`" into the account of both layers: refuse with the leading-`-` rule and the character rule, neutralize with `--` and the quoting rule of [commands.md § 3.1](./contracts/commands.md#31-the-quoting-rule).
   - State that the agent applies every rule in its own reasoning, checks a value before any other use, and hands no value of a source that is not accepted to a shell.
   - Add the character-rule example to `On failure`, and the message rule of [commands.md § 2.3](./contracts/commands.md#23-values-in-messages-fr-005): agent output, control characters escaped.
@@ -33,15 +34,17 @@ Every story changes the same command files, and three of them carry the validati
 
 **Wave 2 — independent (different files):**
 
-- [ ] **T005** [P] [US1] configure (FR-001 to FR-003, FR-005):
+- [ ] **T005** [P] [US1] configure (FR-001 to FR-003, FR-005, FR-014):
   - Copy sync's validation block byte for byte, then `diff` the two ranges.
+  - Apply the file-level schema gate before source use. Change every creation instruction, YAML example, write/preserve instruction and schema-error row to `"1.1"`; replace the unknown-version warning that proceeds with caution. An existing unsupported-version file is never migrated or written automatically ([commands.md § 1.1](./contracts/commands.md#11-schema-gate)).
   - Behavior step 2: keep a quoted argument whole ([commands.md § 5.5](./contracts/commands.md#55-configure-arguments)); a local path starts with `/`, `./`, `../` or `~/`; the character rule runs before the existence check.
   - Add the error rows of [commands.md § 2.2](./contracts/commands.md#22-configure), and change the row for a `url` matching no accepted form.
   - Escape control characters in values the source list and `--verbose` output quote.
 
   · `commands/speckit.knowledge.configure.md`
-- [ ] **T006** [P] [US1] status (FR-002, FR-004 to FR-006):
+- [ ] **T006** [P] [US1] status (FR-002, FR-004 to FR-006, FR-014):
   - Copy sync's validation block byte for byte, then `diff` the two ranges.
+  - Apply the file-level schema gate before the per-source checks; unsupported versions produce no slug, manifest read or reachability check.
   - Check every source before step 2. A source that is not accepted gets no slug, no manifest read and no reachability check.
   - Print its refusal line before the header. Add the `⚠️ invalid` row, ahead of `— disabled`, and the `invalid` count in the `Total` line ([commands.md § 5.1](./contracts/commands.md#51-status)).
   - Quote both reachability checks as § 5.1 shows. Keep the opening words of the remote lead-in, which the test script uses as an anchor.
@@ -56,8 +59,8 @@ Every story changes the same command files, and three of them carry the validati
 **Wave 3 — independent (different files):**
 
 - [ ] **T009** [P] [US2] Quote every configuration placeholder in the cold path (Tiers 1 to 3, the local clone, sparse-checkout) and the warm path (sparse-checkout, remote, local), spelled as [commands.md § 3.2](./contracts/commands.md#32-placeholders) spells them, including `[--branch '<revision>']`, `[ -n '<path_filter>' ]` and `[ -z '<revision>' ]`. Switch the example comments to single quotes, and say that `<expanded-path>` is the home directory written out, since `$HOME` does not expand inside single quotes (FR-006) · `commands/speckit.knowledge.sync.md`
-- [ ] **T010** [P] [US1] remove ([commands.md § 5.3](./contracts/commands.md#53-remove)): a target that is not accepted has its entry deleted or `enabled` toggled, its slug is not computed, and its cache is left for the next prune, with the message § 5.3 shows. An accepted target is purged only after the slug-form check of § 4.5. Escape control characters in the source list (FR-002, FR-005) · `commands/speckit.knowledge.remove.md`
-- [ ] **T011** [P] [US1] search ([commands.md § 5.4](./contracts/commands.md#54-search)): a source that is not accepted gets its refusal line and contributes nothing; a slug's form is checked before a manifest is read through it; item content is read with the file-reading tool, never a shell command; names in results are escaped (FR-002, FR-005, FR-006) · `commands/speckit.knowledge.search.md`
+- [ ] **T010** [P] [US1] remove ([commands.md § 5.3](./contracts/commands.md#53-remove)): apply the file-level schema gate first, so no entry is changed or cache purged for an unsupported version. In schema `1.1`, a target that is not accepted has its entry deleted or `enabled` toggled, its slug is not computed, and its cache is left for the next prune, with the message § 5.3 shows. An accepted target is purged only after the slug-form check of § 4.5. Escape control characters in the source list (FR-002, FR-005, FR-014) · `commands/speckit.knowledge.remove.md`
+- [ ] **T011** [P] [US1] search ([commands.md § 5.4](./contracts/commands.md#54-search)): apply the file-level schema gate before source use; a source that is not accepted gets its refusal line and contributes nothing; a slug's form is checked before a manifest is read through it; item content is read with the file-reading tool, never a shell command; names in results are escaped (FR-002, FR-005, FR-006, FR-014) · `commands/speckit.knowledge.search.md`
 - [ ] **T012** [P] [US2] Add the section for a local path containing a space ([ci.md § 3.3](./contracts/ci.md#33-sections-added)): `~/My Repos/kb` under the test's `HOME`, a cold sync, a warm sync, then status's local check (SC-005) · `.github/scripts/test-sync-git.sh`
 
 **⟶ Wait for Wave 3 to finish, then:**
@@ -96,12 +99,17 @@ Files: `config-template.yml`, `README.md`.
 
 **Wave 1 — independent (different files):**
 
-- [ ] **T017** [P] [US1] In the `url` and `path_filter` comments, state the accepted characters; that a local path starts with `/`, `./`, `../` or `~/` and may also contain spaces, but no space followed by `-`; and that a `path_filter` is a folder name that does not begin with `~` (FR-011) · `config-template.yml`
-- [ ] **T018** [P] [US1] § Configuration Reference: the same, for `sources[*].url` and `sources[*].path_filter`. § Trust model: the two defense rows of [knowledge-config.schema.md § 6](./contracts/knowledge-config.schema.md#6-where-the-rule-is-stated-fr-010-fr-011) after the validation-on-read row, and one bullet under "What does NOT happen": no configuration value and no fetched file name is ever run as a command (FR-010, FR-011) · `README.md`
+- [ ] **T017** [P] [US1] Set `schema_version: "1.1"`. In the `url` and `path_filter` comments, state the accepted characters; that a local path starts with `/`, `./`, `../` or `~/` and may also contain spaces, but no space followed by `-`; and that a `path_filter` is a folder name that does not begin with `~` (FR-011, FR-014) · `config-template.yml`
+- [ ] **T018** [P] [US1] § Configuration Reference: schema `"1.1"` in the reference and every configuration example, plus the same characters as T017 for `sources[*].url` and `sources[*].path_filter`. Document the manual `1.0` migration, the unsupported-version diagnostic, preservation of source values and caches, and discontinued values including bracketed IPv6, using [knowledge-config.schema.md § 5](./contracts/knowledge-config.schema.md#5-compatibility). § Trust model: the two defense rows of [knowledge-config.schema.md § 6](./contracts/knowledge-config.schema.md#6-where-the-rule-is-stated-fr-010-fr-011) after the validation-on-read row, and one bullet under "What does NOT happen": no configuration value and no fetched file name is ever run as a command (FR-010, FR-011, FR-014) · `README.md`
 
 **⟶ Wait for Wave 1 to finish, then:**
 
-- [ ] **T019** [US1] Agent walkthrough of [quickstart.md § 2](./quickstart.md#2-agent-walkthrough) in a scratch consumer: sync by hand and from a hook, status, configure with a backtick, removing a refused source, no pruning while a source is refused, and every documented value accepted. `/tmp/sk007-pwned` never exists (SC-001, SC-002, SC-003) · (scratch consumer)
+- [ ] **T019** [US1] Agent walkthrough of [quickstart.md § 2](./quickstart.md#2-agent-walkthrough) in a scratch consumer:
+  - Run the complete § 2.1 matrix: all 8 seeds in `url` and in `path_filter`, separately, through configure, manual sync, hook-driven sync and status (64 observations). Each uses a fresh scratch marker and one valid companion source. Record the refusal field/character, no injection, valid-source progress, exit 0 and hook continuation; configure writes nothing for each refused input.
+  - Run § 2.2: removing a refused source, no pruning while a source is refused, and every documented value and accepted address form.
+  - Run the schema gate and migration scenarios of § 2.5 for all five commands and a hook: unchanged legacy configuration and caches, missing/unknown versions stopped, version-only manual migration preserving sources, and configure creating `1.1` when absent (FR-014, SC-009).
+
+  No marker ever exists (SC-001, SC-002, SC-003, SC-009) · (scratch consumer)
 
 **Checkpoint**: US1 works on its own. A merged value with shell syntax is refused everywhere it is read, and nothing it carries runs.
 
@@ -122,8 +130,9 @@ Files: `.specify/memory/constitution.md`.
 
 - [ ] **T021** [US2] Verify the second layer (SC-004, SC-005, SC-006):
   - The sections for hostile values, the spaced path and hostile file names pass on macOS and in the Podman run of [ci.md § 3.4](./contracts/ci.md#34-linux-run).
-  - In a scratch copy of the repository, removing the quotes around one `<url>` fails check 12, naming that file and line.
+  - All inert scanner fixtures of [ci.md § 1.4](./contracts/ci.md#14-scanner-fixtures) pass. In a scratch copy of the repository, removing the quotes around one `<url>` or replacing them with `"'<url>'"` fails check 12, naming that file and line.
   - In the scratch consumer, configure with `'~/My Repos/kb' specs/` keeps the path whole, and the source syncs and reports `✅ reachable (local)`.
+  - Perform [quickstart.md § 2.3](./quickstart.md#23-hostile-file-name-search): synchronize a source containing a literal `$(touch pwned).md` with a unique content token, search for that token and inspect the result and file-tool read. The literal name and expected content are returned, no shell step uses the name, and no `pwned` marker exists after sync or search.
 
   · (scratch copy, Podman, scratch consumer)
 
@@ -136,7 +145,7 @@ Files: `.specify/memory/constitution.md`.
 
 Files: none. The procedure is rewritten by T007 and tested by T014.
 
-- [ ] **T022** [US3] Verify: the slug section passes on macOS and in the Podman run, where sh is dash. In a scratch consumer whose two unpinned sources share `cache/e3b0c44298fc/`, the next sync clones each source into its documented slug and prunes `e3b0c44298fc` (User Story 3 scenario 4, SC-007) · (Podman, scratch consumer)
+- [ ] **T022** [US3] Verify: the slug section passes on macOS and in the Podman run, where sh is dash. Perform [quickstart.md § 2.4](./quickstart.md#24-existing-cache-reuse): seed correctly named pre-upgrade caches for pinned and unpinned sources, record the executed git calls, upgrade and sync without `--force`, and assert 0 new `git clone` calls, unchanged cache paths and a successful warm update. Separately, in a scratch consumer whose two unpinned sources share `cache/e3b0c44298fc/`, the next sync clones each source into its documented slug and prunes `e3b0c44298fc` (User Story 3 scenarios 2 and 4, SC-007) · (Podman, scratch consumers)
 
 **Checkpoint**: US3 works on its own. Every source gets its documented slug, and a cache the broken procedure shared is replaced.
 
@@ -157,6 +166,7 @@ Files: `CHANGELOG.md`.
 
 - [ ] **T024** Record under `[Unreleased]` (FR-012):
   - Security: the character rule, quoting, and fetched file names.
+  - Breaking configuration change: schema `1.1`, refusal of `1.0` until a manual version-only migration, a link to the README migration procedure, and preservation of source values and cache identities (FR-011, FR-014).
   - Fixed: the slug procedure, with a **Consequence** sentence: caches the broken procedure named are replaced once.
   - Changed: `~user/` local paths, `path_filter` wildcards and a leading `~` are refused; configure keeps a quoted argument whole; status shows `invalid`.
   - Development: static check 12 (`chore(ci)`), constitution 1.4.0 (`docs(constitution)`).
@@ -166,7 +176,7 @@ Files: `CHANGELOG.md`.
 
 **⟶ Wait for T024 to finish, then:**
 
-- [ ] **T025** Validate against the Success Criteria: run `validate-extension.sh` and `test-sync-git.sh` on macOS and in the Podman run, then map SC-001 to SC-008 to their evidence from T019, T021, T022 and T023 · (verification)
+- [ ] **T025** Validate against the Success Criteria: run `validate-extension.sh` and `test-sync-git.sh` on macOS and in the Podman run, then map SC-001 to SC-009 to their evidence from T019, T021, T022 and T023. SC-001 needs all 64 observations, SC-004 both sync and search, SC-007 both healthy-cache reuse and broken-cache replacement, and SC-009 the schema gate and manual migration; a partial walkthrough is not a pass · (verification)
 
 ## Dependencies & Execution Order
 

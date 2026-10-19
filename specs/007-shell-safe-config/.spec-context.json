@@ -70,7 +70,7 @@
     }
   ],
   "telemetryInstanceId": "b15432d8-ea32-4ff8-8c19-33e942addd4a",
-  "last_action": "living specs evaluated — skipped (not configured)",
+  "last_action": "Pre-implementation analysis findings resolved in planning artifacts; runtime implementation and verification remain pending",
   "coverage": {
     "FR-001": {
       "title": "Refuse url and path_filter characters outside letters, digits and . _ ~ : / @ % + - on every read; local paths (/ ./ ../ ~/) also admit spaces, never one followed by -; a path_filter must not begin with ~",
@@ -167,7 +167,7 @@
       ]
     },
     "FR-011": {
-      "title": "README configuration reference and configuration template state the characters url and path_filter accept",
+      "title": "README and configuration template state schema 1.1 and accepted characters; README documents manual 1.0 migration and discontinued values",
       "tasks": [
         "T017",
         "T018"
@@ -185,6 +185,21 @@
       "tasks": [
         "T023"
       ]
+    },
+    "FR-014": {
+      "title": "All five commands gate source use on configuration schema 1.1; legacy, missing and unknown versions stop without mutations; manual version-only migration preserves sources and caches; manifest and index formats stay unchanged",
+      "tasks": [
+        "T003",
+        "T005",
+        "T006",
+        "T010",
+        "T011",
+        "T017",
+        "T018",
+        "T019",
+        "T024",
+        "T025"
+      ]
     }
   },
   "size": "normal",
@@ -195,7 +210,7 @@
     "verdict": "normal"
   },
   "expectations": [
-    "No version bump, tag, release or catalog submission",
+    "No package version bump, tag, release or catalog submission; configuration schema 1.1 is in scope",
     "No defense against prompt injection or credential exposure",
     "No change to the revision rule",
     "The commands shell steps are not run in CI",
@@ -215,7 +230,7 @@
     "constraint: constitution Code Boundaries, .specify/ is tooling-owned except memory/ and templates",
     "constraint: constitution Quality Gates lists static checks 1-11; a new check needs a docs: amendment",
     "constraint: slug bytes unchanged (004 FR-024 backward compatibility)",
-    "constraint: config-template.yml schema_version stays 1.0"
+    "constraint: configuration schema becomes 1.1 under constitution Principle I; manual version-only migration from 1.0; manifest and index schema versions stay unchanged"
   ],
   "intent": "Stop knowledge-config values and fetched file names from running shell commands, make the slug procedure run as written, and point AGENTS.md at the current feature",
   "decisions": [
@@ -241,7 +256,7 @@
     },
     {
       "decision": "Accept letters, digits and . _ ~ : / @ % + - in url and path_filter; spaces only in local paths and never before a dash; local paths start with ~/ (not ~user/); a path_filter must not begin with ~; wildcards refused",
-      "why": "Covers every git remote form, and no accepted character can run, redirect, glob, comment out or split; ~user and wildcards only ever worked through unquoted expansion",
+      "why": "Covers the supported address forms listed in SC-002. Previously accepted bracketed IPv6 addresses and other discontinued values are documented as a breaking change in configuration schema 1.1",
       "rejected": "A deny-list of known metacharacters"
     },
     {
@@ -270,9 +285,9 @@
       "rejected": "Keeping echo, whose backslash handling differs by shell"
     },
     {
-      "decision": "Static check 12 removes single-quoted segments in bash blocks and fails on any placeholder left other than <slug>",
-      "why": "A double-quoted placeholder counts as unquoted, and a placeholder added later is checked without being listed",
-      "rejected": "A list of placeholders to check; running the snippets in CI"
+      "decision": "Static check 12 tracks effective quote contexts and escapes across physical lines, rejects unsafe or ambiguous placeholder contexts, and checks inert negative fixtures; <slug> is the only exemption",
+      "why": "Removing apparent single-quoted segments accepts single quotes inside double quotes even though command substitution remains active there; analysis finding I1 requires a context-aware fail-closed check",
+      "rejected": "Regex-only removal of single-quoted segments; a fixed placeholder list; shell-executing scanner fixtures in CI"
     },
     {
       "decision": "Extend the local behaviour test: literal quoting-aware substitution, 8 hostile seeds, a local path with a space, slug runs in sh, bash and zsh, hostile file names",
@@ -280,9 +295,14 @@
       "rejected": "Running the test in CI, which needs its own constitution amendment"
     },
     {
-      "decision": "schema_version stays 1.0",
-      "why": "No field, type or form changes; only values with shell syntax, or that never worked as written, are refused",
-      "rejected": "Bumping to 1.1, which fails every existing configuration"
+      "decision": "Configuration schema becomes 1.1 with an all-command version gate and a documented manual version-only migration from 1.0; cache manifest and index formats stay unchanged",
+      "why": "Analysis finding C1: narrowing previously accepted values is a breaking schema change under constitution Principle I, even without changing fields or types. Manual migration preserves source values and cache identities without evaluating input or silently rewriting files",
+      "rejected": "Retaining 1.0 for a changed accepted value domain; automatically rewriting legacy files; using sources before the version gate"
+    },
+    {
+      "decision": "Verification requires all 64 hostile-value observations, explicit hostile-file-name search, healthy pre-upgrade cache reuse with zero clone calls, and schema gate/manual migration evidence",
+      "why": "Analysis findings C2, C3 and C4 exposed partial acceptance coverage; T019, T021, T022 and T025 now require the complete evidence described in quickstart sections 2.1 to 2.5",
+      "rejected": "Treating a smoke walkthrough, scripted sync alone, or broken-cache replacement alone as complete success-criterion coverage"
     },
     {
       "decision": "configure keeps a quoted argument whole",

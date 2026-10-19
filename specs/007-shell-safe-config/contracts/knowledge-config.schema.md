@@ -4,8 +4,10 @@
 
 The user-facing configuration contract. The file is committed and shared: a merged change to it is
 read on every teammate's machine and in every automatic sync. This feature narrows the characters
-`url` and `path_filter` accept. No field, type or form is added, and `schema_version` stays `"1.0"`
-([research § 12](../research.md#12-schema_version-stays-10)).
+`url` and `path_filter` accept. Although no field or type is added, the accepted value domain
+changes, so the configuration `schema_version` becomes `"1.1"` under constitution Principle I
+([research § 12](../research.md#12-configuration-schema-11-and-manual-migration)). Manifest and
+index schema versions and formats stay unchanged.
 
 ---
 
@@ -13,6 +15,11 @@ read on every teammate's machine and in every automatic sync. This feature narro
 
 Applied every time the file is read, by every command that reads it, before any other use of the
 value (FR-002).
+
+The file must first pass the schema gate: only `schema_version: "1.1"` is accepted (FR-014).
+Missing, legacy `"1.0"` and unknown versions stop the whole command before source use, configuration
+writes or cache changes, with the diagnostic of [commands.md § 1.1](./commands.md#11-schema-gate).
+This file-level error is distinct from refusing an individual source in an accepted `1.1` file.
 
 | Value | Accepted characters | Also required |
 | --- | --- | --- |
@@ -36,7 +43,8 @@ value (FR-002).
 
 ## 2. Check order
 
-Each value goes through these steps in order, all in the agent's own reasoning:
+After the file-level schema gate, each value goes through these steps in order, all in the agent's
+own reasoning:
 
 1. **The character rule.** Reading left to right, the first character outside the accepted set is
    the one reported. In a local-path `url`, a space followed by `-` is reported at that space.
@@ -54,11 +62,12 @@ first failure; when several of its values fail, a character-rule failure is repo
 
 ## 3. Validation block rows
 
-These two rows replace today's `url` and `path_filter` rows in § Configuration Validation Rules, in
-all three copies: configure, sync and status. Static check 11 keeps the copies byte-identical, so
-they are copied exactly. Every other row is unchanged.
+These three rows replace today's `schema_version`, `url` and `path_filter` rows in § Configuration
+Validation Rules, in all three copies: configure, sync and status. Static check 11 keeps the copies
+byte-identical, so they are copied exactly. Every other row is unchanged.
 
 ```markdown
+| `schema_version` | Required. Exactly `"1.1"`. Check before using any source; missing, `"1.0"` and unknown versions stop with the schema diagnostic, exit 0 and no configuration or cache changes (007 FR-014). |
 | `url` | Required, non-empty. Either a local path (`/`, `./`, `../`, `~/`) that exists and contains `.git`, or a remote URL matching `^(https?://\|ssh://\|git\+ssh://\|git@)`. **Must not begin with `-`.** **Only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`**; a local path may also contain spaces, but **no space followed by `-`** (007 FR-001). |
 | `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/` or `~`**, **no `..`**, **must not begin with `-`**, and **only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`** (007 FR-001). |
 ```
@@ -70,6 +79,8 @@ Beside the rows, the block:
   ([commands.md § 3.1](./commands.md#31-the-quoting-rule));
 - states that the agent applies every rule in its own reasoning, and hands no value of a source
   that is not accepted to a shell, not even to compute a slug or print a message;
+- distinguishes the whole-file schema gate from per-source refusals, referencing the diagnostics
+  of [commands.md § 1.1](./commands.md#11-schema-gate);
 - adds a character-rule example to its `On failure` lines
   ([commands.md § 2.1](./commands.md#21-the-refusal-line)).
 
@@ -122,8 +133,23 @@ Each of the eight seeds in [ci.md § 3.2](./ci.md#32-seeds) is refused, in `url`
 
 ## 5. Compatibility
 
-`schema_version` stays `"1.0"`. A configuration that worked before keeps working, except for the
-values below, which either carry shell syntax or never worked as written.
+The configuration schema becomes `"1.1"`. Some previously accepted values are no longer valid,
+including bracketed IPv6 addresses; the unchanged field layout does not make this backward
+compatible. Legacy `"1.0"` files are rejected with migration guidance, never silently reinterpreted
+or rewritten. No command uses their sources or changes their caches, and hooks still exit 0.
+
+**Manual migration from `1.0` (FR-011, FR-014):**
+
+1. Back up `knowledge-config.yml` and review the changed value rules in the table below.
+2. With a file-editing tool, change only the root `schema_version` scalar from `"1.0"` to `"1.1"`.
+  Preserve every source, value and other setting. Never pass source values to a shell to migrate
+  them. This procedure does not apply to missing or unknown schema versions.
+3. Run sync and status. The normal `1.1` rules now refuse discontinued values per source, without
+  running them, while valid sources keep their original slug inputs and reuse their caches.
+4. Correct or remove refused entries as a separate, reviewed edit. While any refused source
+  remains, sync prunes nothing. No cache migration or deletion is part of changing the version.
+
+configure creates and preserves `"1.1"`, but does not migrate an existing file automatically.
 
 | Value | Before | After |
 | --- | --- | --- |
@@ -145,9 +171,9 @@ stays in place: sync prunes nothing while any source is not accepted
 
 | Location | States |
 | --- | --- |
-| § Configuration Validation Rules in configure, sync and status | The rule (§ 3) |
-| README § Configuration Reference | The characters `url` and `path_filter` accept, and that a local path may also contain spaces |
-| `config-template.yml`, comments on `url` and `path_filter` | The same |
+| § Configuration Validation Rules in configure, sync and status | The schema gate and character rule (§ 3) |
+| README § Configuration Reference | Schema `1.1`, manual `1.0` migration (§ 5), changed value compatibility, and the characters `url` and `path_filter` accept, including spaces in a local path |
+| `config-template.yml` | `schema_version: "1.1"`, with the same accepted characters in the `url` and `path_filter` comments |
 | README § Trust model, defenses table | The two rows below |
 | README § Trust model | One bullet: no configuration value and no fetched file name is ever run as a command |
 
