@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- `fix(security): keep source values literal`: every read rejects shell syntax in `url` and `path_filter` before using any value of that source. Shell placeholders use single quotes with literal quote escaping, and fetched file names reach commands only through quoted variables and redirected reads. Refusal messages escape control characters.
+
+### Changed
+
+- **Breaking configuration change:** `knowledge-config.yml` now requires schema `"1.1"`. A `"1.0"` file is refused until the [manual version-only migration](README.md#manual-migration-from-10); missing and unknown versions also stop before source use or configuration/cache changes. Migration preserves source values and cache identities. The manifest and index formats are unchanged.
+- `~user/` local paths, wildcard filters and filters beginning with `~` are refused. configure keeps a quoted path argument whole, local paths may contain spaces except before `-`, and status reports invalid sources as `invalid` without probing them. Invalid sources prevent orphan pruning.
+
+### Fixed
+
+- `fix(sync): make the slug procedure executable`: explicit inputs, portable normalization and repaired continuations yield the documented slug in sh, bash and zsh. Correctly named caches are reused. **Consequence:** caches named by the broken procedure are replaced once on the next sync.
+- `fix(package): exclude local virtual environments`: development installs omit `.venv`, `.venv-*` and `venv` directories.
+- `fix(ci): recognize registered skill names`: the install assertion accepts both dotted command names and dashed skill names.
+
+### Development
+
+- `chore(ci): enforce literal configuration placeholders`: static check 12 tracks quote context across lines and rejects double-quoted, escaped and ambiguous lookalikes, with inert scanner fixtures. Local behavior checks cover hostile values and file names, spaced paths and reference slugs in three shells.
+- `docs(constitution): 1.4.0`: Quality Gate 12 makes effective single quoting a package invariant without executing command prose in CI.
+
+### Documentation
+
+- `docs(readme): document shell-safe configuration`: accepted characters, discontinued values, manual schema migration and the two-layer trust model are documented in the README and configuration template.
+
 ## [1.6.0] - 2026-10-15
 
 Catalog readiness, and a sync command that keeps the README's promises. The

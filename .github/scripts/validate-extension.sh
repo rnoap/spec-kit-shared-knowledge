@@ -181,6 +181,127 @@ else
   note "they must stay identical — see Constitution §I on hidden dependencies"
 fi
 
+scan_configuration_quotes() {
+python3 - <<'PY'
+import re
+import sys
+from pathlib import Path
+
+placeholder = re.compile(r'<[A-Za-z][A-Za-z0-9_-]*>')
+
+
+def unsafe_placeholders(lines):
+    context = 'unquoted'
+    escaped = False
+    ambiguous = False
+    occurrences = []
+    for number, line in lines:
+      if context == 'unquoted' and not escaped and line.lstrip().startswith('#'):
+        continue
+      position = 0
+      while position < len(line):
+        match = placeholder.match(line, position)
+        if match and match.group() != '<slug>':
+          occurrences.append((number, match.group(), context == 'single' and not ambiguous))
+        character = line[position]
+        following = line[position:position + 2]
+        if escaped:
+          escaped = False
+        elif context == 'single':
+          if character == "'":
+            context = 'unquoted'
+        elif character == '\\':
+          escaped = True
+        elif context == 'ansi':
+          if character == "'":
+            context = 'unquoted'
+        elif context == 'double':
+          if following in ('$(', '${') or character == '`':
+            ambiguous = True
+          if character == '"':
+            context = 'unquoted'
+        elif following == "$'":
+          context = 'ansi'
+          position += 1
+        elif following in ('${', '<<') or character == '`':
+          ambiguous = True
+        elif character == "'":
+          context = 'single'
+        elif character == '"':
+          context = 'double'
+        position += 1
+    findings = {}
+    for number, name, safe in occurrences:
+      if not safe or context != 'unquoted':
+        findings.setdefault(number, []).append(name)
+    return findings
+
+
+fixtures = [
+    ("git clone -- '<url>'", True),
+    ("test -d '<expanded-path>/.git'", True),
+    ("url='<url>'", True),
+    ("git clone -- <url>", False),
+    ('git clone -- "<url>"', False),
+    ('git clone -- "\'<url>\'"', False),
+    (r"git clone -- \'<url>\'", False),
+    ("git clone -- $'<url>'", False),
+    ('git clone -- "\\\n\'<url>\'"', False),
+    ('git clone -- "\n\'<url>\'"', False),
+    ("git clone -- \\\n\\'<url>\\'", False),
+    ("git clone -- '\n<url>'", True),
+    ("git clone -- '<url>", False),
+    ('echo "$(printf "\'<url>\'")"', False),
+    ("# git clone -- <url>\ngit clone -- '<url>'", True),
+    ('printf "\n# <url>\n"', False),
+    ("git clone -- <slug>", True),
+]
+for fixture, expected in fixtures:
+    accepted = not unsafe_placeholders(enumerate(fixture.splitlines(keepends=True), 1))
+    if accepted != expected:
+      print('scanner fixture misclassified: ' + repr(fixture))
+      sys.exit(2)
+
+findings = []
+for path in sorted(Path('commands').glob('*.md')):
+    block = None
+    for number, line in enumerate(path.read_text().splitlines(keepends=True), 1):
+      if block is None:
+        if line.rstrip() == '```bash':
+          block = []
+      elif line.rstrip() == '```':
+        for location, names in unsafe_placeholders(block).items():
+          findings.append(f'{path}:{location}: ' + ' '.join(names))
+        block = None
+      else:
+        block.append((number, line))
+    if block is not None:
+      for location, names in unsafe_placeholders(block).items():
+        findings.append(f'{path}:{location}: ' + ' '.join(names))
+print('\n'.join(findings), end='\n' if findings else '')
+sys.exit(1 if findings else 0)
+PY
+}
+quote_findings=$(scan_configuration_quotes)
+quote_exit=$?
+if [ "$quote_exit" -eq 2 ]; then
+    bad "inert quote scanner fixtures failed"
+    note "$quote_findings"
+elif [ "$quote_exit" -gt 2 ]; then
+    bad "configuration placeholder scanner could not run"
+    note "$quote_findings"
+else
+    ok "inert quote scanner fixtures distinguish effective single quotes"
+    if [ "$quote_exit" -eq 0 ]; then
+    ok "every configuration placeholder in a bash block is single-quoted"
+    else
+    quote_lines=$(printf '%s\n' "$quote_findings" | wc -l | tr -d ' ')
+    bad "configuration placeholders reach the shell unquoted ($quote_lines lines)"
+    printf '%s\n' "$quote_findings" | sed 's/^/        /'
+    note "quote each one: '<name>' (007 FR-006)"
+    fi
+fi
+
 echo
 if [ "$fail" -eq 0 ]; then
   printf '\033[32m%s checks passed.\033[0m\n\n' "$pass"

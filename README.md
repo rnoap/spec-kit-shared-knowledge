@@ -414,6 +414,7 @@ This section states what that grants, and what it does not.
 Fetched content is read as **data**. It is never executed.
 
 - No build step, script, or repository hook from a source is ever run.
+- No configuration value and no fetched file name is ever run as a command.
 - Clones use `--no-checkout` and `--filter=blob:none`; only `.md` files under your
   `path_filter` are read.
 - Nothing from a source is written outside
@@ -426,6 +427,8 @@ Fetched content is read as **data**. It is never executed.
 | Values beginning with `-` are rejected | Argument injection into `git` — a `revision` of `--upload-pack=<cmd>` would be remote code execution | A legitimately shaped value pointing somewhere hostile |
 | `--` before every config-derived `git` operand | The same, if validation is ever bypassed | As above |
 | Validation runs on **read**, not just write | Values arriving by hand-edit, by PR, or from an older version | Values that are valid but unwanted |
+| `url` and `path_filter` accept only ASCII letters, digits and `. _ ~ : / @ % + -`, plus spaces in a local path | A merged configuration change running commands on teammates' machines | A well-formed value pointing somewhere hostile |
+| Every value reaches the shell inside single quotes, and fetched file names only through shell variables | The same, if validation is ever bypassed, and hostile file names in a source | As above |
 | `--no-checkout` + `--filter=blob:none` | Fetching a working tree wholesale | The subsequent checkout, which does write the filtered files |
 | Every network call is time-bounded: 10 s, 30 s for a full-history fetch, 5 s in `status` | A hung or tarpitting host | A fast host serving hostile content |
 | `path_filter` | Corpus size and blast radius | Anything inside the filtered paths |
@@ -486,21 +489,25 @@ See [`config-template.yml`](config-template.yml) for the full annotated configur
 
 Top-level fields:
 
-- `schema_version` — **required**; exactly `"1.0"`.
+- `schema_version` — **required**; exactly `"1.1"`. Older files require the [manual migration](#manual-migration-from-10) below.
 - `max_cache_age` — optional; project-wide freshness policy (`30m`, `4h`, `7d`). See [Cache freshness](#-cache-freshness).
 - `max_items` / `max_bytes` — optional; project-wide context budget. See [Context budget](#-context-budget).
 - `sources` — **required**; the list of knowledge sources. May be empty.
 
 Key fields per source entry:
 
-- `sources[*].url` — **required**. One of:
+- `sources[*].url` — **required**. Only ASCII letters, digits and `. _ ~ : / @ % + -`. A local path starts with `/`, `./`, `../` or `~/` and may also contain spaces, but no space followed by `-`. Remote addresses write spaces as `%20`. Must not begin with `-`. One of:
   - HTTPS Git URL: `https://github.com/your-org/your-repo`
   - SSH Git URL: `git@github.com:your-org/your-repo`
+  - SSH URL with a port: `ssh://git@git.example.com:2222/team/kb.git`
+  - Git+SSH URL: `git+ssh://git@git.example.com/~alice/kb.git`
   - **Local absolute path** to a Git repository: `/Users/devuser/repos/your-repo`
   - **Local tilde path** (expanded to `$HOME`): `~/repos/your-repo`
+  - **Local relative path**: `./vendor/kb` or `../kb`
+  - **Local path containing spaces**: `~/My Repos/kb`; pass it to configure as `'~/My Repos/kb' specs/` so it stays one argument.
 - `sources[*].label` — optional; human-readable name used for attribution, and the identifier `remove` takes. Must be **unique** and contain no whitespace. Defaults: for remote URLs, `<host>/<org>/<repo>` derived from the URL; for local paths, the last path component (e.g. `~/repos/payment-service` → `payment-service`).
 - `sources[*].revision` — optional; a branch, tag, or full commit SHA. Omitted → the remote's default revision. See [Pinning a revision](#-pinning-a-revision).
-- `sources[*].path_filter` — optional. Three forms:
+- `sources[*].path_filter` — optional folder names. Each entry accepts only ASCII letters, digits and `. _ ~ : / @ % + -`, with no leading `/`, `~` or `-`, no `..`, no spaces and no wildcards. Three forms:
   - **Omitted** → every `.md` file in the repo is indexed.
   - **Single string** → `path_filter: specs/` indexes only files under `specs/`.
   - **YAML list** → `path_filter: [specs/, docs/decisions/]` indexes those two trees and nothing else.
@@ -508,7 +515,57 @@ Key fields per source entry:
 - `sources[*].max_cache_age` — optional; **replaces** the project-wide value for this source.
 - `sources[*].max_items` / `sources[*].max_bytes` — optional; a **sub-ceiling** that can only lower what this source contributes.
 
-Every value is validated each time the file is read. A source with an invalid value is skipped with a message naming the field and value; the other sources still sync.
+Every value is validated each time the file is read, before any shell use. A source
+with an invalid value is skipped with a message naming its field and first
+disallowed character; the other sources still sync. Messages show control
+characters escaped, such as `\n`, rather than letting them rewrite the terminal.
+
+### Manual migration from 1.0
+
+Configuration schema `1.1` narrows accepted values, even though the field layout
+has not changed. All five commands stop on a `1.0` file with this diagnostic:
+
+```text
+Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, review the README migration notes, then change only schema_version. No sources or caches were used or changed.
+```
+
+No command automatically migrates, downgrades or writes an unsupported file.
+They exit 0 without using source values or changing configuration or caches;
+an automatic hook lets its parent command continue. Missing and unknown versions
+also stop, using `<missing>` when the version is absent:
+
+```text
+Error: Unrecognized knowledge-config.yml schema_version "<value>". Expected "1.1". No sources or caches were used or changed.
+```
+
+To migrate a known `1.0` file:
+
+1. Back up `knowledge-config.yml` and review the compatibility table below.
+2. With a file-editing tool, change only the root `schema_version` scalar from
+  `"1.0"` to `"1.1"`. Preserve every source value and other setting. Do not send
+  source values to a shell to migrate them. This procedure does not apply to
+  missing or unknown versions.
+3. Run sync and status. Valid sources keep their original slug inputs and reuse
+  their caches; the normal per-source rules refuse discontinued values.
+4. Correct or remove refused entries as a separate, reviewed edit. While any
+  source is invalid, sync prunes nothing. Removing an invalid entry leaves its
+  cache for the next sync in which every source is accepted.
+
+| Previously accepted value | Schema `1.1` |
+| --- | --- |
+| Shell syntax in `url` or `path_filter` | Refused before any value of that source reaches a shell |
+| `path_filter` wildcards or negation (`*`, `?`, `[ ]`, `!`) | Refused; use folder names |
+| A `path_filter` beginning with `~` | Refused, like a leading `/` |
+| A local path written `~user/…` | Refused; use `/`, `./`, `../` or `~/` |
+| A bracketed IPv6 address | Refused; use a host name |
+| A space in a remote address or filter | Refused; remote URLs use `%20` |
+| A local path containing a space | Accepted unless a space is followed by `-`; rename or link such a folder |
+| Non-ASCII letters | Refused; the character list is ASCII |
+
+configure creates and preserves schema `1.1`. The version-only migration does not
+change source values, cache identities, or the separate manifest and index
+formats. Caches named by the documented slug algorithm are reused. A cache named
+by the old broken slug procedure is replaced once on the next sync.
 
 ## 🙈 .gitignore
 

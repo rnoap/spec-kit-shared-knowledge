@@ -38,6 +38,19 @@ not run is a missed step.
    the user confirms.
 4. Confirm in one line which mandatory hooks you executed.
 
+**Exception: Companion pipeline commands.** `speckit.companion.specify`,
+`speckit.companion.plan`, `speckit.companion.tasks` and
+`speckit.companion.implement` (the dash form `speckit-companion-*` where the
+project registers skills, and every step `speckit.companion.auto` runs) do the
+`.specify/extensions.yml` pass themselves and skip Companion's own capture
+hooks. Execute each `EXECUTE_COMMAND:` block such a command prints, once, offer
+its optional blocks, and add no pass of your own. Never dispatch the capture
+hooks around the outer Companion command. A stock gate invoked inside an
+approved node hook still owns its own configured hook pass, including converge's
+before/after capture hooks, once per gate invocation. These are not an extra
+outer-pipeline pass. A second outer pass creates a second branch and rewrites
+the recorded state.
+
 **Worked example — `speckit.git.commit`** (the `git` extension is always installed):
 
 > markdown: `.specify/extensions/git/commands/speckit.git.commit.md`
@@ -82,19 +95,19 @@ bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/sk
 <!-- SPECKIT-TINY-SPECS END -->
 
 <!-- SPECKIT START -->
-For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan:
+Active feature: **007-shell-safe-config**.
 
-- Latest feature: `005-context-budget-trust`
-- **Plan: [specs/005-context-budget-trust/plan.md](specs/005-context-budget-trust/plan.md)**
-- Spec: [specs/005-context-budget-trust/spec.md](specs/005-context-budget-trust/spec.md)
-- Research: [specs/005-context-budget-trust/research.md](specs/005-context-budget-trust/research.md)
-- Data model: [specs/005-context-budget-trust/data-model.md](specs/005-context-budget-trust/data-model.md)
-- Contracts: [config schema](specs/005-context-budget-trust/contracts/knowledge-config.schema.md) · [command surface](specs/005-context-budget-trust/contracts/commands.md)
-- Tasks: [specs/005-context-budget-trust/tasks.md](specs/005-context-budget-trust/tasks.md)
-- Verification: [specs/005-context-budget-trust/quickstart.md](specs/005-context-budget-trust/quickstart.md)
+Status: implementation completed on branch `007-shell-safe-config`; not yet released.
+The [recorded context](specs/007-shell-safe-config/.spec-context.json) is the
+source of truth for current progress.
 
-Status: completed — shipped in v1.5.0. No feature is in progress.
+- [Specification](specs/007-shell-safe-config/shell-safe-config.spec.md)
+- [Plan](specs/007-shell-safe-config/plan.md)
+- [Research](specs/007-shell-safe-config/research.md)
+- [Data model](specs/007-shell-safe-config/data-model.md)
+- [Contracts](specs/007-shell-safe-config/contracts/commands.md)
+- [Quickstart](specs/007-shell-safe-config/quickstart.md)
+- [Tasks](specs/007-shell-safe-config/tasks.md)
 <!-- SPECKIT END -->
 
 <!-- CODE-GRAPH-GUIDE START -->

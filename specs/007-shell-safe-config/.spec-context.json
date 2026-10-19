@@ -1,0 +1,999 @@
+{
+  "workflow": "companion",
+  "specName": "Shell-Safe Configuration",
+  "branch": "007-shell-safe-config",
+  "currentStep": "implement",
+  "status": "completed",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-16T13:53:48.000Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-16T14:01:02.333Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-19T11:36:07.225Z"
+    },
+    {
+      "step": "plan",
+      "substep": "research",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T11:58:51.480Z"
+    },
+    {
+      "step": "plan",
+      "substep": "design",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T12:31:49.840Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T12:32:47.850Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-19T12:51:08.446Z"
+    },
+    {
+      "step": "tasks",
+      "substep": "generate",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T13:06:36.923Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T13:07:16.317Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-19T15:56:58.516Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T001",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T15:59:09.162Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T002",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:02:30.242Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T003",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:04:39.282Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T004",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:05:56.700Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T007",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:11:11.727Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T006",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:15:02.143Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T005",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:17:19.516Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T008",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:20:12.847Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T012",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:27:34.554Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T009",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:27:43.382Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T011",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T16:31:36.998Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T010",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T17:09:44.541Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T013",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T17:12:55.749Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T014",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T17:14:07.150Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T015",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T17:16:13.158Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T016",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T17:17:09.410Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T017",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T17:18:41.916Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T018",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T17:20:43.654Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T019",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T21:34:04.327Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T020",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T22:02:58.440Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T021",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T22:04:16.679Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T022",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T22:04:16.930Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T023",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T22:04:58.942Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T024",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T22:05:27.609Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T025",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T22:08:27.325Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-19T22:08:27.418Z"
+    }
+  ],
+  "telemetryInstanceId": "b15432d8-ea32-4ff8-8c19-33e942addd4a",
+  "last_action": "25/25 tasks complete; macOS and Ubuntu20.04 each pass 15 static and 206 behavior checks; real install smoke and SC-001 through SC-009 evidence complete.",
+  "coverage": {
+    "FR-001": {
+      "title": "Refuse url and path_filter characters outside letters, digits and . _ ~ : / @ % + - on every read; local paths (/ ./ ../ ~/) also admit spaces, never one followed by -; a path_filter must not begin with ~",
+      "tasks": [
+        "T003",
+        "T005",
+        "T006",
+        "T017",
+        "T018",
+        "T019"
+      ],
+      "tests": [
+        "quickstart.md::SC-001",
+        "quickstart.md::SC-002",
+        "quickstart.md::SC-003"
+      ]
+    },
+    "FR-002": {
+      "title": "Every command that reads the configuration checks a value before any other use (local-path check, reachability, slug), so a refused value never reaches a command",
+      "tasks": [
+        "T003",
+        "T005",
+        "T006",
+        "T010",
+        "T011",
+        "T015",
+        "T019"
+      ],
+      "tests": [
+        "quickstart.md::SC-001",
+        "quickstart.md::SC-009"
+      ]
+    },
+    "FR-003": {
+      "title": "Configure refuses to write a failing value, naming the field and the first disallowed character",
+      "tasks": [
+        "T005",
+        "T019"
+      ],
+      "tests": [
+        "quickstart.md::SC-001 configure cases"
+      ]
+    },
+    "FR-004": {
+      "title": "Sync and status skip only the refused source, name source, field and character, continue and exit 0",
+      "tasks": [
+        "T006",
+        "T015",
+        "T019"
+      ],
+      "tests": [
+        "quickstart.md::SC-003 and hook continuation"
+      ]
+    },
+    "FR-005": {
+      "title": "Messages quoting a configuration value, a label or a fetched file name show control characters escaped, never raw",
+      "tasks": [
+        "T003",
+        "T005",
+        "T006",
+        "T010",
+        "T011",
+        "T013",
+        "T019"
+      ],
+      "tests": [
+        "quickstart.md::SC-003 escaped diagnostics",
+        "quickstart.md::SC-004 literal-name search"
+      ]
+    },
+    "FR-006": {
+      "title": "Every value handed to the shell (config values, expanded local paths, fetched file names) arrives as one literal argument",
+      "tasks": [
+        "T003",
+        "T007",
+        "T008",
+        "T009",
+        "T011",
+        "T012",
+        "T013",
+        "T016",
+        "T021"
+      ],
+      "tests": [
+        ".github/scripts/test-sync-git.sh::hostile_values",
+        "quickstart.md::SC-004",
+        "quickstart.md::SC-005"
+      ]
+    },
+    "FR-007": {
+      "title": "Automated checks fail when a shell step hands a configuration value to the shell unquoted",
+      "tasks": [
+        "T002",
+        "T020",
+        "T021"
+      ],
+      "tests": [
+        ".github/scripts/validate-extension.sh::check12 and inert fixtures",
+        "quickstart.md::SC-006"
+      ]
+    },
+    "FR-008": {
+      "title": "Source Slug Generation runs as written in sh, bash and zsh",
+      "tasks": [
+        "T007",
+        "T014",
+        "T022"
+      ],
+      "tests": [
+        ".github/scripts/test-sync-git.sh::slug_checks sh bash zsh"
+      ]
+    },
+    "FR-009": {
+      "title": "The slug procedure yields the slug the documented algorithm yields today for every source",
+      "tasks": [
+        "T007",
+        "T014",
+        "T022"
+      ],
+      "tests": [
+        ".github/scripts/test-sync-git.sh::slug_checks",
+        "quickstart.md::SC-007 cache reuse and replacement"
+      ]
+    },
+    "FR-010": {
+      "title": "README trust model lists the new defense, what it covers and what it does not",
+      "tasks": [
+        "T018"
+      ],
+      "tests": [
+        "README.md::Trust model manual check"
+      ]
+    },
+    "FR-011": {
+      "title": "README and configuration template state schema 1.1 and accepted characters; README documents manual 1.0 migration and discontinued values",
+      "tasks": [
+        "T017",
+        "T018"
+      ],
+      "tests": [
+        "config-template.yml YAML parse",
+        "README.md::Manual migration from 1.0"
+      ]
+    },
+    "FR-012": {
+      "title": "CHANGELOG [Unreleased] records the security fix, the slug fix, the docs, the new check and the constitution amendment",
+      "tasks": [
+        "T020",
+        "T024"
+      ],
+      "tests": [
+        "CHANGELOG.md::Unreleased manual check",
+        "validate-extension.sh"
+      ]
+    },
+    "FR-013": {
+      "title": "AGENTS.md spec-kit section names the same latest feature as .github/copilot-instructions.md with its true status",
+      "tasks": [
+        "T023"
+      ],
+      "tests": [
+        "quickstart.md::SC-008 agent pointer and link check"
+      ]
+    },
+    "FR-014": {
+      "title": "All five commands gate source use on configuration schema 1.1; legacy, missing and unknown versions stop without mutations; manual version-only migration preserves sources and caches; manifest and index formats stay unchanged",
+      "tasks": [
+        "T003",
+        "T005",
+        "T006",
+        "T010",
+        "T011",
+        "T017",
+        "T018",
+        "T019",
+        "T024",
+        "T025"
+      ],
+      "tests": [
+        "quickstart.md::SC-009 18 schema gates and migration"
+      ]
+    }
+  },
+  "size": "normal",
+  "classification": {
+    "projectedFiles": 10,
+    "projectedTasks": 16,
+    "scopeSignal": "none",
+    "verdict": "normal"
+  },
+  "expectations": [
+    "No package version bump, tag, release or catalog submission; configuration schema 1.1 is in scope",
+    "No defense against prompt injection or credential exposure",
+    "No change to the revision rule",
+    "The commands shell steps are not run in CI",
+    "The ../ local-path detection mismatch in sync and status is left as is",
+    "No repository settings changes"
+  ],
+  "context": [
+    "area: commands/speckit.knowledge.{configure,sync,status}.md Configuration Validation Rules, three byte-identical copies (static check 11)",
+    "area: commands/speckit.knowledge.sync.md cold/warm path, sparse-checkout and Indexable Items steps interpolate <url>, <expanded-path>, <revision>, <pattern...>, <dir...> unquoted and <path_filter> in double quotes",
+    "area: commands/speckit.knowledge.status.md L131-L138 ls-remote takes <url> unquoted; the local check takes <expanded-path> in double quotes",
+    "area: commands/speckit.knowledge.sync.md L22-L27 Source Slug Generation puts # comments after line continuations and reads url/revision from shell variables",
+    "area: commands/speckit.knowledge.remove.md L67 reuses the slug procedure without the validation block",
+    "area: README.md Trust model defenses table",
+    "area: .github/scripts/test-sync-git.sh fills placeholders with sed and runs the bash blocks offline; it does not run the slug block",
+    "area: AGENTS.md SPECKIT block is hand-maintained and export-ignored; agent-context manages only .github/copilot-instructions.md",
+    "constraint: constitution I, the validation block stays duplicated verbatim in three commands, never extracted",
+    "constraint: constitution Code Boundaries, .specify/ is tooling-owned except memory/ and templates",
+    "constraint: constitution Quality Gates lists static checks 1-11; a new check needs a docs: amendment",
+    "constraint: slug bytes unchanged (004 FR-024 backward compatibility)",
+    "constraint: configuration schema becomes 1.1 under constitution Principle I; manual version-only migration from 1.0; manifest and index schema versions stay unchanged"
+  ],
+  "intent": "Stop knowledge-config values and fetched file names from running shell commands, make the slug procedure run as written, and point AGENTS.md at the current feature",
+  "decisions": [
+    {
+      "decision": "Accept spaces in a local-path url; remote addresses and path_filter keep refusing them; a space followed by - stays refused",
+      "why": "User decision 2026-10-19: folders with spaces are common on macOS and FR-006 quoting makes them safe; the dash guard keeps the leading - rule true for every piece the shell would see if a quote were missed",
+      "rejected": "Refusing spaces everywhere and pointing users to a symbolic link"
+    },
+    {
+      "decision": "Single-quote every configuration placeholder in the bash blocks; a quote inside a value is written as close-quote, backslash-quote, reopen",
+      "why": "Single quotes stop all expansion and splitting in sh, bash and zsh, and the escape keeps that true when validation is bypassed",
+      "rejected": "Double quotes (still run command substitution), a quoted heredoc per value, a temp file per value, environment variables"
+    },
+    {
+      "decision": "State the quoting rule inside the duplicated Configuration Validation Rules block",
+      "why": "configure, sync and status all carry it, static check 11 keeps the copies identical, and it extends the existing leading-dash account",
+      "rejected": "One copy in the sync Algorithm Reference; a shared file, which constitution I forbids"
+    },
+    {
+      "decision": "The agent applies the character rule in its own reasoning; no validation snippet",
+      "why": "A snippet would hand the unchecked value to a shell in order to check it",
+      "rejected": "A case pattern or a tr filter run in the shell"
+    },
+    {
+      "decision": "Accept letters, digits and . _ ~ : / @ % + - in url and path_filter; spaces only in local paths and never before a dash; local paths start with ~/ (not ~user/); a path_filter must not begin with ~; wildcards refused",
+      "why": "Covers the supported address forms listed in SC-002. Previously accepted bracketed IPv6 addresses and other discontinued values are documented as a breaking change in configuration schema 1.1",
+      "rejected": "A deny-list of known metacharacters"
+    },
+    {
+      "decision": "A refused value never reaches a shell: status shows invalid, sync prunes nothing that run, remove deletes the entry and leaves the cache to the next prune, search skips the source",
+      "why": "Computing a slug is the one place quoting would have to hold for a value that really contains a quote or a line break",
+      "rejected": "Computing the slug of a refused value under the quoting rule"
+    },
+    {
+      "decision": "Use a slug only when it is 12 lowercase hex characters, and delete only directories so named, only when every expected slug has that form",
+      "why": "Run as written in zsh the slug procedure yields an empty slug, which turns cache/<slug>/ into the cache root",
+      "rejected": "Trusting the fixed procedure"
+    },
+    {
+      "decision": "Fetched file names travel only through variables and redirection; find starting points get ./; item lines with a .. segment or a leading / are dropped; manifest and index are written with the file tool",
+      "why": "File names come from whoever controls the source and no configuration rule sees them",
+      "rejected": "NUL-separated lists, which are not POSIX and which dash cannot read"
+    },
+    {
+      "decision": "Every message is agent output, never echo or printf, with control characters escaped in any quoted value, label or file name",
+      "why": "echo around a refused value runs its command substitution, and labels and file names can carry terminal escapes",
+      "rejected": "A character rule for labels only"
+    },
+    {
+      "decision": "Fix the slug procedure: comments off the continuation lines, explicit url and revision assignments, printf instead of echo, the real worked example",
+      "why": "As written, zsh fails and sh and bash hash an empty address, so unpinned sources share e3b0c44298fc; output for every accepted value is unchanged",
+      "rejected": "Keeping echo, whose backslash handling differs by shell"
+    },
+    {
+      "decision": "Static check 12 tracks effective quote contexts and escapes across physical lines, rejects unsafe or ambiguous placeholder contexts, and checks inert negative fixtures; <slug> is the only exemption",
+      "why": "Removing apparent single-quoted segments accepts single quotes inside double quotes even though command substitution remains active there; analysis finding I1 requires a context-aware fail-closed check",
+      "rejected": "Regex-only removal of single-quoted segments; a fixed placeholder list; shell-executing scanner fixtures in CI"
+    },
+    {
+      "decision": "Extend the local behaviour test: literal quoting-aware substitution, 8 hostile seeds, a local path with a space, slug runs in sh, bash and zsh, hostile file names",
+      "why": "sed reads a pipe, an ampersand, a backslash or a line break in a value as syntax, so seeds would pass for the wrong reason",
+      "rejected": "Running the test in CI, which needs its own constitution amendment"
+    },
+    {
+      "decision": "Configuration schema becomes 1.1 with an all-command version gate and a documented manual version-only migration from 1.0; cache manifest and index formats stay unchanged",
+      "why": "Analysis finding C1: narrowing previously accepted values is a breaking schema change under constitution Principle I, even without changing fields or types. Manual migration preserves source values and cache identities without evaluating input or silently rewriting files",
+      "rejected": "Retaining 1.0 for a changed accepted value domain; automatically rewriting legacy files; using sources before the version gate"
+    },
+    {
+      "decision": "Verification requires all 64 hostile-value observations, explicit hostile-file-name search, healthy pre-upgrade cache reuse with zero clone calls, and schema gate/manual migration evidence",
+      "why": "Analysis findings C2, C3 and C4 exposed partial acceptance coverage; T019, T021, T022 and T025 now require the complete evidence described in quickstart sections 2.1 to 2.5",
+      "rejected": "Treating a smoke walkthrough, scripted sync alone, or broken-cache replacement alone as complete success-criterion coverage"
+    },
+    {
+      "decision": "configure keeps a quoted argument whole",
+      "why": "Otherwise a local path with a space can only be added by editing the YAML",
+      "rejected": "Plain whitespace splitting"
+    },
+    {
+      "decision": "AGENTS.md stays hand-maintained: pointed at 007 once the after-plan hook has run, marked completed by the last implement task, no CHANGELOG line",
+      "why": "Precedent a774934; the file is export-ignored and nothing rewrites it at completion",
+      "rejected": "Adding AGENTS.md to the agent-context targets"
+    },
+    {
+      "decision": "All runtime edits and the tests live in Foundational; story phases document and verify",
+      "why": "Every story touches sync, status and configure, which share a byte-identical block, and one file may have only one owner phase",
+      "rejected": "Story phases editing the same command files in turn"
+    },
+    {
+      "decision": "AGENTS.md gets one edit whose status stays true until the release; the release flips it to shipped",
+      "why": "A second edit at completion would give the file two owner phases; precedent a774934 wrote the shipped status at release",
+      "rejected": "A last implement task marking it completed"
+    },
+    {
+      "decision": "Use schema 1.1 with manual scalar-only migration",
+      "why": "Narrowing accepted characters is a breaking value-domain change; source values and documented cache identities must remain unchanged.",
+      "rejected": "Silently rewriting or processing legacy configuration"
+    },
+    {
+      "decision": "Validate in agent reasoning, then single-quote every configuration shell operand",
+      "why": "An unchecked source must never reach a shell, and literal argument quoting must still hold when validation is bypassed.",
+      "rejected": "A shell-based validator or double-quoted interpolation"
+    },
+    {
+      "decision": "Apply the two user-approved install-gate repairs",
+      "why": "The real dev install copied a local virtual environment and the assertion missed dashed skill names; both fixes were validated by a successful real reinstall.",
+      "rejected": "Ignoring the failed install gate or broad packaging refactoring"
+    }
+  ],
+  "concerns": [
+    {
+      "note": "plan-blocks.py failed again: the installed companion lacks presets/_parts (call-paths.md), so the call-path block is prose in plan.md",
+      "step": "plan"
+    },
+    {
+      "note": "Planning found 13 touched files, above the 10-file oversized threshold; all are one package of command prose, so size stays normal and plan.md carries a Scale note",
+      "step": "plan"
+    },
+    {
+      "note": "The spec was amended during planning (research 16): FR-001, FR-002, FR-005, FR-012, User Story 3, SC-007 and four edge cases",
+      "step": "plan"
+    },
+    {
+      "note": "The character rule is applied in agent reasoning, so only the quickstart walkthrough verifies it; the scripts verify quoting, slugs and file names",
+      "step": "plan"
+    },
+    {
+      "note": "Caches named e3b0c44298fc, or by a hand-repaired slug variant, are replaced once after the upgrade; SC-007 holds only for caches named by the documented algorithm",
+      "step": "plan"
+    },
+    {
+      "note": "T019 scratch install smoke is blocked by pre-existing packaging/check defects: untracked .venv-1 is copied in dev installs (1503 files), and assert-install.sh counts dotted registrations while the CLI emits dashed skill names. Both owning files are unchanged from HEAD; scope approval required before remediation."
+    },
+    {
+      "note": "Snyk code scanning could not run: no snyk_code_scan tool is available in this session. Repository static, behavioral, installation and targeted security regression checks passed.",
+      "step": "implement"
+    },
+    {
+      "note": "Real-agent command transcripts were interrupted by DNS and permission timeouts; subsequent retained observations and native checks completed the required scenarios. Inline Markdown operations have no standalone process exit; no such numeric exit was invented.",
+      "step": "implement"
+    }
+  ],
+  "step_summaries": {
+    "plan": {
+      "summary": "Two-layer plan: an agent-applied character rule plus single-quoted placeholders; refused values never reach a shell; slug procedure fixed; static check 12 and a local behaviour test",
+      "key_finding": "Run as written, the slug procedure hashes an empty address in sh and bash, so every unpinned source shared cache e3b0c44298fc, and in zsh it yields an empty slug that would make remove purge the whole cache root"
+    },
+    "tasks": {
+      "summary": "25 tasks: a setup gate, a 5-wave Foundational phase (5 command files, check 12, the test script), US1 docs and agent walkthrough, US2 constitution and verification, US3 verification, US4 AGENTS.md, Polish CHANGELOG and validation",
+      "key_finding": "Shared command files force all runtime work into Foundational; the story phases own disjoint files, so they can run in parallel after it"
+    },
+    "implement": {
+      "summary": "Implemented shell-safe schema 1.1 commands, literal shell operands and fetched-name reads, portable slugs, static check 12 and full regression evidence; 25/25 tasks complete."
+    }
+  },
+  "approach": "Refuse url and path_filter values outside an explicit character list, applied by the agent before any shell use, and never hand a refused value to a shell. Single-quote every configuration placeholder in the bash blocks, route fetched file names through variables, and fix the slug procedure. Static check 12 and an extended local behaviour test keep it that way.",
+  "verified": [
+    {
+      "what": "Baseline sync behavior",
+      "command": "bash .github/scripts/test-sync-git.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 10.5,
+      "result": "  \u001b[32mPASS\u001b[0m  no timeout tool at all: the call still runs ·   \u001b[32mPASS\u001b[0m  no timeout tool at all: one warning says so · \u001b[32m38 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T002 unsafe-placeholder baseline",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 2,
+      "durationSeconds": 0.7,
+      "result": "  \u001b[32mPASS\u001b[0m  the three Configuration Validation Rules blocks are byte-identical · .github/scripts/validate-extension.sh: line 308: unexpected EOF while looking for matching `'' · .github/scripts/validate-extension.sh: line 310: syntax error: unexpected end of file",
+      "warnings": [
+        "exited 2"
+      ]
+    },
+    {
+      "what": "T002 exact 18-line unsafe baseline (expected failure)",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 1,
+      "durationSeconds": 0.7,
+      "result": "        commands/speckit.knowledge.sync.md:713: <revision> ·         quote each one: '<name>' (007 FR-006) · \u001b[31m1 failed\u001b[0m, 14 passed.",
+      "warnings": [
+        "exited 1"
+      ]
+    },
+    {
+      "what": "T013 hostile argument defense",
+      "command": "bash .github/scripts/test-sync-git.sh --hostile-values",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 9.5,
+      "result": "  \u001b[32mPASS\u001b[0m  status-local / LOCAL / seed 7: no marker, byte-exact arguments ·   \u001b[32mPASS\u001b[0m  status-local / LOCAL / seed 8: no marker, byte-exact arguments · \u001b[32m128 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Quoted command static validation",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.9,
+      "result": "  \u001b[32mPASS\u001b[0m  inert quote scanner fixtures distinguish effective single quotes ·   \u001b[32mPASS\u001b[0m  every configuration placeholder in a bash block is single-quoted · \u001b[32m15 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Slug references in sh bash zsh",
+      "command": "bash .github/scripts/test-sync-git.sh --slugs",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 1.3,
+      "result": "  \u001b[32mPASS\u001b[0m  zsh slug reference 8: exact stdout, empty stderr, exit 0 ·   \u001b[32mPASS\u001b[0m  zsh slug reference 9: exact stdout, empty stderr, exit 0 · \u001b[32m27 checks passed.\u001b[0m"
+    },
+    {
+      "what": "T015 guarded sync static validation",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "  \u001b[32mPASS\u001b[0m  inert quote scanner fixtures distinguish effective single quotes ·   \u001b[32mPASS\u001b[0m  every configuration placeholder in a bash block is single-quoted · \u001b[32m15 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Hostile fetched filename defense",
+      "command": "bash .github/scripts/test-sync-git.sh --hostile-files",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "  \u001b[32mPASS\u001b[0m  no measured item content comes from outside the cache ·   \u001b[32mPASS\u001b[0m  hostile fetched name never creates a marker · \u001b[32m7 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Template schema 1.1",
+      "command": "ruby -ryaml -e 'abort unless YAML.safe_load(File.read(ARGV[0]))[\"schema_version\"] == \"1.1\"' config-template.yml",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.2,
+      "result": "no output"
+    },
+    {
+      "what": "README and package static validation",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "  \u001b[32mPASS\u001b[0m  inert quote scanner fixtures distinguish effective single quotes ·   \u001b[32mPASS\u001b[0m  every configuration placeholder in a bash block is single-quoted · \u001b[32m15 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Working-tree consumer install",
+      "command": "cd '/Users/r0n0352/spec-kit-007.qcNrgr/consumer' && specify extension add '/Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge' --dev --force > install.log 2>&1 && bash '/Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge/.github/scripts/assert-install.sh' '/Users/r0n0352/spec-kit-007.qcNrgr/consumer' '/Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 3.1,
+      "result": "  \u001b[32mPASS\u001b[0m  installed file count is sane (15) ·   \u001b[32mPASS\u001b[0m  4 hooks registered, none carrying arguments · Smoke test passed."
+    },
+    {
+      "what": "Wibey scratch runner startup",
+      "command": "cd '/Users/r0n0352/spec-kit-007.qcNrgr/consumer' && wibey --prompt 'Reply only SK007_READY. Do not read or edit files and do not call tools.' --output-format json",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 23.6,
+      "result": "  \"subagents\": null · } · \u001b[?1000l\u001b[?1002l\u001b[?1003l\u001b[?1006l\u001b[?1004l\u001b[?2004l\u001b[?7h\u001b]0;\u0007\u001b]2;\u0007\u001b[0m"
+    },
+    {
+      "what": "Complete macOS sync behavior suite",
+      "command": "bash .github/scripts/test-sync-git.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 29.3,
+      "result": "  \u001b[32mPASS\u001b[0m  no timeout tool at all: the call still runs ·   \u001b[32mPASS\u001b[0m  no timeout tool at all: one warning says so · \u001b[32m206 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Linux git-2.25 static and behavior suites",
+      "command": "podman run --rm -v '/Users/r0n0352/Walmart/repos/spec-kit-shared-knowledge':/w -w /w docker.io/library/ubuntu:20.04 sh -c 'apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get install -yqq git perl procps zsh python3-yaml && bash .github/scripts/validate-extension.sh && bash .github/scripts/test-sync-git.sh'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 28.4,
+      "result": "  \u001b[32mPASS\u001b[0m  no timeout tool at all: one warning says so · \u001b[32m206 checks passed.\u001b[0m · debconf: delaying package configuration, since apt-utils is not installed"
+    },
+    {
+      "what": "64-case real-agent evidence consolidation",
+      "command": "cd '/Users/r0n0352/spec-kit-007.qcNrgr/acceptance' && node host-evidence-check.js",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 4.1,
+      "result": "  \"detailed_check_path\": \"/Users/r0n0352/spec-kit-007.qcNrgr/acceptance/host-resume-01-evidence-check.json\", ·   \"visible_response_path\": \"/Users/r0n0352/spec-kit-007.qcNrgr/acceptance/host-resume-01-response-turns.json\" · }"
+    },
+    {
+      "what": "Constitution 1.4.0 static gates",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "  \u001b[32mPASS\u001b[0m  inert quote scanner fixtures distinguish effective single quotes ·   \u001b[32mPASS\u001b[0m  every configuration placeholder in a bash block is single-quoted · \u001b[32m15 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Final native acceptance evidence",
+      "command": "ruby -rjson -e 'root = \"/Users/r0n0352/spec-kit-007.qcNrgr/final-checks\"; data = JSON.parse(File.read(\"#{root}/results.json\")); abort unless data[\"checks\"].length == 7 && data[\"checks\"].all? { |check| check[\"result\"] == \"PASS\" }; data[\"checks\"].first(2).each { |check| abort unless File.read(\"#{root}/#{check[\"exit_file\"]}\").strip == \"1\"; abort unless File.read(\"#{root}/#{check[\"log\"]}\").include?(check[\"diagnostic_file\"]) }; exits = Dir.glob(\"#{root}/logs/*/process.exit\"); abort unless exits.length == 30 && exits.all? { |file| File.read(file).strip == \"0\" }; abort if File.exist?(\"#{root}/space-consumer/pwned\"); abort unless File.directory?(\"#{root}/broken-consumer/.specify/extensions/knowledge/cache/af87b6573e0a\") && File.directory?(\"#{root}/broken-consumer/.specify/extensions/knowledge/cache/bf4929c85ec8\") && !File.exist?(\"#{root}/broken-consumer/.specify/extensions/knowledge/cache/e3b0c44298fc\"); puts \"PASS: 7 acceptance scenarios, 30 native exits, 2 expected-red mutations, literal-name marker absent and replacement caches verified\"'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.2,
+      "result": "PASS: 7 acceptance scenarios, 30 native exits, 2 expected-red mutations, literal-name marker absent and replacement caches verified"
+    },
+    {
+      "what": "Final macOS static validation",
+      "command": "bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.9,
+      "result": "  \u001b[32mPASS\u001b[0m  inert quote scanner fixtures distinguish effective single quotes ·   \u001b[32mPASS\u001b[0m  every configuration placeholder in a bash block is single-quoted · \u001b[32m15 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Success-criteria evidence map",
+      "command": "ruby -e 'text = File.read(\"specs/007-shell-safe-config/quickstart.md\"); section = text.split(\"## 4. Verification record: 2026-10-19\", 2).last; abort unless section; expected = (1..9).map { |number| \"SC-%03d\" % number }; abort unless section.scan(/^\\| (SC-\\d{3}) \\|/).flatten == expected; abort unless section.include?(\"206 checks\") && section.include?(\"15 checks\") && section.include?(\"no independent process exit\"); puts \"PASS: SC-001 through SC-009 mapped to verified evidence\"'",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.2,
+      "result": "PASS: SC-001 through SC-009 mapped to verified evidence"
+    },
+    {
+      "what": "Agent-applied command semantics and accepted address forms",
+      "result": "Reviewed the actual prompt decisions and native file-tool operations, 64 matrix records, 18 schema gates, scalar-only migration, removal/cache retention, native search and healthy/broken cache evidence. Inline Markdown commands do not have independent process exits; actual subprocess exits and parent continuation are retained separately."
+    }
+  ],
+  "currentTask": null,
+  "task_summaries": {
+    "T001": {
+      "status": "DONE",
+      "did": "Confirmed isolated planning commits, allowed worktree state and passing unchanged sync behavior test.",
+      "files": [
+        "specs/007-shell-safe-config/.spec-context.json"
+      ]
+    },
+    "T002": {
+      "status": "DONE",
+      "did": "Added stateful quote scanner and inert fixtures; unchanged commands report exactly the 18 contractual unsafe lines.",
+      "files": [
+        ".github/scripts/validate-extension.sh"
+      ]
+    },
+    "T003": {
+      "status": "DONE",
+      "did": "Added schema 1.1 gate, exact character-rule rows, quoting defense and escaped agent-only messages; contract row diff passes.",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T004": {
+      "status": "DONE",
+      "did": "Replaced sed rendering with literal one-pass substitution; Bash 3.2 syntax and hostile-byte round trips pass for every placeholder form.",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T007": {
+      "status": "DONE",
+      "did": "Made slug inputs explicit, repaired continuations and final output, and corrected worked examples; all nine references pass in sh/bash/zsh (27/27, exact stdout plus LF, empty stderr, exit 0).",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T006": {
+      "status": "DONE",
+      "did": "Added status schema/source gates, canonical validation, invalid precedence/count, slug guard, quoted probes and escaped output; validation-block diff, both Bash syntax checks and three offline spaced-path cases pass.",
+      "files": [
+        "commands/speckit.knowledge.status.md"
+      ]
+    },
+    "T005": {
+      "status": "DONE",
+      "did": "Updated configure with byte-identical validation, schema 1.1 gating, literal quoted arguments, exact refusals and escaped output; focused contract and whitespace checks pass.",
+      "files": [
+        "commands/speckit.knowledge.configure.md"
+      ]
+    },
+    "T008": {
+      "status": "DONE",
+      "did": "Added 128 hostile-value cases with scratch-only markers and byte-exact NUL argument recording; Bash 3.2 syntax and expected-red gate pass (96 expected failures, 32 passes), quoted controls pass 128/128; full suite has 109 known failures pending T009/T013, including 13 unchanged baseline failures, with no unexpected failures.",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T012": {
+      "status": "DONE",
+      "did": "Added scratch-HOME spaced local repository cold sync, upstream mutation, warm sync and local status checks; Bash 3.2 syntax and all 6 focused checks pass.",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T009": {
+      "status": "DONE",
+      "did": "Single-quoted all cold/warm configuration placeholders and sparse examples, documented literal home-directory expansion, and passed all 88 owned hostile-value cases.",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T011": {
+      "status": "DONE",
+      "did": "Added search schema, source and slug gates, guarded automatic sync, escaped output, and file-tool-only content reads; 26 contract checks and whitespace passed.",
+      "files": [
+        "commands/speckit.knowledge.search.md"
+      ]
+    },
+    "T010": {
+      "status": "DONE",
+      "did": "Implemented schema-1.1 gating, agent-only raw matching, entry-only invalid-target handling, validated-slug purging and escaped output; 31 focused text assertions and file whitespace check passed.",
+      "files": [
+        "commands/speckit.knowledge.remove.md"
+      ]
+    },
+    "T013": {
+      "status": "DONE",
+      "did": "Quoted find operands, guarded newline-forged traversal/absolute paths and required literal filename reads plus file-tool writes; 128 hostile and 15 static checks pass.",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T014": {
+      "status": "DONE",
+      "did": "Added permanent nine-row slug references; exact stdout, empty stderr and exit 0 pass in sh, bash and zsh (27 checks).",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T015": {
+      "status": "DONE",
+      "did": "Added refusal-before-header ordering, pre-use slug guard and three-condition orphan pruning; all 15 static checks pass.",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T016": {
+      "status": "DONE",
+      "did": "Added hostile-name, leading-dash and newline-forged path fixtures; all seven indexing/measurement/hash/no-marker checks pass.",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T017": {
+      "status": "DONE",
+      "did": "Updated template to schema 1.1 with URL/local-space and folder-filter character rules; YAML parse and schema assertion pass.",
+      "files": [
+        "config-template.yml"
+      ]
+    },
+    "T018": {
+      "status": "DONE",
+      "did": "Documented schema 1.1, accepted characters, exact unsupported-version diagnostics, manual version-only migration and two-layer trust defenses; static validation passes.",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T019": {
+      "status": "DONE",
+      "did": "Completed 64 real-agent matrix observations across four hooks, 18 schema gates, version-only migration with warm-cache reuse, empty configure, invalid-source removal/cache retention and agent-applied accepted-form checks. Evidence: /Users/r0n0352/spec-kit-007.qcNrgr/acceptance; inline Markdown operations have no independent numeric process exit.",
+      "files": [
+        "specs/007-shell-safe-config/quickstart.md"
+      ]
+    },
+    "T020": {
+      "status": "DONE",
+      "did": "Added exact Quality Gate 12, constitution 1.4.0 and rationale dated 2026-10-19; 15 static gates pass; committed independently.",
+      "files": [
+        ".specify/memory/constitution.md"
+      ]
+    },
+    "T021": {
+      "status": "DONE",
+      "did": "Verified both quote-scanner mutations, native quoted-path configure/sync/status, file-tool-only hostile-name search with no marker; macOS/Linux full suites pass. Native remaining evidence: final-checks/results.json (4/4).",
+      "files": [
+        ".github/scripts/test-sync-git.sh",
+        ".github/scripts/validate-extension.sh"
+      ]
+    },
+    "T022": {
+      "status": "DONE",
+      "did": "Verified 27 cross-shell slug references on macOS/Linux; pinned/unpinned healthy caches warm-update twice with zero clones; broken shared cache replaced by two correct caches and pruned (3/3 native scenarios).",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T023": {
+      "status": "DONE",
+      "did": "Updated only the managed Spec Kit section with active 007, truthful in-progress/unreleased status and eight resolving links; both agent pointers agree; committed independently.",
+      "files": [
+        "AGENTS.md"
+      ]
+    },
+    "T024": {
+      "status": "DONE",
+      "did": "Recorded all required security, breaking schema migration, slug consequence, compatibility, development and documentation changes under Unreleased, plus approved install fixes; static validation passes.",
+      "files": [
+        "CHANGELOG.md"
+      ]
+    },
+    "T025": {
+      "status": "DONE",
+      "did": "Mapped SC-001 through SC-009 in quickstart to complete matrix/schema/migration/cache/search evidence; macOS and Ubuntu20.04 pass 15 static and 206 behavior checks; final diff and evidence-map checks pass.",
+      "files": [
+        "specs/007-shell-safe-config/quickstart.md"
+      ]
+    }
+  }
+}

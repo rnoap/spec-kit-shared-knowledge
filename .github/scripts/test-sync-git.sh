@@ -23,6 +23,16 @@ expect() {
   fi
 }
 
+finish() {
+  echo
+  if [ "$fail" -eq 0 ]; then
+    printf '\033[32m%s checks passed.\033[0m\n\n' "$pass"
+    exit 0
+  fi
+  printf '\033[31m%s failed\033[0m, %s passed. Scratch kept: %s\n\n' "$fail" "$pass" "$T"
+  exit 1
+}
+
 T=$(mktemp -d "${TMPDIR:-/tmp}/sync-git.XXXXXX") || exit 1
 P=$T/project
 TARPIT=
@@ -47,12 +57,34 @@ block() {
 
 URL='' LOCAL='' REV='' FILTER='' DIRS=. SLUG=''
 render() {
-  if [ -n "$REV" ]; then sed 's|\[--branch <revision>\]|--branch <revision>|'
-  else sed '/\[--branch <revision>\]/d'; fi \
-  | sed -e "s|<url>|$URL|g" -e "s|<expanded-path>|$LOCAL|g" \
-        -e "s|<revision>|$REV|g" -e "s|<slug>|$SLUG|g" \
-        -e "s|<pattern1> \[<pattern2> \.\.\.\]|$FILTER|g" -e "s|<path_filter>|$FILTER|g" \
-        -e "s|<dir1> \[<dir2> \.\.\.\]|$DIRS|g"
+  URL="$URL" LOCAL="$LOCAL" REV="$REV" FILTER="$FILTER" DIRS="$DIRS" SLUG="$SLUG" perl -0pe '
+    sub escaped {
+      my ($value) = @_;
+      $value =~ s/\x27/\x27\\\x27\x27/g;
+      return $value;
+    }
+    sub quoted { return "\x27" . escaped($_[0]) . "\x27" }
+    sub replacement {
+      my ($token) = @_;
+      return length($ENV{REV}) ? "--branch " . quoted($ENV{REV}) : ""
+        if $token eq "[--branch \x27<revision>\x27]";
+      return quoted($ENV{FILTER}) if $token =~ /<pattern1>/;
+      return quoted(($token =~ m{\./<dir1>} ? "./" : "") . $ENV{DIRS})
+        if $token =~ /<dir1>/;
+      my %values = (
+        "<url>" => $ENV{URL}, "<expanded-path>" => $ENV{LOCAL},
+        "<revision>" => $ENV{REV}, "<slug>" => $ENV{SLUG},
+        "<path_filter>" => $ENV{FILTER},
+      );
+      return exists($values{$token}) ? escaped($values{$token}) : $token;
+    }
+    s{\[--branch\x20\x27<revision>\x27\]
+      |\x27<pattern1>\x27\x20\[\x27<pattern2>\x27\x20\.\.\.\]
+      |\x27\./<dir1>\x27\x20\[\x27\./<dir2>\x27\x20\.\.\.\]
+      |\x27<dir1>\x27\x20\[\x27<dir2>\x27\x20\.\.\.\]
+      |<[A-Za-z][A-Za-z0-9_-]*>
+    }{replacement($&)}gex;
+  '
 }
 
 # run <file> <anchor>...: each block in its own subshell from the project root,
@@ -104,12 +136,304 @@ WARM='#### Warm path (update)'
 WARM_REMOTE='**Remote URL** — check out the declared revision'
 WARM_LOCAL='**Local path** (fetch from local remote'
 
+hostile_record() {
+  printf '%s\0' "$#" "$@" >> "$HOSTILE_LOG"
+}
+
+hostile_arguments() {
+  perl -e '
+    sub fields {
+      open my $input, "<:raw", $_[0] or die "$ARGV[0]: $!\n";
+      local $/;
+      my @fields = split /\0/, scalar(<$input>) // "", -1;
+      pop @fields if @fields && $fields[-1] eq "";
+      return @fields;
+    }
+    my @actual = fields($ARGV[0]);
+    my %actual;
+    while (@actual) {
+      my $argc = shift @actual;
+      die "malformed argument recording\n"
+        unless $argc =~ /^[1-9][0-9]*$/ && @actual >= $argc;
+      my @args = splice @actual, 0, $argc;
+      my $program = shift @args;
+      $actual{$program}{$_}++ for @args;
+    }
+    my @expected = fields($ARGV[1]);
+    die "malformed argument expectations\n" if @expected % 2;
+    my %expected;
+    while (@expected) {
+      my ($program, $value) = splice @expected, 0, 2;
+      $expected{$program}{$value}++;
+    }
+    my $valid = 1;
+    for my $program (sort keys %expected) {
+      for my $value (sort keys %{$expected{$program}}) {
+        my $want = $expected{$program}{$value};
+        my $got = $actual{$program}{$value} // 0;
+        next if $want == $got;
+        warn "$program: expected $want byte-exact argument(s), received $got\n";
+        $valid = 0;
+      }
+    }
+    exit($valid ? 0 : 1);
+  ' "$1" "$2"
+}
+
+hostile_block() {
+  local source=$1 anchor=$2 name=$3
+  shift 3
+  local body field seed_number seed case_dir marker marker_word value rc reason
+  local URL LOCAL REV FILTER DIRS SLUG
+  body=$(block "$source" "$anchor")
+  if [ -z "$body" ]; then bad "$name: missing block"; return; fi
+  for field in "$@"; do
+    for seed_number in 1 2 3 4 5 6 7 8; do
+      case_dir=$T/hostile/$name-$field-$seed_number
+      mkdir -p "$case_dir"
+      marker=$case_dir/marker
+      marker_word=$(printf '%q' "$marker")
+      case "$seed_number" in
+        1) seed="\$(touch $marker_word)" ;;
+        2) seed="\`touch $marker_word\`" ;;
+        3) seed="x;touch $marker_word" ;;
+        4) seed="x&&touch $marker_word" ;;
+        5) seed="x|touch $marker_word" ;;
+        6) seed="x>$marker_word" ;;
+        7) seed="x';touch $marker_word;'" ;;
+        8) seed=$(printf 'x\ntouch %s' "$marker_word") ;;
+      esac
+      URL=https://example.invalid/repo LOCAL=$T/source REV=main
+      FILTER=docs/ DIRS=docs SLUG=012345abcdef
+      case "$field" in
+        URL) URL=https://example.invalid/$seed ;;
+        LOCAL) LOCAL=$T/$seed ;;
+        *) printf -v "$field" '%s' "$seed" ;;
+      esac
+      value=${!field}
+      : > "$case_dir/argv"
+      : > "$case_dir/expected"
+      case "$name:$field" in
+        slug:*) printf '%s\0' "slug-$field" "$value" >> "$case_dir/expected" ;;
+        indexable:DIRS)
+          printf '%s\0' git "$value" find "./$value" >> "$case_dir/expected" ;;
+        status-local:LOCAL)
+          printf '%s\0' '[' "$value/.git" git "$value" >> "$case_dir/expected" ;;
+        warm-sparse:FILTER|warm-remote:REV|warm-local:REV)
+          printf '%s\0' '[' "$value" git "$value" >> "$case_dir/expected" ;;
+        *) printf '%s\0' git "$value" >> "$case_dir/expected" ;;
+      esac
+      {
+        block "$SYNC" '### Bounded Network Call'
+        declare -f hostile_record
+        printf '%s\n' \
+          'function [ { hostile_record "[" "$@"; builtin [ "$@"; }' \
+          'find() { hostile_record find "$@"; printf "./fixture.md\n"; }'
+        printf '%s\n' "$body" | render
+        printf '%s\n' 'hostile_rc=$?'
+        if [ "$name" = slug ]; then
+          printf '%s\n' \
+            'hostile_record slug-URL "${url-}"' \
+            'hostile_record slug-REV "${revision-}"'
+        fi
+        printf '%s\n' 'exit "$hostile_rc"'
+      } > "$case_dir/run.sh"
+      ( cd "$P" && PATH="$hostile_bin:$PATH" HOSTILE_LOG="$case_dir/argv" \
+        "$BASH" "$case_dir/run.sh" ) > "$case_dir/run.log" 2>&1
+      rc=$?
+      reason=''
+      if [ -e "$marker" ]; then reason='marker executed; '; fi
+      if ! hostile_arguments "$case_dir/argv" "$case_dir/expected" >> "$case_dir/run.log" 2>&1; then
+        reason="${reason}argument bytes/count differ; "
+      fi
+      if [ "$rc" -ne 0 ]; then reason="${reason}snippet exit $rc; "; fi
+      if [ -z "$reason" ]; then
+        ok "$name / $field / seed $seed_number: no marker, byte-exact arguments"
+      else
+        bad "$name / $field / seed $seed_number: $reason"
+      fi
+    done
+  done
+}
+
+hostile_values() {
+  local hostile_bin=$T/hostile/bin
+  mkdir -p "$hostile_bin" "$(cache 012345abcdef)"
+  {
+    printf '#!%s\n' "$BASH"
+    declare -f hostile_record
+    printf '%s\n' 'hostile_record git "$@"'
+  } > "$hostile_bin/git"
+  chmod +x "$hostile_bin/git"
+  echo
+  echo 'Hostile values (validation bypassed)'
+  hostile_block "$SYNC" '### Source Slug Generation' slug URL REV
+  hostile_block "$SYNC" "$TIER1" tier1 URL REV
+  hostile_block "$SYNC" "$TIER2" tier2 URL REV
+  hostile_block "$SYNC" "$TIER3" tier3 REV
+  hostile_block "$SYNC" "$LOCAL_COLD" local-cold LOCAL REV
+  hostile_block "$SYNC" "$SPARSE" cold-sparse FILTER
+  hostile_block "$SYNC" "$WARM" warm-sparse FILTER
+  hostile_block "$SYNC" "$WARM_REMOTE" warm-remote REV
+  hostile_block "$SYNC" "$WARM_LOCAL" warm-local REV
+  hostile_block "$SYNC" '### Indexable Items' indexable DIRS
+  hostile_block "$STATUS" '**Remote URL** (`with_timeout`' status-remote URL
+  hostile_block "$STATUS" '**Local path** (expand' status-local LOCAL
+}
+
+slug_checks() {
+  local shell_name reference slug_exit URL REV expected_slug
+  local slug_urls=(
+    'https://GitHub.com/org/payment-service.git'
+    'https://github.com/org/payment-service/'
+    'https://github.com/org/payment-service.git/'
+    'https://github.com/org/payment-service'
+    'https://github.com/org/payment-service'
+    'git@github.com:org/payment-service.git'
+    'git@github.com:org/payment-service'
+    'ssh://git@GitHub.com/Org/Payment-Service/'
+    '~/My Repos/kb'
+  )
+  local slug_revisions=('' '' '' v2.4.1 0123456789abcdef0123456789abcdef01234567 '' main '' '')
+  local slug_expected=(18dbb51ec4eb 18dbb51ec4eb e60fc46dba69 5e8b13c49fbe 93b864df69a3 c9511374b688 b916698aa6c1 0b93c9b8c26b d3ae9616ac00)
+  echo
+  echo 'Slug procedure in sh, bash and zsh'
+  for shell_name in sh bash zsh; do
+    if ! command -v "$shell_name" >/dev/null 2>&1; then
+      bad "slug procedure: required shell $shell_name is missing"
+      continue
+    fi
+    for reference in "${!slug_urls[@]}"; do
+      URL=${slug_urls[$reference]} REV=${slug_revisions[$reference]}
+      expected_slug=${slug_expected[$reference]}
+      block "$SYNC" '### Source Slug Generation' | render > "$T/slug.sh"
+      printf '%s\n' "$expected_slug" > "$T/slug.expected"
+      "$shell_name" "$T/slug.sh" > "$T/slug.stdout" 2> "$T/slug.stderr"
+      slug_exit=$?
+      if [ "$slug_exit" -eq 0 ] && [ ! -s "$T/slug.stderr" ] \
+        && cmp -s "$T/slug.expected" "$T/slug.stdout"; then
+        ok "$shell_name slug reference $((reference + 1)): exact stdout, empty stderr, exit 0"
+      else
+        bad "$shell_name slug reference $((reference + 1)): output or exit differs ($slug_exit)"
+      fi
+    done
+  done
+}
+
+if [ "${1:-}" = --slugs ]; then slug_checks; finish; fi
+case "${1:-}" in
+  --local-space|--hostile-files) ;;
+  *) hostile_values ;;
+esac
+if [ "${1:-}" = --hostile-values ]; then finish; fi
+
 # --- fixtures ----------------------------------------------------------------
 
 new_repo() { git init -q "$1" && git -C "$1" symbolic-ref HEAD refs/heads/main; }
 commit()   { git -C "$1" add -A && git -C "$1" commit -q -m "$2" && git -C "$1" rev-parse HEAD; }
 # Like GitHub: partial clone, and any object may be fetched by id.
 serve()    { git -C "$1" config uploadpack.allowFilter true && git -C "$1" config uploadpack.allowAnySHA1InWant true; }
+
+hostile_file_checks() {
+  local source=$T/hostile-files-source hostile_name='$(touch pwned).md'
+  local relative_dir=$'relative\n..' absolute_dir=$'absolute\n'
+  local outside_file=$T/hostile-outside/escape.md outside_hash expected_hash
+  local URL LOCAL REV='' FILTER='' DIRS=. SLUG=hostile-files
+  mkdir -p "${outside_file%/*}"
+  printf 'OUTSIDE-CACHE\n' > "$outside_file"
+  new_repo "$source"
+  printf 'LITERAL-NAME\n' > "$source/$hostile_name"
+  printf 'LEADING-DASH\n' > "$source/-option.md"
+  mkdir -p "$source/$relative_dir" "$source/$absolute_dir/${outside_file%/*}"
+  printf 'INSIDE-RELATIVE\n' > "$source/$relative_dir/escape.md"
+  printf 'INSIDE-ABSOLUTE\n' > "$source/$absolute_dir/${outside_file#/}"
+  commit "$source" hostile-names >/dev/null
+  URL=$source LOCAL=$source
+  echo
+  echo 'Hostile fetched file names'
+  run "$SYNC" "$LOCAL_COLD" "$NOFILTER"
+  printf 'OUTSIDE-CACHE\n' > "$(cache "$SLUG")/../escape.md"
+  items_of
+  check 'hostile file name is indexed literally' grep -Fxq -- "$hostile_name" "$T/items.out"
+  check 'leading-dash file is indexed' grep -Fxq -- '-option.md' "$T/items.out"
+  if grep -Eq '(^|/)\.\.(/|$)|^/' "$T/items.out"; then
+    bad 'newline directory cannot forge traversal or absolute item paths'
+  else
+    ok 'newline directory cannot forge traversal or absolute item paths'
+  fi
+  {
+    block "$SYNC" '### Indexable Items' | render
+    printf '%s\n' 'while IFS= read -r file; do' '[ -f "$file" ] || continue'
+    block "$SYNC" '### Corpus Measurement'
+    printf '%s\n' \
+      'if command -v sha256sum >/dev/null 2>&1; then' \
+      '  hash=$(sha256sum < "$file" | cut -d " " -f1)' \
+      'else' \
+      '  hash=$(shasum -a 256 < "$file" | cut -d " " -f1)' \
+      'fi'
+    printf 'printf "%%s\\t%%s\\t%%s\\n" "$file" "$size" "$hash" >> %q\n' "$T/measured.out"
+    printf '%s\n' 'done <<< "$items"'
+  } > "$T/hostile-files.sh"
+  : > "$T/measured.out"
+  ( cd "$P" && "$BASH" "$T/hostile-files.sh" ) >> "$T/run.log" 2>&1
+  expect 'literal file name is measured without command evaluation' \
+    "$(awk -F '\t' '$1 == "$(touch pwned).md" { print $2 }' "$T/measured.out" | tr -d ' ')" 13
+  expected_hash=$(shasum -a 256 < "$source/-option.md" | cut -d ' ' -f1)
+  expect 'leading-dash file is measured and hashed as content, not an option' \
+    "$(awk -F '\t' '$1 == "-option.md" { print $2 "|" $3 }' "$T/measured.out" | tr -d ' ')" \
+    "13|$expected_hash"
+  outside_hash=$(shasum -a 256 < "$outside_file" | cut -d ' ' -f1)
+  if grep -Fq -- "$outside_hash" "$T/measured.out"; then
+    bad 'no measured item content comes from outside the cache'
+  else
+    ok 'no measured item content comes from outside the cache'
+  fi
+  if [ -e "$T/pwned" ] || [ -e "$P/pwned" ] || [ -e "$(cache "$SLUG")/pwned" ]; then
+    bad 'hostile fetched name never creates a marker'
+  else
+    ok 'hostile fetched name never creates a marker'
+  fi
+}
+
+if [ "${1:-}" = --hostile-files ]; then hostile_file_checks; finish; fi
+
+echo
+echo 'A local path containing a space'
+
+URL='~/My Repos/kb' LOCAL="$HOME/My Repos/kb" REV='' FILTER='' DIRS=. SLUG=local-space
+mkdir -p "$LOCAL"
+new_repo "$LOCAL"
+mkdir "$LOCAL/docs"
+printf 'A v1\n' > "$LOCAL/docs/a.md"
+printf 'B cold only\n' > "$LOCAL/docs/b.md"
+spaced_cold=$(commit "$LOCAL" cold)
+
+run "$SYNC" "$LOCAL_COLD" "$NOFILTER"; rc=$?
+expect 'spaced local path: cold sync exits 0' "$rc" 0
+expect 'spaced local path: cold cache has the source commit and items' \
+  "$(head_of "$SLUG")|$(content "$SLUG" docs/a.md)|$(content "$SLUG" docs/b.md)" \
+  "$spaced_cold|A v1|B cold only"
+expect 'spaced local path: clone uses the expanded home path' \
+  "$(git -C "$(cache "$SLUG")" remote get-url origin 2>/dev/null)" "$LOCAL"
+
+git -C "$LOCAL" rm -q docs/b.md
+printf 'A v2\n' > "$LOCAL/docs/a.md"
+printf 'C warm only\n' > "$LOCAL/docs/c.md"
+spaced_warm=$(commit "$LOCAL" warm)
+
+run "$SYNC" "$WARM" "$WARM_LOCAL"; rc=$?
+expect 'spaced local path: warm sync exits 0' "$rc" 0
+expect 'spaced local path: warm cache updates, removes and adds items' \
+  "$(head_of "$SLUG")|$(content "$SLUG" docs/a.md)|$(exists "$SLUG" docs/b.md)|$(content "$SLUG" docs/c.md)" \
+  "$spaced_warm|A v2|no|C warm only"
+
+run "$STATUS" '**Local path** (expand'; rc=$?
+expect 'spaced local path: status reports local reachability with exit 0' "$rc" 0
+
+if [ "${1:-}" = --local-space ]; then finish; fi
+
+slug_checks
+hostile_file_checks
 
 echo
 echo "git $(git --version | sed 's/^git version //')"
@@ -298,10 +622,4 @@ bounded "$T/bin-none" 5 git ls-remote --exit-code -- "file://$U" HEAD >/dev/null
 expect "no timeout tool at all: the call still runs" "$?" 0
 check "no timeout tool at all: one warning says so" grep -q 'without a time bound' "$T/warn"
 
-echo
-if [ "$fail" -eq 0 ]; then
-  printf '\033[32m%s checks passed.\033[0m\n\n' "$pass"
-  exit 0
-fi
-printf '\033[31m%s failed\033[0m, %s passed. Scratch kept: %s\n\n' "$fail" "$pass" "$T"
-exit 1
+finish
