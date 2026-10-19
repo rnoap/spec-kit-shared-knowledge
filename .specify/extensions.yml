@@ -108,7 +108,7 @@ hooks:
   - extension: tinyspec
     command: speckit.tinyspec.classify
     enabled: true
-    optional: false
+    optional: true
     priority: 10
     prompt: Check if this task is small enough for the lightweight tinyspec workflow?
     description: Auto-classify task complexity before starting the full SDD workflow
