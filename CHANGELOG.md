@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-21
+
+Shell-safe configuration. Every read now rejects shell syntax in `url` and
+`path_filter` before any value of that source reaches a shell, and accepted
+values stay literal inside single quotes. The configuration schema moves to
+`"1.1"`, with a manual, version-only migration from `"1.0"`. The slug procedure
+now produces the documented cache name in sh, bash and zsh.
+
 ### Security
 
 - `fix(security): keep source values literal`: every read rejects shell syntax in `url` and `path_filter` before using any value of that source. Shell placeholders use single quotes with literal quote escaping, and fetched file names reach commands only through quoted variables and redirected reads. Refusal messages escape control characters.
@@ -15,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking configuration change:** `knowledge-config.yml` now requires schema `"1.1"`. A `"1.0"` file is refused until the [manual version-only migration](README.md#manual-migration-from-10); missing and unknown versions also stop before source use or configuration/cache changes. Migration preserves source values and cache identities. The manifest and index formats are unchanged.
 - `~user/` local paths, wildcard filters and filters beginning with `~` are refused. configure keeps a quoted path argument whole, local paths may contain spaces except before `-`, and status reports invalid sources as `invalid` without probing them. Invalid sources prevent orphan pruning.
+- `extension.yml` `version` bumped from `1.6.0` to `1.7.0`. The command count stays at 5 and no hook changes.
 
 ### Fixed
 
@@ -30,6 +39,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 
 - `docs(readme): document shell-safe configuration`: accepted characters, discontinued values, manual schema migration and the two-layer trust model are documented in the README and configuration template.
+
+### Compatibility
+
+- Migrate `knowledge-config.yml` once after upgrading: back it up and change only `schema_version` from `"1.0"` to `"1.1"`, as the [manual migration](README.md#manual-migration-from-10) describes. Until then every command stops before using a source and changes no configuration or cache.
+- Entries the narrower rules refuse are skipped with a message naming the field; the other sources still sync. Correct or remove them as a separate edit.
+- Valid sources keep their cache identities. Caches named by the broken slug procedure are replaced once, on the next sync.
+- The manifest and index formats are unchanged. spec-kit `>=0.15.2` and git `>=2.25` remain the floors, and no tool becomes required.
 
 ## [1.6.0] - 2026-10-15
 
@@ -259,7 +275,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.0
 [1.6.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.6.0
 [1.5.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.5.0
 [1.4.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.4.0
