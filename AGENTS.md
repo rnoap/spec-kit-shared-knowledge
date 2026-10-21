@@ -95,9 +95,9 @@ bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/sk
 <!-- SPECKIT-TINY-SPECS END -->
 
 <!-- SPECKIT START -->
-Active feature: **007-shell-safe-config**.
+Latest feature: **007-shell-safe-config**.
 
-Status: implementation completed on branch `007-shell-safe-config`; not yet released.
+Status: completed — shipped in v1.7.0. No feature is in progress.
 The [recorded context](specs/007-shell-safe-config/.spec-context.json) is the
 source of truth for current progress.
 
