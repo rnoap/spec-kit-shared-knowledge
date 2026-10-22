@@ -19,6 +19,8 @@
 # url accepts only ASCII letters, digits and . _ ~ : / @ % + -.
 # A local path starts with /, ./, ../ or ~/ and may also contain spaces,
 # but no space followed by -. Remote addresses write a space as %20.
+# On the configure command line, quote a path that contains a space,
+# '~/My Repos/kb', or it is split at the space. Other paths need no quotes.
 #
 # Path filters are optional. With zero filters, every .md file in the repository
 # is indexed. With one or more filters, indexing is scoped to ONLY those folders.
@@ -191,4 +193,16 @@ sources:                 # required; may be empty list []
   # merges, the spec reaches you through main; merging yours with this source
   # still here makes every teammate sync a temporary branch. A deleted branch is
   # not an error: sync keeps serving the last cached copy.
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 9 — LOCAL path containing spaces
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: "~/My Repos/kb"                                  # spaces are fine inside this file
+  #   label: kb
+  #   path_filter: specs/
+  #
+  # On the configure command line, QUOTE such a path, or it is split at the
+  # space and the rest is read as path filters:
+  #   /speckit.knowledge.configure '~/My Repos/kb' specs/
+  # A path without spaces needs no quotes.
 

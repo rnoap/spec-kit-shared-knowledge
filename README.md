@@ -115,6 +115,9 @@ Initialize or edit the knowledge source configuration for the current project. A
 # Local absolute path, single folder filter
 /speckit.knowledge.configure /Users/devuser/repos/payment-service specs/
 
+# Local path containing a space: quote it
+/speckit.knowledge.configure '~/My Repos/kb' specs/
+
 # Local path with tilde, NO filter (indexes every .md in the repo)
 /speckit.knowledge.configure ~/repos/architecture-decisions
 
@@ -127,6 +130,15 @@ Initialize or edit the knowledge source configuration for the current project. A
 # Same, using the @ shorthand (HTTPS and local paths only — not SSH)
 /speckit.knowledge.configure https://github.com/your-org/payments@v2.4.1 specs/
 ```
+
+**Quoting**: arguments are split at spaces. A URL or path without spaces needs no
+quotes; quote a local path that contains one, with single or double quotes:
+
+| You type | `url` | `path_filter` |
+| --- | --- | --- |
+| `~/repos/kb specs/` | `~/repos/kb` | `specs/` |
+| `'~/My Repos/kb' specs/` | `~/My Repos/kb` | `specs/` |
+| `~/My Repos/kb specs/` | `~/My`, which does not exist, so nothing is written | `Repos/kb` and `specs/` |
 
 **Output**:
 
