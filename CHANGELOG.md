@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-22
+
+### Added
+
+- `/speckit-knowledge-configure` accepts an optional `--label <label>` argument
+  to choose a source's display name when adding or updating it. Omitting the
+  option preserves the existing label derivation behavior. The README includes
+  examples with and without folder filters.
+
+### Changed
+
+- `extension.yml` `version` bumped from `1.7.1` to `1.8.0`.
+
 ## [1.7.1] - 2026-10-22
 
 Documentation for adding a teammate's unmerged spec as a source and for quoting
@@ -296,7 +309,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.0
 [1.7.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.1
 [1.7.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.0
 [1.6.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.6.0

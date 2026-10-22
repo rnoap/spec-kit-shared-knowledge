@@ -1,0 +1,213 @@
+{
+  "workflow": "companion",
+  "specName": "Optional Label for Knowledge Sources",
+  "branch": "009-optional-config-label",
+  "currentStep": "implement",
+  "status": "completed",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-22T14:43:08.131Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-22T14:46:22.206Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-22T14:47:35.225Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T001",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T14:50:22.450Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T002",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T14:50:22.753Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T003",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T14:54:26.642Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T004",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T14:55:22.834Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T14:55:22.905Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-22T14:59:44.383Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-22T15:00:03.096Z"
+    }
+  ],
+  "telemetryInstanceId": "efd593d6-7415-491d-b23d-44f1666f1a72",
+  "last_action": "All tasks complete; 17 extension checks and 206 sync Git behavior checks passed.",
+  "coverage": {
+    "FR-001": {
+      "title": "The configure command MUST accept an optional --label <label> argument alongside a source URL or path and zero or more folder filters.",
+      "tests": [
+        ".github/scripts/validate-extension.sh::Configure label contract"
+      ]
+    },
+    "FR-002": {
+      "title": "The configure command MUST use a supplied label for the new or matching source instead of deriving one.",
+      "tests": [
+        ".github/scripts/validate-extension.sh::Configure label contract"
+      ]
+    },
+    "FR-003": {
+      "title": "The configure command MUST retain the existing label derivation behavior when the label option is omitted."
+    },
+    "FR-004": {
+      "title": "The configure command MUST validate a supplied label as non-empty, free of whitespace, and unique across configured sources before writing.",
+      "tests": [
+        ".github/scripts/validate-extension.sh::Configure label contract"
+      ]
+    },
+    "FR-005": {
+      "title": "The configure command MUST report a missing, empty, whitespace-containing, repeated, or conflicting label and make no configuration changes until the input is resolved.",
+      "tests": [
+        ".github/scripts/validate-extension.sh::Configure label contract"
+      ]
+    },
+    "FR-006": {
+      "title": "The configure command MUST parse the label option without changing the interpretation of the URL/path, revision, or folder filters."
+    },
+    "FR-007": {
+      "title": "The command documentation MUST explain that a label is optional and include examples of passing one with a source and with folder filters.",
+      "tests": [
+        ".github/scripts/validate-extension.sh::README label examples"
+      ]
+    }
+  },
+  "size": "simple",
+  "classification": {
+    "projectedFiles": 3,
+    "projectedTasks": 4,
+    "scopeSignal": "smaller",
+    "verdict": "simple"
+  },
+  "expectations": [
+    "No changes to indexing, synchronization, or configuration schema"
+  ],
+  "context": [
+    "area: commands/speckit.knowledge.configure.md and README.md",
+    "constraint: preserve automatic label derivation when --label is omitted",
+    "constraint: preserve the existing unique-label rule"
+  ],
+  "intent": "Allow developers to choose a knowledge source label during configure while keeping it optional.",
+  "approach": "Add optional --label parsing and validation, document usage, and extend configure behavior tests.",
+  "currentTask": null,
+  "task_summaries": {
+    "T001": {
+      "status": "DONE",
+      "did": "Documented optional label parsing, validation, selection, and persistence in configure flow.",
+      "files": [
+        "commands/speckit.knowledge.configure.md"
+      ]
+    },
+    "T002": {
+      "status": "DONE",
+      "did": "Added optional label syntax and examples with filters and derived labels to README.",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T003": {
+      "status": "DONE",
+      "did": "Added validator assertions for label parsing, validation, update precedence, and README examples; the 17-check validator passed.",
+      "files": [
+        ".github/scripts/validate-extension.sh"
+      ]
+    },
+    "T004": {
+      "status": "DONE",
+      "did": "Verified the extension validator and all 206 existing sync Git behavior checks.",
+      "files": [
+        ".github/scripts/validate-extension.sh",
+        ".github/scripts/test-sync-git.sh"
+      ]
+    }
+  },
+  "verified": [
+    {
+      "what": "extension validation",
+      "command": "PATH=/Users/r0n0352/.copilot/session-state/fed6f48b-7955-48cc-b801-e59fb034d98c/files/pyyaml-validation-venv/bin:/opt/homebrew/bin:/usr/bin:/bin bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.8,
+      "result": "  \u001b[32mPASS\u001b[0m  inert quote scanner fixtures distinguish effective single quotes ·   \u001b[32mPASS\u001b[0m  every configuration placeholder in a bash block is single-quoted · \u001b[32m17 checks passed.\u001b[0m"
+    },
+    {
+      "what": "sync Git behavior",
+      "command": "bash .github/scripts/test-sync-git.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 27,
+      "result": "  \u001b[32mPASS\u001b[0m  no timeout tool at all: the call still runs ·   \u001b[32mPASS\u001b[0m  no timeout tool at all: one warning says so · \u001b[32m206 checks passed.\u001b[0m"
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "Use --label <label> as the optional argument and remove its token pair before identifying path filters.",
+      "why": "It lets developers name a source in the same command without changing the existing positional URL/path and filter forms.",
+      "rejected": "Treating the label as a positional token, which could make it ambiguous with folder filters."
+    },
+    {
+      "decision": "An explicit label replaces the label on a matching URL and revision; when omitted, preserve an existing label or use the current derivation rules.",
+      "why": "An explicit choice should take effect on the source it names while preserving established defaults.",
+      "rejected": "Ignoring an explicit label when updating an already configured source."
+    }
+  ],
+  "concerns": [
+    {
+      "note": "Configure behavior is expressed as agent instructions rather than executable parser code, so label acceptance is checked with command-contract assertions instead of an end-to-end parser test.",
+      "step": "implement"
+    }
+  ],
+  "step_summaries": {
+    "specify": {
+      "summary": "Added optional source labels to configure guidance, documented usage, and added contract checks."
+    }
+  }
+}
