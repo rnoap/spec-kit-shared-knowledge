@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `fix(commands): stop citing README migration notes`: the schema `"1.0"` diagnostic in all five commands no longer refers to README migration notes.
+
 ### Documentation
 
 - `docs(readme): read a teammate's unmerged spec`: the README and the configuration template show how to add a teammate's pushed, unmerged branch of a shared repository as a source, filtered to its spec folder, and when to remove it.

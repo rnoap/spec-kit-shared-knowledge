@@ -47,7 +47,7 @@ that is not accepted reaches a shell, not even for its slug or a message
 schema `"1.1"`. For `"1.0"`, print as agent output:
 
 ```text
-Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, review the README migration notes, then change only schema_version. No sources or caches were used or changed.
+Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, then change only schema_version. No sources or caches were used or changed.
 ```
 
 For a missing or unknown version, print the following, substituting `<missing>`
@@ -391,7 +391,7 @@ before any source use or configuration/cache change.
 | `max_cache_age` fails `^[0-9]+[mhd]$` | `❌ Error: max_cache_age must be a number followed by m, h or d — e.g. 30m, 4h, 7d` |
 | `enabled` is not a boolean | `❌ Error: enabled must be true or false` |
 | Invalid YAML in existing config | `❌ Error: knowledge-config.yml contains invalid YAML: <parse error>. Fix the file manually and re-run.` |
-| `schema_version` is `"1.0"` | `Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, review the README migration notes, then change only schema_version. No sources or caches were used or changed.` |
+| `schema_version` is `"1.0"` | `Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, then change only schema_version. No sources or caches were used or changed.` |
 | `schema_version` missing | `Error: Unrecognized knowledge-config.yml schema_version "<missing>". Expected "1.1". No sources or caches were used or changed.` |
 | `schema_version` unknown | `Error: Unrecognized knowledge-config.yml schema_version "<value>". Expected "1.1". No sources or caches were used or changed.` |
 | SSH URL given with the `<url>@<rev>` form | `❌ Error: SSH URLs already contain "@". Pass the revision with --revision <rev>.` |
