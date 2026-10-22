@@ -94,6 +94,23 @@ schema_version: "1.1"   # required; must be exactly "1.1"
 # max_items: 120
 # max_bytes: 1mb
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Optional — the shared knowledge section in AGENTS.md
+# ──────────────────────────────────────────────────────────────────────────────
+# Sync keeps a short section in the project's root AGENTS.md, between
+# <!-- KNOWLEDGE START --> and <!-- KNOWLEDGE END -->. It tells the agent to read
+# the knowledge index first when you ask about another repository in a plain chat,
+# and lists the enabled source labels. Remove, --disable and --enable keep it in
+# step. Nothing outside the markers is ever changed.
+#
+#   agents_md: true | false     exactly true or false
+#
+# Omitted (the default) means true. false removes the section and leaves
+# AGENTS.md alone from then on. Any other value leaves AGENTS.md untouched and
+# is reported on every sync.
+#
+# agents_md: false
+
 sources:                 # required; may be empty list []
 
   # ────────────────────────────────────────────────────────────────────────────

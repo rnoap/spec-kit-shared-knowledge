@@ -386,6 +386,107 @@ link targets are derived from each machine's own source locations. **Two indexes
 therefore never byte-equal even when they select identical items** — any check for
 sameness must compare the item list, not the file.
 
+### Agent Context Section
+
+The **knowledge section** is the block of the project's root `AGENTS.md` that this
+extension owns (010). It tells the agent to consult the knowledge index for
+questions about other repositories, outside any spec-kit command. Step 1a and step
+8b apply this procedure. `__SPECKIT_COMMAND_KNOWLEDGE_REMOVE__` applies it by
+reference. Read and write `AGENTS.md` only with the agent's file tools, never a
+shell.
+
+**Inputs.** A mode, `write` or `remove`. For `write`, the **labels**: the `label` of
+every source that is enabled and passes § Configuration Validation Rules, in
+configuration order. A `write` with no label is a `remove`.
+
+**Checks, in order.** The first one that fails ends the procedure with its report
+line, and `AGENTS.md` is left as it was:
+
+1. **`agents_md`**: absent and `true` keep the mode, `false` turns it into `remove`.
+   Any other value prints the invalid-key line.
+2. **Read**: read `AGENTS.md` at the project root. A missing file is fine. A file that
+   cannot be read prints the write-failed line.
+3. **Markers**: count the lines that are exactly `<!-- KNOWLEDGE START -->` and
+   exactly `<!-- KNOWLEDGE END -->`. None of either: the section is **absent**. One
+   of each, start first: **present**. Anything else: **damaged**, which prints the
+   damaged line.
+4. **Apply** the mode:
+
+| Mode | State | Action | Line |
+| --- | --- | --- | --- |
+| `write` | No file, or a file holding only whitespace | Write `AGENTS.md` holding only the section | Created |
+| `write` | Absent | End the file with a line feed if it lacks one, add one empty line, then the section | Added |
+| `write` | Present | Replace the lines from the start marker through the end marker. When the result equals the file, do not write | Updated, or Unchanged |
+| `remove` | Present | Delete the lines from the start marker through the end marker, and one empty line directly above them if there is one. When only whitespace remains, delete the file | Removed, or Removed and deleted |
+| `remove` | Absent, or no file | Nothing | none |
+
+A failed write or delete prints the write-failed line. Every byte outside the
+section stays as it was. A write followed by a remove restores the file, apart from
+a final line feed the write added to a file that lacked one.
+
+**The section.** These exact lines, each ending in a line feed. Replace the
+`- <label line>` line with one line per label:
+
+```markdown
+<!-- KNOWLEDGE START -->
+## Shared knowledge
+
+For any question about another repository or a knowledge source listed below:
+
+1. Read `.specify/extensions/knowledge/knowledge-index.md` first.
+2. Open the `.md` files it lists for those sources, from `.specify/extensions/knowledge/cache/<slug>/`.
+3. Cite borrowed information as `<label> › <relative-path>`.
+4. When the index marks an item `⚠️ CONFLICT`, show every version present and flag the conflict to the user.
+5. Use only the sources listed below, and ignore index entries for any other source.
+6. If the index, a source's entries, or a listed file is missing, suggest running the knowledge sync command, `speckit.knowledge.sync`, instead of guessing.
+
+Sources:
+- <label line>
+<!-- KNOWLEDGE END -->
+```
+
+**Label lines.** Escape the label under § Values in messages. Write `- `, then the
+label in a code span whose backtick delimiter is one longer than the longest
+backtick run inside it. When the label begins or ends with a backtick, put one
+space inside each delimiter:
+
+```text
+payment-service  →  - `payment-service`
+x`y              →  - ``x`y``
+`tick            →  - `` `tick ``
+```
+
+A label line always starts with `- `, so a label cannot close the section, and the
+code span keeps any markdown in it inert.
+
+**Report lines.** Print at most one, as agent output, escaping `<value>`,
+`<problem>` and `<reason>` under § Values in messages:
+
+| Outcome | Line |
+| --- | --- |
+| Created | `✅ Created AGENTS.md with the shared knowledge section.` |
+| Added | `✅ Added the shared knowledge section to AGENTS.md.` |
+| Updated | `✅ Updated the shared knowledge section in AGENTS.md.` |
+| Unchanged | `ℹ️  The shared knowledge section in AGENTS.md is already up to date. Nothing was changed.` |
+| Removed | `✅ Removed the shared knowledge section from AGENTS.md.` |
+| Removed and deleted | `✅ Removed the shared knowledge section and deleted AGENTS.md, which held nothing else.` |
+| Damaged | `⚠️  AGENTS.md was left untouched: <problem>. Delete the knowledge marker lines and the text between them, then run __SPECKIT_COMMAND_KNOWLEDGE_SYNC__.` |
+| Invalid key | ``⚠️  Ignoring `agents_md` value "<value>" (must be true or false). AGENTS.md was left untouched.`` |
+| Write failed | `⚠️  Could not update AGENTS.md (<reason>). Everything else in this run completed.` |
+
+`<problem>` is `found <n> "<!-- KNOWLEDGE START -->" and <m> "<!-- KNOWLEDGE END -->" lines`,
+or `"<!-- KNOWLEDGE END -->" comes before "<!-- KNOWLEDGE START -->"`. `<reason>` is
+the error the file tool returned. None of these lines changes the command's result,
+and the exit code stays 0.
+
+**Why the section is fixed text.** `AGENTS.md` is committed and shared, so the same
+configuration must produce the same bytes on every machine and every agent. That is
+why the section holds no timestamp, count, absolute path or source content, and why
+it names `speckit.knowledge.sync` by its canonical id: a command token renders
+differently for each agent. The markers mirror the `<!-- SPECKIT START -->` block
+of spec-kit's `agent-context` extension, which this procedure treats as ordinary
+content.
+
 ---
 
 ## Configuration Validation Rules
@@ -440,6 +541,7 @@ absent, null, and `[]` identically: the project has no configured sources.
 | `revision` | Optional. Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. |
 | `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/` or `~`**, **no `..`**, **must not begin with `-`**, and **only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`** (007 FR-001). |
 | `enabled` | Optional, default `true`. Exactly `true` or `false` — `"yes"` and `1` are rejected. |
+| `agents_md` | Optional, top level only, default `true`. Exactly `true` or `false`, like `enabled`. An invalid value leaves `AGENTS.md` untouched and skips no source (010 FR-010). |
 | `max_items` (top level and per source) | Optional. Matches `^[0-9]+$` and is `>= 1`. |
 | `max_bytes` (top level and per source) | Optional. Matches `^[0-9]+(kb\|mb)$` — `512kb`, `2mb`. |
 
@@ -563,6 +665,12 @@ when its source is unreachable: a configuration mistake must never leave the
 project with less knowledge than it had before the setting existed. Exit code
 stays 0 (FR-022).
 
+The top-level `agents_md` is read here too, and governs only § Agent Context
+Section. An invalid value fails **closed** instead: `AGENTS.md` is a committed
+file, and a typo such as `agents_md: no` may be an attempt to stop exactly that
+write. The section procedure reports it and leaves `AGENTS.md` untouched. No source
+is skipped.
+
 Validation runs here, on the read path, rather than only inside `configure`.
 A value that arrived by hand-edit, by pull request, or from an older version of
 this extension is checked exactly like one this extension wrote.
@@ -575,20 +683,24 @@ following and then stop (FR-031):
 
 1. Report the project as having no configured knowledge.
 2. **Delete `knowledge-index.md`** if it exists.
-3. Do **not** emit the Context Output for AI Agents block.
-4. Exit 0.
+3. Apply § Agent Context Section in `remove` mode, and print its line, if any,
+   after the lines below (010 FR-009).
+4. Do **not** emit the Context Output for AI Agents block.
+5. Exit 0.
 
 ```
 ℹ️  No enabled knowledge sources are configured for this project.
 ✅ Removed the stale knowledge index (.specify/extensions/knowledge/knowledge-index.md).
    Run __SPECKIT_COMMAND_KNOWLEDGE_CONFIGURE__ <url> to add a source, or
    __SPECKIT_COMMAND_KNOWLEDGE_REMOVE__ <label> --enable to re-enable a disabled one.
+✅ Removed the shared knowledge section from AGENTS.md.
 ```
 
 **The index is deleted rather than left in place.** A stale index would let an
 agent keep reading and citing knowledge the project no longer declares — a silent
 failure that looks like success. Deleting it costs nothing in interface terms,
-because `status` already reports and explains a missing index.
+because `status` already reports and explains a missing index. The knowledge
+section goes with it, so `AGENTS.md` stops pointing the agent at the index.
 
 Disabled sources keep their cache directories through this path (FR-004); only the
 index is removed. Cache pruning is a separate concern, handled in step 8a.
@@ -1051,6 +1163,19 @@ Report each removal on its own line:
 🧹 Pruned orphaned cache abc123def456/ (no configured source resolves to it)
 ```
 
+### 8b. Keep the knowledge section in `AGENTS.md`
+
+When `knowledge-index.md` exists, whether written in step 8 or kept from an earlier
+run, apply § Agent Context Section in `write` mode. Its line is printed in step 9.
+
+When no index exists, as on a first sync with every source unreachable, skip this
+step and leave `AGENTS.md` alone. `AGENTS.md` is committed and the index is not, so
+a teammate's fresh clone carries the section without the index. Removing it there
+would change a shared file on every offline first sync, and the section already
+tells the agent to suggest a sync when the index is missing.
+
+`--no-context-output` does not affect this step. `agents_md` alone governs it.
+
 ### 9. Print summary
 
 For each source, print one status line. All source labels and names in symbolic-link
@@ -1093,6 +1218,12 @@ Final summary line:
 ```
 ✅ Knowledge index updated: 20 items from 2 sources.
    → .specify/extensions/knowledge/knowledge-index.md
+```
+
+Then the line from step 8b, if any:
+
+```
+✅ Created AGENTS.md with the shared knowledge section.
 ```
 
 #### Withholding report (only when the budget withheld something)
@@ -1299,7 +1430,7 @@ a hook entry would break this**; `extension.yml` carries a comment saying so.
 
 ## --no-context-output flag
 
-When `--no-context-output` is present in `$ARGUMENTS`, set `suppress_context_output = true` and skip emitting the trailing Context Output for AI Agents block (step 10). All other output — per-source status lines, summary line, pointer line — prints identically. Exit code remains 0.
+When `--no-context-output` is present in `$ARGUMENTS`, set `suppress_context_output = true` and skip emitting the trailing Context Output for AI Agents block (step 10). All other output — per-source status lines, summary line, pointer line — prints identically. It has no effect on the knowledge section in `AGENTS.md` (step 8b). Exit code remains 0.
 
 This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose`. It composes orthogonally with `--verbose` (both may be present simultaneously). The four auto-trigger paths (`before_specify`, `before_clarify`, `before_plan`, `before_tasks`) declare no arguments in `extension.yml`, so `--no-context-output` is structurally unreachable from those hooks — the block always emits on auto-trigger.
 
@@ -1341,6 +1472,11 @@ This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose
 | Conflict pair cannot fit in full | All versions withdrawn, reported once; capacity not reused | 0 |
 | Budget configured, corpus fits inside it | Nothing withheld, nothing reported | 0 |
 | No budget configured, corpus past the advisory threshold | Warning only; index unaffected | 0 |
+| `agents_md` not exactly `true` or `false` | Invalid-key line; `AGENTS.md` untouched; sources and index unaffected | 0 |
+| `AGENTS.md` knowledge markers damaged | Damaged line; `AGENTS.md` untouched | 0 |
+| `AGENTS.md` unreadable or not writable | Write-failed line; result otherwise unchanged | 0 |
+| Knowledge section already matches | Unchanged line; `AGENTS.md` not written | 0 |
+| No index exists after the run | No `AGENTS.md` line; `AGENTS.md` untouched | 0 |
 
 ---
 
@@ -1350,5 +1486,6 @@ This flag is parsed using the same `$ARGUMENTS` token-scan pattern as `--verbose
 - Writes `cache/<slug>/.manifest.json` per source
 - **Deletes** cache directories that belong to no configured source (step 8a)
 - Writes/updates `knowledge-index.md`, or **deletes** it when no enabled sources remain
+- Creates, updates or removes the knowledge section in the project's root `AGENTS.md`, never a byte outside it, and deletes `AGENTS.md` only when nothing else was left in it (§ Agent Context Section)
 - Does **not** modify `knowledge-config.yml`
 - Does **not** modify `.specify/extensions.yml`

@@ -138,9 +138,26 @@ Neither activation mode computes a slug or purges a cache.
 ### 3. Write the configuration
 
 Write `knowledge-config.yml` back with the agent's file-writing tool, preserving
-`schema_version: "1.1"` and every other source entry untouched, including invalid
-entries. Display escaping must not alter persisted values. Never write an
-unsupported-version file.
+`schema_version: "1.1"`, every other top-level key such as `agents_md`, and every
+other source entry untouched, including invalid entries. Display escaping must not
+alter persisted values. Never write an unsupported-version file.
+
+### 3a. Update the knowledge section in `AGENTS.md`
+
+After step 3 writes the configuration, and only when
+`.specify/extensions/knowledge/knowledge-index.md` exists, apply § Agent Context
+Section from `speckit.knowledge.sync.md` in `write` mode. Its labels are those of
+the sources that are enabled and accepted **after** this change, so a removed or
+disabled source drops out at once. With no label left, the procedure removes the
+section (010 FR-015).
+
+This step does not run when nothing was written: after the schema gate, an
+unknown or ambiguous identifier, a source already in the requested state, or the
+interactive list. It never writes `knowledge-index.md` (010 FR-016). Until the next
+sync the index can still list a removed or disabled source, and the section tells
+the agent to use only the sources it lists.
+
+Print its line, if any, after the step 4 report.
 
 ### 4. Report
 
@@ -179,7 +196,11 @@ Re-enable:
 ```
 ✅ Enabled source "payments-v2". Its cache was retained, so no re-download is needed.
    Run __SPECKIT_COMMAND_KNOWLEDGE_SYNC__ to rebuild the index with it.
+✅ Updated the shared knowledge section in AGENTS.md.
 ```
+
+The last line comes from step 3a and is one of the report lines in § Agent Context
+Section. It is absent when no index exists.
 
 No identifier given:
 
@@ -256,6 +277,10 @@ sources:
 | Slug is not exactly 12 lowercase hex characters | Entry removed; cache not purged; escaped warning above | 0 |
 | Cache directory already absent on remove | Entry still removed; no warning needed | 0 |
 | Cache directory cannot be deleted | Entry removed, cache retention reported as a warning | 0 |
+| `agents_md` not exactly `true` or `false` | Requested change applied; invalid-key line; `AGENTS.md` untouched | 0 |
+| `AGENTS.md` knowledge markers damaged | Requested change applied; damaged line; `AGENTS.md` untouched | 0 |
+| `AGENTS.md` unreadable or not writable | Requested change applied; write-failed line | 0 |
+| No `knowledge-index.md` exists | Requested change applied; `AGENTS.md` untouched, no line | 0 |
 
 ---
 
@@ -266,8 +291,11 @@ sources:
 - Deletes `cache/<slug>/` **on removal only**, for an accepted target after the
   12-lowercase-hex slug check; never for an invalid target, an unsupported schema,
   `--disable` or `--enable`
+- Creates, updates or removes the knowledge section in the project's root
+  `AGENTS.md` (step 3a), only when `knowledge-index.md` exists, and never a byte
+  outside the section
 - Does **not** run sync, and does **not** touch `knowledge-index.md`. The index is
-  rebuilt by the next sync, which keeps this command's failure surface to one file
+  rebuilt by the next sync, so this command never needs the network or index logic
 - Does **not** modify `.specify/extensions.yml`
 
 ---

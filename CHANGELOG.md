@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-22
+
+### Added
+
+- `feat(sync): point the agent at shared knowledge from AGENTS.md` — outside the
+  spec-kit commands, an agent had no reason to read the knowledge index, and its
+  file search skips the git-ignored cache. Sync now keeps a short section in the
+  project's root `AGENTS.md`, between `<!-- KNOWLEDGE START -->` and
+  `<!-- KNOWLEDGE END -->`. It tells the agent to read `knowledge-index.md` first
+  for questions about other repositories, cite `<label> › <path>`, use only the
+  listed sources, and suggest a sync when the index is missing.
+  - Sync creates `AGENTS.md` when absent, refreshes the section in place, writes
+    nothing when it is current, and never changes a byte outside the markers.
+  - The section holds no timestamps, counts or machine paths, so teammates commit
+    the same bytes.
+  - Damaged markers, an unreadable file, or an invalid `agents_md` value leave
+    `AGENTS.md` untouched with a warning. The sync result and exit code do not
+    change.
+- `agents_md` configuration key: optional, top level, default `true`. `false`
+  removes the section and leaves `AGENTS.md` alone. `schema_version` stays
+  `"1.1"`.
+
+### Changed
+
+- `/speckit-knowledge-remove`, `--disable` and `--enable` now refresh the
+  `AGENTS.md` section's source list at once, when an index exists. They still never
+  touch `knowledge-index.md`.
+- `/speckit-knowledge-configure` and `/speckit-knowledge-remove` now state that
+  every top-level key (`agents_md`, `max_cache_age`, `max_items`, `max_bytes`) is
+  preserved when they rewrite `knowledge-config.yml`.
+- `extension.yml` `version` bumped from `1.8.1` to `1.9.0`.
+
 ## [1.8.1] - 2026-10-22
 
 ### Fixed
@@ -337,7 +369,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.8.1...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.0
 [1.8.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.1
 [1.8.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.0
 [1.7.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.1

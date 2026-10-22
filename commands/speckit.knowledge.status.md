@@ -75,6 +75,7 @@ absent, null, and `[]` identically: the project has no configured sources.
 | `revision` | Optional. Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. |
 | `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/` or `~`**, **no `..`**, **must not begin with `-`**, and **only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`** (007 FR-001). |
 | `enabled` | Optional, default `true`. Exactly `true` or `false` — `"yes"` and `1` are rejected. |
+| `agents_md` | Optional, top level only, default `true`. Exactly `true` or `false`, like `enabled`. An invalid value leaves `AGENTS.md` untouched and skips no source (010 FR-010). |
 | `max_items` (top level and per source) | Optional. Matches `^[0-9]+$` and is `>= 1`. |
 | `max_bytes` (top level and per source) | Optional. Matches `^[0-9]+(kb\|mb)$` — `512kb`, `2mb`. |
 

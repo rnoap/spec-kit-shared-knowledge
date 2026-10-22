@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.15.2-7d4cdb">
-  <img alt="Status" src="https://img.shields.io/badge/status-v1.8.1-success">
+  <img alt="Status" src="https://img.shields.io/badge/status-v1.9.0-success">
 </p>
 
 ## 📖 Overview
@@ -39,7 +39,7 @@ When working in a microservices or multi-repo environment, architectural decisio
 `specify extension search` finds extensions in spec-kit's community catalog, but that catalog is searchable, not installable, by default. Install the published release from its archive:
 
 ```bash
-specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.8.1.zip
+specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.9.0.zip
 ```
 
 spec-kit first shows an `Untrusted Source` prompt naming the URL. Confirm it to install.
@@ -528,6 +528,40 @@ The AI agent's knowledge-reading behavior is driven by the **Context Output bloc
 
 > 💤 **No-op when not configured**: If `.specify/extensions/knowledge/knowledge-config.yml` does not exist, all commands exit 0 with a "not configured" message. Projects without the extension are completely unaffected.
 
+## 💬 Ask in plain language
+
+Outside the spec-kit commands, the agent has no reason to look at the knowledge
+index. The cache is git-ignored, so its file search usually skips it too. So every
+sync keeps a short section in your project's root `AGENTS.md`, which agents such as
+Copilot and Codex read in every chat:
+
+```markdown
+<!-- KNOWLEDGE START -->
+## Shared knowledge
+
+For any question about another repository or a knowledge source listed below:
+
+1. Read `.specify/extensions/knowledge/knowledge-index.md` first.
+...
+Sources:
+- `payment-service`
+<!-- KNOWLEDGE END -->
+```
+
+Then ask "how does payment-service retry failed charges?" with no command and no
+file named. The agent reads the index and cites `payment-service › <path>`.
+
+- **Sync** creates `AGENTS.md` if needed, adds or refreshes the section, and writes
+  nothing when it is already current. Nothing outside the markers is touched.
+- **Remove**, `--disable` and `--enable` refresh the label list at once, without a
+  sync. The agent uses only the listed sources, so a disabled source stops being
+  cited even though the index still lists it until the next sync.
+- **The section is safe to commit.** It holds no timestamps or machine paths, so
+  teammates produce the same bytes. On a fresh clone without an index, it tells the
+  agent to suggest a sync.
+- **Opt out** with `agents_md: false` in `knowledge-config.yml`. The next sync removes
+  the section, and `AGENTS.md` is left alone from then on.
+
 ## 📑 Configuration Reference
 
 See [`config-template.yml`](config-template.yml) for the full annotated configuration schema.
@@ -537,6 +571,7 @@ Top-level fields:
 - `schema_version` — **required**; exactly `"1.1"`. Any other value stops every command before it uses a source.
 - `max_cache_age` — optional; project-wide freshness policy (`30m`, `4h`, `7d`). See [Cache freshness](#-cache-freshness).
 - `max_items` / `max_bytes` — optional; project-wide context budget. See [Context budget](#-context-budget).
+- `agents_md` — optional; default `true`. Exactly `true` or `false`. `false` removes the shared knowledge section from `AGENTS.md` and leaves the file alone; an invalid value leaves `AGENTS.md` untouched. See [Ask in plain language](#-ask-in-plain-language).
 - `sources` — **required**; the list of knowledge sources. May be empty.
 
 Key fields per source entry:
