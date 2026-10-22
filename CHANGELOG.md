@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- `docs(readme): read a teammate's unmerged spec`: the README and the configuration template show how to add a teammate's pushed, unmerged branch of a shared repository as a source, filtered to its spec folder, and when to remove it.
+
 ## [1.7.0] - 2026-10-21
 
 Shell-safe configuration. Every read now rejects shell syntax in `url` and

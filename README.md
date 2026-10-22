@@ -286,6 +286,29 @@ as conflicts. Reading the local clone's `origin` would fix this but adds a failu
 mode and a trust question to a purely advisory report, so it is deliberately not
 done.
 
+### 👥 Reading a teammate's unmerged spec
+
+A teammate's spec can be a source before it is merged, as long as its branch is
+pushed. Add the repository you share, pin the teammate's branch, and filter to the
+spec's folder:
+
+```bash
+/speckit.knowledge.configure https://github.com/your-org/your-repo --revision 012-order-tracking specs/012-order-tracking/
+```
+
+- **Filter to the spec's folder.** The branch also carries everything already on
+  `main`; without a filter you index your own specs a second time.
+- **Use the remote URL.** A local path can only check out branches that exist
+  locally in that clone.
+- **A branch moves.** Every refresh fetches its latest commit. To keep the version
+  you reviewed, pin its full commit SHA instead.
+- **Remove the source when either branch merges.** After the teammate's branch
+  merges, the spec reaches you through `main`. Merging yours with the source still
+  configured makes every teammate sync a temporary branch. Run
+  `/speckit.knowledge.remove <label>`.
+- **A deleted branch is not an error.** Sync keeps serving the last cached copy and
+  reports the source as `cached`.
+
 ## ⏳ Cache freshness
 
 Set `max_cache_age` and a sync will skip the network entirely when the cached

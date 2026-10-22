@@ -173,3 +173,23 @@ sources:                 # required; may be empty list []
   # remainder to the others. Within a source, items are taken in ascending path
   # order — so you can work out your own index on paper.
 
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 8 — A TEAMMATE'S UNMERGED SPEC (same repository, pushed branch)
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: https://github.com/your-org/your-repo            # the repository you share
+  #   label: order-tracking-spec                            # unique; /speckit.knowledge.remove takes it
+  #   revision: 012-order-tracking                          # the teammate's PUSHED branch
+  #   path_filter: specs/012-order-tracking/                # only that spec's folder
+  #
+  # The branch also carries everything already on main, so filter to the spec's
+  # folder or you will index your own specs a second time. Use the remote URL: a
+  # local path can only check out branches that exist locally in that clone.
+  #
+  # A branch moves: every refresh fetches its latest commit. To keep the version
+  # you reviewed, pin its full commit SHA instead.
+  #
+  # Remove this source when either branch merges. After the teammate's branch
+  # merges, the spec reaches you through main; merging yours with this source
+  # still here makes every teammate sync a temporary branch. A deleted branch is
+  # not an error: sync keeps serving the last cached copy.
+
