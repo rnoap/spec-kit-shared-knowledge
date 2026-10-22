@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-10-22
+
+Documentation for adding a teammate's unmerged spec as a source and for quoting
+local paths with spaces, examples in the hyphenated command form, and a README
+without migration notes. The schema `"1.0"` diagnostic no longer points at them.
+
+### Changed
+
+- `extension.yml` `version` bumped from `1.7.0` to `1.7.1`. The command count stays at 5 and no hook changes.
+
 ### Fixed
 
 - `fix(commands): stop citing README migration notes`: the schema `"1.0"` diagnostic in all five commands no longer refers to README migration notes.
@@ -286,7 +296,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.1
 [1.7.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.0
 [1.6.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.6.0
 [1.5.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.5.0
