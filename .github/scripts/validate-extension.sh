@@ -136,6 +136,26 @@ for c in d['provides']['commands']:
                        || bad "command(s) missing from README: $undocumented"
 
 echo
+echo "Configure label contract"
+CONFIGURE=commands/speckit.knowledge.configure.md
+if grep -Fq -- '`--label <label>`' "$CONFIGURE" \
+   && grep -Fq 'If `--label <label>` was provided, use that value exactly.' "$CONFIGURE" \
+   && grep -Fq 'Reject an explicit label that is empty or contains whitespace' "$CONFIGURE" \
+   && grep -Fq 'exclude that entry from the collision check' "$CONFIGURE" \
+   && grep -Fq 'label when one was explicitly provided; otherwise retain' "$CONFIGURE" \
+   && grep -Fq 'appears more than once' "$CONFIGURE"; then
+  ok "configure command documents optional label parsing and validation"
+else
+  bad "configure command is missing optional label parsing or validation"
+fi
+if grep -Fq -- 'https://github.com/your-org/payment-service --label payments-v2 specs/ docs/decisions/' README.md \
+   && grep -Fq 'Use the derived label by omitting the optional label' README.md; then
+  ok "README shows a chosen label with filters and the optional default"
+else
+  bad "README is missing chosen-label or derived-label usage examples"
+fi
+
+echo
 echo "Published artifact"
 
 # --- BLOCKER v1.2.0: the catalog download_url is the git archive. Without

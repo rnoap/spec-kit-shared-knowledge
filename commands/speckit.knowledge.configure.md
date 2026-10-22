@@ -9,8 +9,11 @@ description: "Initialize or edit the knowledge source configuration for the curr
 **Arguments**: `$ARGUMENTS` — optional. May contain:
 - A Git repository URL (SSH or HTTPS), e.g. `https://github.com/your-org/your-repo`
 - **Or** a local filesystem path to a Git repository starting with `/`, `./`, `../` or `~/`. Quote a path containing spaces, e.g. `'~/My Repos/kb'`.
+- **Optional label** via `--label <label>`. If omitted, the command derives the label as described below.
 - **Optional path filter(s)** after the URL/path. Pass one **or more** folder paths to scope indexing to only those folders. Examples:
   - `https://github.com/your-org/your-repo specs/`
+  - `https://github.com/your-org/your-repo --label payments-main specs/`
+  - `https://github.com/your-org/your-repo --label payments-main specs/ docs/decisions/`
   - `~/repos/your-repo specs/ docs/decisions/`
   - `'~/My Repos/kb' specs/`
   - `/abs/path/to/repo` (no filter — indexes every `.md` file in the repo)
@@ -152,21 +155,21 @@ Check for `.specify/extensions/knowledge/knowledge-config.yml` in the project ro
 If `$ARGUMENTS` is non-empty (excluding `--verbose`):
 
 1. Split `$ARGUMENTS` on whitespace, except inside a matching pair of `'...'` or `"..."`. Keep that text as one argument and remove the matching quotes (007 FR-003). An unmatched quote stays in its argument and is refused by the character rule. Parse in the agent's own reasoning: nothing else is interpreted, including `$` or a backslash escape; never evaluate the text in a shell.
-2. Remove the `--verbose` flag and extract `--revision <rev>` as described in 3a. The first remaining token is the **URL or local path**. Extract any revision shorthand under 3a before validating the resulting URL/path:
+2. Remove the `--verbose` flag, then extract `--revision <rev>` as described in 3a and `--label <label>`. Each recognized option may appear once. Its value is the next token; a missing value, an empty value, or a repeated option is an error. A recognized option cannot be used as another option's value. Remove each option and its value before identifying the URL/path or path filters. The first remaining token is the **URL or local path**. Reject an explicit label that is empty or contains whitespace before any other use. Extract any revision shorthand under 3a before validating the resulting URL/path:
    - Apply the character rule first, reporting the first disallowed character from left to right. A local path may contain spaces, but no space followed by `-`.
    - Must be non-empty
    - Detect type:
      - **Local path**: starts with `/`, `./`, `../` or `~/`, recognized by prefix alone. `~user/` is not a local path and matches no accepted form.
      - **Remote URL**: matches `^(https?://|ssh://|git\+ssh://|git@)` and contains no spaces; anything matching neither form is an error.
    - Apply the remaining `url` rules. Defer local existence and `.git` checks until the character and other syntax rules have passed for the source, including its filters and revision (007 FR-001, FR-002).
-3. **All remaining tokens** (zero or more, after the URL/path and excluding flags and their values) are **path filters**. Each must:
+3. **All remaining tokens** (zero or more, after the URL/path and excluding recognized flags and their values) are **path filters**. Each must:
    - Pass the character rule before any other use; only ASCII letters, digits and `. _ ~ : / @ % + -` are accepted, with no spaces
    - Be non-empty
    - Not start with `/` (no absolute paths)
    - Not start with `~` (no home-directory expansion)
    - Not contain `..` (no directory traversal)
    - Not begin with `-` (it would be read as a git option — FR-034)
-   - Not be `--verbose`, `--revision`, or a `--revision` value (skip flag tokens)
+   - Not be `--verbose`, `--revision`, `--label`, or a value consumed by either option
    - If the URL/path, any filter or revision is invalid: print the § Error cases diagnostic with escaped values and stop with exit 0; write nothing, including a new configuration or `.gitignore`
    - **Zero tokens** → omit `path_filter` from the source entry (indexes all `.md` files in the repo)
    - **One token** → store as a single string for readability: `path_filter: specs/`
@@ -189,16 +192,19 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
 | `"~/My Repos/kb"` | `~/My Repos/kb` | none |
 | `~/My Repos/kb` | `~/My`, which does not exist | `Repos/kb` |
 
-4. Derive **label** if no explicit label is provided:
-   - **Local path**: use the last path component of the directory (e.g. `/Users/me/repos/payment-service` → `payment-service`)
-   - **Remote URL**:
-     - Strip trailing `.git` and trailing `/`
-     - Extract the last three path components: `<host>/<org>/<repo>`
-     - Examples:
-       - `https://github.com/your-org/payment-service.git` → `github.com/your-org/payment-service`
-       - `git@github.com:your-org/identity-service` → `github.com/your-org/identity-service`
+4. Select the **label**:
+   - If `--label <label>` was provided, use that value exactly.
+   - Otherwise, preserve the label on an accepted existing source with the same URL and revision, if it has one.
+   - Otherwise, derive the label:
+     - **Local path**: use the last path component of the directory (e.g. `/Users/me/repos/payment-service` → `payment-service`)
+     - **Remote URL**:
+       - Strip trailing `.git` and trailing `/`
+       - Extract the last three path components: `<host>/<org>/<repo>`
+       - Examples:
+         - `https://github.com/your-org/payment-service.git` → `github.com/your-org/payment-service`
+         - `git@github.com:your-org/identity-service` → `github.com/your-org/identity-service`
 
-5. **Enforce label uniqueness before writing** (FR-028). The label is the identity
+5. **Enforce label uniqueness before writing** (FR-028). When updating an accepted source with the same URL and revision, exclude that entry from the collision check. Check the selected label against every other accepted source. The label is the identity
    of a source — it is what `__SPECKIT_COMMAND_KNOWLEDGE_REMOVE__` takes, and what
    `status` and `search` display. A URL stopped being a unique key the moment
    revisions became pinnable, so uniqueness has to be guaranteed here, once,
@@ -209,8 +215,9 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
    - two local paths sharing a final component — `~/a/payments` and `~/b/payments`
    - the same repository added twice at different revisions
 
-   On collision, **do not write and do not silently overwrite**. Offer a suffixed
-   candidate and let the developer accept or replace it:
+   On collision, **do not write and do not silently overwrite**. This also applies
+   to an explicitly supplied label. Offer a suffixed candidate and let the developer
+   accept it or type a different unique label:
 
    ```
    ⚠️  Label "payments" is already used by https://github.com/org/payments (revision: v2.4.1).
@@ -239,7 +246,8 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
 
   **Merge only into an accepted entry when the URL *and* the revision both match.** An existing entry
    with the same URL **and** the same revision is updated in place (its
-   `path_filter`, and its label if not already set). An existing entry with the
+   `path_filter`, and its label when one was explicitly provided; otherwise retain
+   its existing label). An existing entry with the
    same URL but a **different** revision is a different source and must be left
   alone — appending a second entry is the correct outcome. Existing entries that
   are not accepted are preserved unchanged, never merged or silently repaired.
@@ -378,6 +386,7 @@ before any source use or configuration/cache change.
 | `url` begins with `-` | `❌ Error: url must not begin with "-" (it would be read as a git option)` |
 | Local path does not exist | `❌ Error: Local path "<path>" does not exist.` |
 | Local path is not a git repo | `❌ Error: Local path "<path>" is not a Git repository (no .git directory found).` |
+| `--label` has no following value, has an empty value, or appears more than once | `❌ Error: --label requires exactly one non-empty value and may be used only once.` |
 | `label` contains whitespace | `❌ Error: label must not contain whitespace` |
 | `label` already used by another source | `❌ Error: label "<label>" is already used. Accept the suggested label, type a different one, or remove the existing source first with __SPECKIT_COMMAND_KNOWLEDGE_REMOVE__ <label>.` |
 | `revision` fails `^[A-Za-z0-9._/-]+$` | `❌ Error: revision "<value>" contains characters git does not accept in a refname` |

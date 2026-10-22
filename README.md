@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.15.2-7d4cdb">
-  <img alt="Status" src="https://img.shields.io/badge/status-v1.7.1-success">
+  <img alt="Status" src="https://img.shields.io/badge/status-v1.8.0-success">
 </p>
 
 ## 📖 Overview
@@ -39,7 +39,7 @@ When working in a microservices or multi-repo environment, architectural decisio
 `specify extension search` finds extensions in spec-kit's community catalog, but that catalog is searchable, not installable, by default. Install the published release from its archive:
 
 ```bash
-specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.7.1.zip
+specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.8.0.zip
 ```
 
 spec-kit first shows an `Untrusted Source` prompt naming the URL. Confirm it to install.
@@ -97,13 +97,14 @@ The examples use the hyphenated form, such as `/speckit-knowledge-sync`. That is
 | 📊 `/speckit-knowledge-status` | `/speckit.knowledge.status` | Show reachability, revision, last sync, item count, budget, and cache age |
 | 🔌 `/speckit-knowledge-remove` | `/speckit.knowledge.remove` | Remove, disable, or re-enable a configured source |
 
-### 🔧 `/speckit-knowledge-configure [url-or-path] [--revision <rev>] [path_filter ...]`
+### 🔧 `/speckit-knowledge-configure [url-or-path] [--revision <rev>] [--label <label>] [path_filter ...]`
 
 Initialize or edit the knowledge source configuration for the current project. Accepts:
 
 - **A remote Git URL** — HTTPS (`https://github.com/your-org/your-repo`) or SSH (`git@github.com:your-org/your-repo`).
 - **A local filesystem path to a Git repository** — use this when the repo is already cloned on your machine and you want to avoid network roundtrips, or when it lives on a private network. Both **absolute** paths and **`~`-prefixed** paths are supported (the tilde is expanded to `$HOME`).
 - **An optional revision** — a branch, tag, or full commit SHA. See [Pinning a revision](#-pinning-a-revision).
+- **An optional label** — choose the name shown for the source. If omitted, the command derives it from the URL or local path.
 - **Zero or more path filters** after the URL/path. With zero filters every `.md` file in the repo is indexed; with one or more filters, indexing is restricted to those folders only.
 
 **Examples**:
@@ -111,6 +112,12 @@ Initialize or edit the knowledge source configuration for the current project. A
 ```bash
 # Remote URL, single folder filter
 /speckit-knowledge-configure https://github.com/your-org/payment-service specs/
+
+# Choose a label, with no folder filter
+/speckit-knowledge-configure https://github.com/your-org/payment-service --label payments-main
+
+# Choose a label and multiple folder filters
+/speckit-knowledge-configure https://github.com/your-org/payment-service --label payments-v2 specs/ docs/decisions/
 
 # Local absolute path, single folder filter
 /speckit-knowledge-configure /Users/devuser/repos/payment-service specs/
@@ -126,6 +133,9 @@ Initialize or edit the knowledge source configuration for the current project. A
 
 # Pinned to a tag
 /speckit-knowledge-configure https://github.com/your-org/payments --revision v2.4.1 specs/
+
+# Use the derived label by omitting the optional label
+/speckit-knowledge-configure https://github.com/your-org/architecture-decisions specs/
 
 # Same, using the @ shorthand (HTTPS and local paths only — not SSH)
 /speckit-knowledge-configure https://github.com/your-org/payments@v2.4.1 specs/
@@ -152,7 +162,9 @@ Configured sources:
   3. shared-contracts    →  ~/repos/shared-contracts                     (paths: specs/, docs/decisions/)
 ```
 
-**Flags**: `--verbose` — print full YAML after write
+**Flags**:
+- `--verbose` — print full YAML after write
+- `--label <label>` — optional source name. It may appear before or after the path filters.
 
 ### 🔄 `/speckit-knowledge-sync [--force]`
 
