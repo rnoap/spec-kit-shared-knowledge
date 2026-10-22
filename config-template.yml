@@ -6,10 +6,12 @@
 # The cache/ directory and knowledge-index.md are local only — add them to .gitignore.
 #
 # Usage:
-#   /speckit.knowledge.configure <url-or-local-path> [--revision <rev>] [path_filter ...]
-#   /speckit.knowledge.sync [--force]
-#   /speckit.knowledge.remove <label> [--disable | --enable]
-#   /speckit.knowledge.status
+#   /speckit-knowledge-configure <url-or-local-path> [--revision <rev>] [path_filter ...]
+#   /speckit-knowledge-sync [--force]
+#   /speckit-knowledge-remove <label> [--disable | --enable]
+#   /speckit-knowledge-status
+#   (agents that install slash commands use the dot form,
+#   such as /speckit.knowledge.sync)
 #
 # A "knowledge source" can be either:
 #   1. A remote Git URL (HTTPS or SSH)
@@ -142,7 +144,7 @@ sources:                 # required; may be empty list []
   # A pinned source gets its own cache, so the SAME repository may be added twice
   # at two revisions without the two contaminating each other. Because a URL then
   # no longer identifies one source, every source carries a UNIQUE label — that
-  # label is what /speckit.knowledge.remove takes.
+  # label is what /speckit-knowledge-remove takes.
   #
   # Abbreviated SHAs (a1b2c3d) are NOT supported: they are not fetchable and a
   # prefix that is unique today can become ambiguous as the repository grows.
@@ -178,7 +180,7 @@ sources:                 # required; may be empty list []
   # Example 8 — A TEAMMATE'S UNMERGED SPEC (same repository, pushed branch)
   # ────────────────────────────────────────────────────────────────────────────
   # - url: https://github.com/your-org/your-repo            # the repository you share
-  #   label: order-tracking-spec                            # unique; /speckit.knowledge.remove takes it
+  #   label: order-tracking-spec                            # unique; /speckit-knowledge-remove takes it
   #   revision: 012-order-tracking                          # the teammate's PUSHED branch
   #   path_filter: specs/012-order-tracking/                # only that spec's folder
   #
@@ -203,6 +205,6 @@ sources:                 # required; may be empty list []
   #
   # On the configure command line, QUOTE such a path, or it is split at the
   # space and the rest is read as path filters:
-  #   /speckit.knowledge.configure '~/My Repos/kb' specs/
+  #   /speckit-knowledge-configure '~/My Repos/kb' specs/
   # A path without spaces needs no quotes.
 

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs(readme): read a teammate's unmerged spec`: the README and the configuration template show how to add a teammate's pushed, unmerged branch of a shared repository as a source, filtered to its spec folder, and when to remove it.
 - `docs(readme): drop migration notes`: the README and the configuration template no longer carry migration or version-compatibility notes.
 - `docs(readme): quote local paths with spaces`: the README and the configuration template show that configure needs a quoted path only when it contains a space.
+- `docs(readme): show the hyphenated command form`: the README and the configuration template show commands as `/speckit-knowledge-sync`, the form GitHub Copilot, Claude Code and other agents that install commands as skills show. The commands table lists the dot form for agents that install slash commands.
 
 ## [1.7.0] - 2026-10-21
 
