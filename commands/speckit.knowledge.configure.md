@@ -16,7 +16,7 @@ description: "Initialize or edit the knowledge source configuration for the curr
   - `https://github.com/your-org/your-repo --label payments-main specs/ docs/decisions/`
   - `~/repos/your-repo specs/ docs/decisions/`
   - `'~/My Repos/kb' specs/`
-  - `/abs/path/to/repo` (no filter — indexes every `.md` file in the repo)
+  - `/abs/path/to/repo` (no filter — indexes every `.md` file in the repo, except root-level dot-directories such as `.specify/` and `.github/`, and `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`)
 - **Optional revision** — a branch, tag, or full commit SHA to read from, in either form:
   - `--revision <rev>` — always works
   - `<url>@<rev>` — shorthand, split on the **last** `@`. Unambiguous for HTTPS URLs
@@ -171,7 +171,7 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
    - Not begin with `-` (it would be read as a git option — FR-034)
    - Not be `--verbose`, `--revision`, `--label`, or a value consumed by either option
    - If the URL/path, any filter or revision is invalid: print the § Error cases diagnostic with escaped values and stop with exit 0; write nothing, including a new configuration or `.gitignore`
-   - **Zero tokens** → omit `path_filter` from the source entry (indexes all `.md` files in the repo)
+   - **Zero tokens** → omit `path_filter` from the source entry (indexes all `.md` files in the repo, except root-level dot-directories and `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`)
    - **One token** → store as a single string for readability: `path_filter: specs/`
    - **Two or more tokens** → store as a YAML list: `path_filter: [specs/, docs/decisions/]`
 

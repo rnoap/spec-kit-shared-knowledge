@@ -62,7 +62,7 @@ sources:
 | `url` | string | yes | — | Non-empty. Either a local path (`/`, `./`, `../`, `~`) that exists and contains `.git`, or a remote URL matching `^(https?://\|ssh://\|git\+ssh://\|git@)`. **Must not begin with `-`.** |
 | `label` | string | no | derived from `url` | Non-empty. No whitespace. **Unique across `sources`** (FR-028). |
 | `revision` | string | no | absent | Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. Absent = the remote's default revision (FR-010). |
-| `path_filter` | string \| list | no | absent | Each entry non-empty, **no leading `/`**, **no `..`**, **must not begin with `-`**. Absent = every `.md` file in the repository. |
+| `path_filter` | string \| list | no | absent | Each entry non-empty, **no leading `/`**, **no `..`**, **must not begin with `-`**. Absent = every `.md` file in the repository except those under root-level dot-directories (`.specify/`, `.github/`, …) and `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` (amended 2026-10-22, bug `remote-cache-copies-all-files`). Present = only `<dir>/**/*.md` for each entry, honored as written. |
 | `max_cache_age` | string | no | inherits top-level | Matches `^[0-9]+[mhd]$`. A source-level value always wins over the project-level one. |
 | `enabled` | boolean | no | `true` | Exactly `true` or `false`. `"yes"` and `1` are rejected. |
 

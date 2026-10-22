@@ -31,7 +31,7 @@ repository). Scaffolded from `config-template.yml` at install time.
 |-------|------|:--------:|---------|:------------:|-------|
 | `url` | string | yes | — | — | Remote URL or local path. No longer a unique key — see § 2.2. |
 | `label` | string | no in file, always present after `configure` | derived from `url` | — | **The identity of the source** (FR-001, FR-028). Unique across `sources`. |
-| `path_filter` | string \| list | no | *absent* | — | Absent means every `.md` file in the repository. |
+| `path_filter` | string \| list | no | *absent* | — | Absent means every `.md` file in the repository except those under root-level dot-directories and `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` (amended 2026-10-22, bug `remote-cache-copies-all-files`). Present: each entry `<dir>/` caches and indexes `<dir>/**/*.md`, as written. |
 | `enabled` | boolean | no | `true` | — | Existed in the schema since 1.0.0; this feature is the first to expose it through a command. |
 | `revision` | string | no | *absent* | ✅ | Branch, tag, or full commit SHA. Absent means the remote's default revision (FR-010). |
 | `max_cache_age` | string | no | inherits top-level | ✅ | Per-source override (FR-016). A source-level value always wins over the project-level one. |

@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.15.2-7d4cdb">
-  <img alt="Status" src="https://img.shields.io/badge/status-v1.8.0-success">
+  <img alt="Status" src="https://img.shields.io/badge/status-v1.8.1-success">
 </p>
 
 ## 📖 Overview
@@ -39,7 +39,7 @@ When working in a microservices or multi-repo environment, architectural decisio
 `specify extension search` finds extensions in spec-kit's community catalog, but that catalog is searchable, not installable, by default. Install the published release from its archive:
 
 ```bash
-specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.8.0.zip
+specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.8.1.zip
 ```
 
 spec-kit first shows an `Untrusted Source` prompt naming the URL. Confirm it to install.
@@ -73,7 +73,7 @@ Then reload your editor / AI agent so it picks up the new commands.
 # 1b. … or from a LOCAL repository on your machine
 /speckit-knowledge-configure ~/repos/payment-service specs/
 
-# 1c. … or with NO filter (indexes every .md file in the repo)
+# 1c. … or with NO filter (indexes every .md file in the repo, minus the default exclusions)
 /speckit-knowledge-configure git@github.com:your-org/architecture-decisions.git
 
 # 1d. … or scoped to MULTIPLE folders
@@ -105,7 +105,7 @@ Initialize or edit the knowledge source configuration for the current project. A
 - **A local filesystem path to a Git repository** — use this when the repo is already cloned on your machine and you want to avoid network roundtrips, or when it lives on a private network. Both **absolute** paths and **`~`-prefixed** paths are supported (the tilde is expanded to `$HOME`).
 - **An optional revision** — a branch, tag, or full commit SHA. See [Pinning a revision](#-pinning-a-revision).
 - **An optional label** — choose the name shown for the source. If omitted, the command derives it from the URL or local path.
-- **Zero or more path filters** after the URL/path. With zero filters every `.md` file in the repo is indexed; with one or more filters, indexing is restricted to those folders only.
+- **Zero or more path filters** after the URL/path. With zero filters every `.md` file in the repo is indexed, except root-level dot-directories (`.specify/`, `.github/`, …) and `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`. With one or more filters, indexing is restricted to the `.md` files in those folders only.
 
 **Examples**:
 
@@ -125,7 +125,7 @@ Initialize or edit the knowledge source configuration for the current project. A
 # Local path containing a space: quote it
 /speckit-knowledge-configure '~/My Repos/kb' specs/
 
-# Local path with tilde, NO filter (indexes every .md in the repo)
+# Local path with tilde, NO filter (indexes every .md in the repo, minus the default exclusions)
 /speckit-knowledge-configure ~/repos/architecture-decisions
 
 # Local path, MULTIPLE folder filters
@@ -553,9 +553,11 @@ Key fields per source entry:
 - `sources[*].label` — optional; human-readable name used for attribution, and the identifier `remove` takes. Must be **unique** and contain no whitespace. Defaults: for remote URLs, `<host>/<org>/<repo>` derived from the URL; for local paths, the last path component (e.g. `~/repos/payment-service` → `payment-service`).
 - `sources[*].revision` — optional; a branch, tag, or full commit SHA. Omitted → the remote's default revision. See [Pinning a revision](#-pinning-a-revision).
 - `sources[*].path_filter` — optional folder names. Each entry accepts only ASCII letters, digits and `. _ ~ : / @ % + -`, with no leading `/`, `~` or `-`, no `..`, no spaces and no wildcards. Three forms:
-  - **Omitted** → every `.md` file in the repo is indexed.
-  - **Single string** → `path_filter: specs/` indexes only files under `specs/`.
+  - **Omitted** → every `.md` file in the repo is indexed, **except** those under root-level dot-directories (`.specify/`, `.github/`, `.wibey/`, `.claude/`, …) and files named `AGENTS.md`, `CLAUDE.md` or `GEMINI.md`. Those hold another project's tool and agent instructions, not shared knowledge. Root dotfiles and nested hidden folders are kept.
+  - **Single string** → `path_filter: specs/` indexes only the `.md` files under `specs/`.
   - **YAML list** → `path_filter: [specs/, docs/decisions/]` indexes those two trees and nothing else.
+
+  An explicit filter is honored as written, so `path_filter: .github/docs/` indexes that folder despite the default exclusions. Either way, only `.md` files are cached: the sparse checkout never writes code, images or configuration to disk.
 - `sources[*].enabled` — optional; default `true`; set `false` to skip a source without removing it from the file — or run `/speckit-knowledge-remove <label> --disable`.
 - `sources[*].max_cache_age` — optional; **replaces** the project-wide value for this source.
 - `sources[*].max_items` / `sources[*].max_bytes` — optional; a **sub-ceiling** that can only lower what this source contributes.

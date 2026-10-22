@@ -283,14 +283,18 @@ the same reasoning that serves an over-age cache when its source is unreachable
 
 ### Indexable Items
 
-An **item** is a `.md` file under the source's `path_filter` (anywhere in the cache
-when there is none) that is a **regular file** on disk **and** that git does not
-record as a symbolic link. Step 5 indexes items and nothing else, and the Cache
-Integrity Check counts them the same way.
+An **item** is a `.md` file under the source's `path_filter` that is a **regular
+file** on disk **and** that git does not record as a symbolic link. With no
+`path_filter`, an item may be anywhere in the cache **except** under a root-level
+dot-directory (`.specify/`, `.github/`, …) or named `AGENTS.md`, `CLAUDE.md` or
+`GEMINI.md`. These are the same exclusions the default sparse patterns apply. Step 5
+indexes items and nothing else, and the Cache Integrity Check counts them the same
+way.
 
 Run from the cache root. `'<dir1>' ['<dir2>' ...]` are the `path_filter` entries
 without their trailing `/`, or `'.'` when there is no filter. Prefix every
-`find` starting point with `./`; with no filter its one argument is `'./.'`:
+`find` starting point with `./`; with no filter its one argument is `'./.'`.
+`'<path_filter>'` is empty when there is no filter:
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
@@ -298,6 +302,9 @@ links=$(git -c core.quotePath=false ls-files -s -- '<dir1>' ['<dir2>' ...] \
   | awk -F '\t' '$1 ~ /^120000 / { print $2 }')
 items=$(find './<dir1>' ['./<dir2>' ...] -name .git -prune -o -type f -name '*.md' -print 2>/dev/null \
   | sed -e ':again' -e 's|^\./||' -e 't again' | grep -vE '(^|/)\.\.(/|$)|^/' | grep -vxF -e "$links")
+if [ -z '<path_filter>' ]; then
+  items=$(printf '%s\n' "$items" | grep -vE '^\.[^/]*/|(^|/)(AGENTS|CLAUDE|GEMINI)\.md$')
+fi
 ```
 
 `$items` is what step 5 indexes. Every path in `$links` is skipped and named in
@@ -305,6 +312,11 @@ step 9, never read. Strip every leading `./` and drop any line with a `..` path
 segment or a leading `/`. A directory name containing a line break must never
 forge an item outside the cache (007 FR-006). Read each item only as `"$file"`,
 never paste its name into command text.
+
+**The no-filter exclusions are applied here as well as in the sparse patterns.** A
+cache cloned before the default patterns existed holds the whole tree until its
+next warm sync prunes it. When that sync falls back to the cache, the exclusions
+here still keep a foreign `.specify/` out of the index.
 
 **Both tests are needed, because each misses a case the other catches.** Every
 clone sets `core.symlinks=false`, so git writes a link as a small regular file
@@ -344,7 +356,7 @@ Written with the agent's file-writing tool to `.specify/extensions/knowledge/kno
 > (<limit_items> items / <limit_bytes>). Search the corpus to reach them.
 
 ### Source: <label> (<url>)
-**Status**: <fresh|cached|unreachable> | **Synced**: <ISO8601> | **Items**: <N> | **Path filter**: <path_filter or "all .md files">
+**Status**: <fresh|cached|unreachable> | **Synced**: <ISO8601> | **Items**: <N> | **Path filter**: <path_filter or "all .md files (default exclusions)">
 
 - [<relative-path>](cache/<slug>/<relative-path>)
 - [<relative-path>](cache/<slug>/<relative-path>)
@@ -355,6 +367,10 @@ Written with the agent's file-writing tool to `.specify/extensions/knowledge/kno
 ```
 
 The machine-readable HTML comment on line 1 allows scripts to detect the index without reading the full file.
+
+With no `path_filter`, the **Path filter** field reads `all .md files (default
+exclusions)`: root-level dot-directories and `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`
+are not indexed (§ Indexable Items).
 
 The four `withheld_*` / `limit_*` fields and the `⚠️ Partial` line are **omitted
 entirely** when the budget withheld nothing — including when no budget is
@@ -725,7 +741,25 @@ git clone \
   .specify/extensions/knowledge/cache/<slug>
 ```
 
-After clone (both remote and local), apply sparse-checkout if `path_filter` is set. The `path_filter` field may be either a single string (`specs/`) or a YAML list (`[specs/, docs/decisions/]`); normalize to separately single-quoted arguments for `git sparse-checkout set`:
+After clone (both remote and local), **always** apply a sparse checkout: the cache
+holds only `.md` files, never a full checkout of the source.
+
+**Sparse patterns.** `path_filter` may be a single string (`specs/`) or a YAML list
+(`[specs/, docs/decisions/]`). Each entry names a folder. Strip its trailing `/` and
+append `/**/*.md` to get `<patternN>`, then pass each one as a separately
+single-quoted argument to `git sparse-checkout set`:
+
+| `path_filter` | `git sparse-checkout set` arguments |
+| --- | --- |
+| `specs/` (or `specs`) | `-- 'specs/**/*.md'` |
+| `[specs/, docs/decisions/]` | `-- 'specs/**/*.md' 'docs/decisions/**/*.md'` |
+| *absent* | `-- '*.md' '!/.*/**' '!AGENTS.md' '!CLAUDE.md' '!GEMINI.md'` (the **default patterns**) |
+
+The default patterns apply **only** when `path_filter` is absent. An explicit
+`path_filter` is honored as written, including one that points into a dot-directory
+such as `.github/docs/`.
+
+With a `path_filter`:
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
@@ -733,34 +767,46 @@ cd .specify/extensions/knowledge/cache/<slug>
 # Cone mode always includes root-level files (package.json, Dockerfile, etc.)
 # regardless of the pattern, which violates the path_filter contract.
 git sparse-checkout init --no-cone
-# Normalize each pattern: ensure trailing slash so git treats it as a directory match.
 # `--` before the patterns keeps a pattern beginning with "-" from being read as an
 # option (FR-034).
-# For a single string  → one arg:    git sparse-checkout set -- 'specs/'
-# For a YAML list      → multi-arg:  git sparse-checkout set -- 'specs/' 'docs/decisions/'
 git sparse-checkout set -- '<pattern1>' ['<pattern2>' ...]
 git checkout
 ```
 
-> **Pattern semantics**: in `--no-cone` mode, git uses gitignore-style patterns. A bare directory name like `specs/` matches every file recursively under `specs/` and **nothing else**. Root-level files at the cache root are excluded. This matches user expectations: `path_filter: specs/` means "only `specs/` content"; `path_filter: [specs/, docs/decisions/]` means "only those two trees".
+> **Pattern semantics**: in `--no-cone` mode, git uses gitignore-style patterns. `specs/**/*.md` matches every `.md` file at any depth under `specs/` and **nothing else**: no root-level files, and no images, code or configuration inside `specs/`. `path_filter: [specs/, docs/decisions/]` means "only the Markdown in those two trees".
 
 If no `path_filter`:
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
-git checkout HEAD -- .
+git sparse-checkout init --no-cone
+# The default patterns: every .md file, minus root-level dot-directories
+# (.specify/, .github/, .wibey/, .claude/, …) and agent instruction files.
+git sparse-checkout set -- '*.md' '!/.*/**' '!AGENTS.md' '!CLAUDE.md' '!GEMINI.md'
+git checkout
 ```
+
+> **Why these exclusions**: a source's tool directories and agent instruction
+> files are instructions for *that* repository's agent — spec-kit commands,
+> templates, a constitution — not knowledge to share. The hooks tell the consuming
+> agent to open every indexed file, so indexing them would hand another project's
+> directives to this one. Write the dot-directory exclusion as `!/.*/**`:
+> `!/.*/` and `!/.specify/` exclude nothing in `--no-cone` mode. Only root-level
+> dot-directories are excluded; root dotfiles and nested hidden folders such as
+> `specs/.drafts/` are kept. To index excluded content, name it in `path_filter`.
 
 #### Warm path (update)
 
-Before pulling new content, **re-apply the sparse-checkout configuration in `--no-cone` mode** if `path_filter` is set. This is idempotent and self-heals caches that were originally cloned with the buggy `--cone` configuration (which always included root-level files). Pass each pattern in the (possibly list-form) `path_filter` as a separate argument:
+Before pulling new content, **re-apply the sparse-checkout configuration in `--no-cone` mode**, with the `path_filter` patterns or, when there is none, the default patterns (**Sparse patterns**, cold path above). This is idempotent and self-heals older caches: those cloned with the buggy `--cone` configuration (which always included root-level files), those cloned with no `path_filter` before the default patterns existed (a full checkout), and those whose filter patterns predate the `/**/*.md` suffix. Pass each pattern as a separate argument:
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
+git sparse-checkout init --no-cone
+# same patterns and same `--` as the cold path (FR-034); `set` also removes files
+# an older checkout left outside them
 if [ -n '<path_filter>' ]; then
-  git sparse-checkout init --no-cone
-  # one or more patterns — same normalization as the cold path, same `--` (FR-034);
-  # `set` also removes files an older --cone checkout left outside the filter
   git sparse-checkout set -- '<pattern1>' ['<pattern2>' ...]
+else
+  git sparse-checkout set -- '*.md' '!/.*/**' '!AGENTS.md' '!CLAUDE.md' '!GEMINI.md'
 fi
 ```
 
@@ -799,7 +845,7 @@ fi
 
 **Move HEAD; do not overlay the tree.** `checkout --force --detach` makes the
 working tree match the fetched commit: paths deleted upstream are removed, and the
-sparse patterns hold, so nothing outside `path_filter` is written. `git checkout
+sparse patterns hold, so nothing outside them is written. `git checkout
 <ref> -- .` never removed a path — a file deleted upstream stayed cached and indexed
 indefinitely — and wrote files added upstream outside the filter. `--force` loses
 nothing: the cache holds no local edits, and untracked files such as
@@ -830,7 +876,7 @@ less available knowledge than it had before.
 
 ### 5. Index .md files per source
 
-After a successful sync (cold or warm), collect the source's items as § Indexable Items describes: the `.md` files under the path_filter (or all `.md` files if no filter) that are regular files git does not record as symbolic links. For each item:
+After a successful sync (cold or warm), collect the source's items as § Indexable Items describes: the `.md` files under the path_filter (or, with no filter, every `.md` file outside root-level dot-directories, other than `AGENTS.md`, `CLAUDE.md` and `GEMINI.md`) that are regular files git does not record as symbolic links. For each item:
 - Record relative path from cache root
 - Hold the name in `file`, never paste it into command text; measure with `wc -c < "$file"` and compute SHA-256 with `sha256sum < "$file"` or `shasum -a 256 < "$file"` (macOS)
 

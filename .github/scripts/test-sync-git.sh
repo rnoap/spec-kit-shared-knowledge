@@ -130,7 +130,7 @@ TIER1='**Tier 1 — no revision pinned, or a branch or tag.**'
 TIER2='**Tier 2 — a full commit SHA.**'
 TIER3='**Tier 3 — the server refuses an unadvertised object.**'
 LOCAL_COLD='**Local path** (no network flags needed'
-SPARSE='After clone (both remote and local), apply sparse-checkout'
+SPARSE='With a `path_filter`:'
 NOFILTER='If no `path_filter`:'
 WARM='#### Warm path (update)'
 WARM_REMOTE='**Remote URL** — check out the declared revision'
@@ -217,6 +217,8 @@ hostile_block() {
         slug:*) printf '%s\0' "slug-$field" "$value" >> "$case_dir/expected" ;;
         indexable:DIRS)
           printf '%s\0' git "$value" find "./$value" >> "$case_dir/expected" ;;
+        indexable:FILTER)
+          printf '%s\0' '[' "$value" >> "$case_dir/expected" ;;
         status-local:LOCAL)
           printf '%s\0' '[' "$value/.git" git "$value" >> "$case_dir/expected" ;;
         warm-sparse:FILTER|warm-remote:REV|warm-local:REV)
@@ -276,7 +278,7 @@ hostile_values() {
   hostile_block "$SYNC" "$WARM" warm-sparse FILTER
   hostile_block "$SYNC" "$WARM_REMOTE" warm-remote REV
   hostile_block "$SYNC" "$WARM_LOCAL" warm-local REV
-  hostile_block "$SYNC" '### Indexable Items' indexable DIRS
+  hostile_block "$SYNC" '### Indexable Items' indexable DIRS FILTER
   hostile_block "$STATUS" '**Remote URL** (`with_timeout`' status-remote URL
   hostile_block "$STATUS" '**Local path** (expand' status-local LOCAL
 }
@@ -464,7 +466,7 @@ git clone -q --bare "$U" "$T/up-v0.git"
 echo
 echo "Pinning a full commit SHA  (Tiers 2 and 3)"
 
-URL=file://$U REV=$C1 FILTER=docs/ DIRS=docs SLUG=tier2
+URL=file://$U REV=$C1 FILTER='docs/**/*.md' DIRS=docs SLUG=tier2
 run "$SYNC" "$TIER1"; rc=$?
 check "Tier 1 cannot clone a SHA, so the sync escalates" [ "$rc" -ne 0 ]
 run "$SYNC" "$TIER2"; rc=$?
@@ -482,7 +484,7 @@ expect "Tier 2, no path_filter: the pin's HEAD and content" \
        "$(head_of tier2-nofilter)|$(content tier2-nofilter docs/a.md)|$(exists tier2-nofilter docs/c.md)" "$C1|A v1|no"
 
 git config --global protocol.version 0
-URL=file://$T/up-v0.git REV=$C1 FILTER=docs/ DIRS=docs SLUG=tier3
+URL=file://$T/up-v0.git REV=$C1 FILTER='docs/**/*.md' DIRS=docs SLUG=tier3
 run "$SYNC" "$TIER1"; run "$SYNC" "$TIER2"; rc=$?
 check "Tier 2 fails when the server refuses unadvertised objects" [ "$rc" -ne 0 ]
 run "$SYNC" "$TIER3"; rc=$?
@@ -505,7 +507,7 @@ W=$T/warm; new_repo "$W"; serve "$W"; mkdir "$W/docs"
 printf 'ADR-1\n' > "$W/docs/adr-001.md"; printf 'ADR-2\n' > "$W/docs/adr-002.md"; printf 'readme\n' > "$W/README.md"
 commit "$W" one >/dev/null
 
-URL=file://$W REV='' FILTER=docs/ DIRS=docs SLUG=warm
+URL=file://$W REV='' FILTER='docs/**/*.md' DIRS=docs SLUG=warm
 run "$SYNC" "$TIER1" "$SPARSE"
 printf '{}\n' > "$(cache warm)/.manifest.json"
 LOCAL=$W FILTER='' DIRS=. SLUG=warm-local
@@ -518,7 +520,7 @@ printf 'ADR-1 v2\n' > "$W/docs/adr-001.md"; printf 'r\n' > "$W/root.md"
 mkdir "$W/other"; printf 'o\n' > "$W/other/x.md"
 W2=$(commit "$W" two)
 
-FILTER=docs/ DIRS=docs SLUG=warm
+FILTER='docs/**/*.md' DIRS=docs SLUG=warm
 run "$SYNC" "$WARM" "$WARM_REMOTE"
 expect "HEAD moves to the fetched commit" "$(head_of warm)" "$W2"
 expect "a file deleted upstream is removed" "$(exists warm docs/adr-002.md)" no
@@ -532,7 +534,7 @@ expect "local path: deletion removed, additions written, manifest kept" \
        "$(exists warm-local docs/adr-002.md)|$(exists warm-local root.md)|$(exists warm-local .manifest.json)" "no|yes|yes"
 
 # Older caches were cloned in cone mode, which always checks out root files.
-URL=file://$W REV='' FILTER=docs/ DIRS=docs SLUG=cone
+URL=file://$W REV='' FILTER='docs/**/*.md' DIRS=docs SLUG=cone
 c=$(cache cone)
 git clone -q --filter=blob:none --no-checkout --depth=1 -- "$URL" "$c" 2>/dev/null
 git -C "$c" sparse-checkout init --cone 2>/dev/null
@@ -554,17 +556,90 @@ run "$SYNC" "$WARM" "$WARM_REMOTE"
 expect "a pinned cache that served the default branch converges to the pin" \
        "$(head_of legacy)|$(content legacy docs/a.md)|$(exists legacy docs/b.md)|$(exists legacy docs/c.md)" "$C1|A v1|yes|no"
 
+# --- Markdown-only caches: default patterns and path_filter --------------------
+
+echo
+echo "Markdown-only caches  (default patterns with no path_filter, *.md filters)"
+
+files_of() {
+  (cd "$(cache "$1")" && find . -name .git -prune -o -type f ! -name .manifest.json -print) \
+    | sed 's|^\./||' | sort | tr '\n' ' ' | sed 's/ $//'
+}
+
+M=$T/md; new_repo "$M"; serve "$M"
+mkdir -p "$M/.specify/memory" "$M/.github/docs" "$M/.wibey" "$M/docs" "$M/specs/.drafts" "$M/src"
+for f in .specify/memory/constitution.md .github/docs/guide.md .wibey/agent.md AGENTS.md CLAUDE.md GEMINI.md \
+         docs/AGENTS.md docs/a.md specs/.drafts/d.md README.md .notes.md; do
+  printf '%s\n' "$f" > "$M/$f"
+done
+printf '{}\n' > "$M/package.json"; printf 'x\n' > "$M/src/app.ts"; printf 'png\n' > "$M/docs/diagram.png"
+commit "$M" md >/dev/null
+KEPT='.notes.md README.md docs/a.md specs/.drafts/d.md'
+
+URL=file://$M REV='' FILTER='' DIRS=. SLUG=md-default
+run "$SYNC" "$TIER1" "$NOFILTER"; rc=$?
+expect "no path_filter: the cold sparse step exits 0" "$rc" 0
+expect "no path_filter: only .md files outside root dot-directories and agent files are cached" \
+       "$(files_of md-default)" "$KEPT"
+expect "no path_filter: the cache is a sparse checkout" \
+       "$(git -C "$(cache md-default)" config core.sparseCheckout)" true
+items_of
+expect "no path_filter: items match the cached files" "$(joined items)" "$KEPT"
+
+LOCAL=$M SLUG=md-default-local
+run "$SYNC" "$LOCAL_COLD" "$NOFILTER"
+expect "no path_filter, local source: the same default patterns apply" "$(files_of md-default-local)" "$KEPT"
+
+FILTER='docs/**/*.md' DIRS=docs SLUG=md-filter
+run "$SYNC" "$TIER1" "$SPARSE"
+expect "path_filter: only .md files under the filter are cached, no images" \
+       "$(files_of md-filter)" "docs/AGENTS.md docs/a.md"
+items_of
+expect "path_filter: agent files under an explicit filter are honored" "$(joined items)" "docs/AGENTS.md docs/a.md"
+
+FILTER='.github/docs/**/*.md' DIRS=.github/docs SLUG=md-dotdir
+run "$SYNC" "$TIER1" "$SPARSE"
+items_of
+expect "path_filter into a dot-directory is honored as written" \
+       "$(files_of md-dotdir)|$(joined items)" ".github/docs/guide.md|.github/docs/guide.md"
+
+# Before the default patterns, a cache with no path_filter was a full checkout.
+FILTER='' DIRS=. SLUG=md-full
+c=$(cache md-full)
+git clone -q -c core.symlinks=false --filter=blob:none --no-checkout --depth=1 -- "$URL" "$c" 2>/dev/null
+git -C "$c" checkout -q HEAD -- . 2>/dev/null
+printf '{}\n' > "$c/.manifest.json"
+expect "a full-checkout cache starts with code and .specify/" \
+       "$(exists md-full package.json)|$(exists md-full .specify/memory/constitution.md)" "yes|yes"
+items_of
+expect "...yet its items already leave out dot-directories and agent files" "$(joined items)" "$KEPT"
+run "$SYNC" "$WARM"; rc=$?
+check "...the warm sparse step succeeds with no path_filter" [ "$rc" -eq 0 ]
+run "$SYNC" "$WARM_REMOTE"
+expect "...and its next warm sync prunes it to the default patterns" "$(files_of md-full)" "$KEPT"
+expect "...keeping the untracked .manifest.json" "$(exists md-full .manifest.json)" yes
+
+# Before the /**/*.md suffix, a filtered cache held every file under the filter.
+FILTER='docs/**/*.md' DIRS=docs SLUG=md-oldfilter
+c=$(cache md-oldfilter)
+git clone -q -c core.symlinks=false --filter=blob:none --no-checkout --depth=1 -- "$URL" "$c" 2>/dev/null
+git -C "$c" sparse-checkout init --no-cone 2>/dev/null
+git -C "$c" sparse-checkout set -- 'docs/' 2>/dev/null; git -C "$c" checkout -q 2>/dev/null
+expect "an old-pattern filtered cache starts with non-.md files" "$(exists md-oldfilter docs/diagram.png)" yes
+run "$SYNC" "$WARM" "$WARM_REMOTE"
+expect "...and loses them on its next warm sync" "$(files_of md-oldfilter)" "docs/AGENTS.md docs/a.md"
+
 # --- D4: symbolic links ------------------------------------------------------
 
 echo
 echo "Symbolic links in a source"
 
-SLUG=tier2 DIRS=docs; items_of
+SLUG=tier2 FILTER='docs/**/*.md' DIRS=docs; items_of
 expect "a link is checked out as a plain file" "$(kind tier2 docs/notes.md)" file
 expect "items are the regular files git does not record as links" "$(joined items)" "docs/a.md docs/b.md"
 expect "every link is reported" "$(joined links)" "docs/linked docs/notes.md docs/rel.md"
 
-SLUG=legacy DIRS=.; items_of
+SLUG=legacy FILTER='' DIRS=.; items_of
 expect "a cache cloned before the fix still holds real links" "$(kind legacy docs/notes.md)" symlink
 expect "...and none of them is an item" "$(joined items)" "README.md docs/a.md docs/b.md"
 leaks=$(cd "$(cache legacy)" && sed '/^$/d' "$T/items.out" | while read -r f; do cat "$f"; done | grep -c SECRET)

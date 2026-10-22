@@ -25,7 +25,11 @@
 # '~/My Repos/kb', or it is split at the space. Other paths need no quotes.
 #
 # Path filters are optional. With zero filters, every .md file in the repository
-# is indexed. With one or more filters, indexing is scoped to ONLY those folders.
+# is indexed, except root-level dot-directories (.specify/, .github/, .wibey/, …)
+# and AGENTS.md, CLAUDE.md and GEMINI.md: those are tool and agent instructions,
+# not shared knowledge. With one or more filters, indexing is scoped to ONLY the
+# .md files in those folders, honored as written. Name a dot-directory folder
+# (e.g. .github/docs/) to index it. Only .md files are ever cached.
 # Each path_filter is a folder name using only ASCII letters, digits and
 # . _ ~ : / @ % + -, with no leading /, ~ or -, no .. and no spaces or wildcards.
 #
@@ -101,11 +105,12 @@ sources:                 # required; may be empty list []
   #   enabled: true                                         # optional; default true
 
   # ────────────────────────────────────────────────────────────────────────────
-  # Example 2 — Remote URL, NO filter (indexes every .md in the repo)
+  # Example 2 — Remote URL, NO filter (every .md, minus default exclusions)
   # ────────────────────────────────────────────────────────────────────────────
   # - url: git@github.com:your-org/architecture-decisions.git
   #   label: adr-repo
-  #   # path_filter omitted → all .md files indexed
+  #   # path_filter omitted → all .md files indexed, except root-level
+  #   # dot-directories and AGENTS.md / CLAUDE.md / GEMINI.md
 
   # ────────────────────────────────────────────────────────────────────────────
   # Example 3 — LOCAL absolute path

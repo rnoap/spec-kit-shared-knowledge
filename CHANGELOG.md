@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-10-22
+
+### Fixed
+
+- `fix(sync): a source without path_filter cached the whole repository` — the
+  cold path ran a full `git checkout HEAD -- .`, so the cache held the source's
+  code, images and configuration. It also indexed the Markdown in its tool
+  directories: `.specify/` commands, templates and constitution, and `.wibey/`
+  agent prompts. The hooks then had the agent open another project's directives.
+  - A source with no `path_filter` now gets a no-cone sparse checkout with
+    default patterns: `*.md`, minus root-level dot-directories (`!/.*/**`) and
+    `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` at any depth. § Indexable Items applies
+    the same exclusions.
+  - A `path_filter` entry `<dir>/` now becomes the pattern `<dir>/**/*.md`, so a
+    filtered cache holds only `.md` files too. An explicit filter is honored as
+    written, including one inside a dot-directory such as `.github/docs/`.
+  - The warm path always re-applies the sparse patterns. Existing full or
+    old-pattern caches are pruned on their next sync, with no `--force` needed.
+
+### Changed
+
+- A source with no `path_filter` no longer indexes Markdown under root-level
+  dot-directories or `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`. To keep indexing any
+  of it, name the folder in `path_filter`. The index shows `all .md files
+  (default exclusions)` for such a source. Its first sync after upgrading
+  reports fewer items.
+- `extension.yml` `version` bumped from `1.8.0` to `1.8.1`.
+
 ## [1.8.0] - 2026-10-22
 
 ### Added
@@ -309,7 +337,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.1
 [1.8.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.0
 [1.7.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.1
 [1.7.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.0
