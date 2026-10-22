@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 
 - `docs(readme): read a teammate's unmerged spec`: the README and the configuration template show how to add a teammate's pushed, unmerged branch of a shared repository as a source, filtered to its spec folder, and when to remove it.
+- `docs(readme): drop migration notes`: the README and the configuration template no longer carry migration or version-compatibility notes.
 
 ## [1.7.0] - 2026-10-21
 
@@ -29,7 +30,7 @@ now produces the documented cache name in sh, bash and zsh.
 
 ### Changed
 
-- **Breaking configuration change:** `knowledge-config.yml` now requires schema `"1.1"`. A `"1.0"` file is refused until the [manual version-only migration](README.md#manual-migration-from-10); missing and unknown versions also stop before source use or configuration/cache changes. Migration preserves source values and cache identities. The manifest and index formats are unchanged.
+- **Breaking configuration change:** `knowledge-config.yml` now requires schema `"1.1"`. A `"1.0"` file is refused until the [manual version-only migration](https://github.com/rnoap/spec-kit-shared-knowledge/blob/v1.7.0/README.md#manual-migration-from-10); missing and unknown versions also stop before source use or configuration/cache changes. Migration preserves source values and cache identities. The manifest and index formats are unchanged.
 - `~user/` local paths, wildcard filters and filters beginning with `~` are refused. configure keeps a quoted path argument whole, local paths may contain spaces except before `-`, and status reports invalid sources as `invalid` without probing them. Invalid sources prevent orphan pruning.
 - `extension.yml` `version` bumped from `1.6.0` to `1.7.0`. The command count stays at 5 and no hook changes.
 
@@ -50,7 +51,7 @@ now produces the documented cache name in sh, bash and zsh.
 
 ### Compatibility
 
-- Migrate `knowledge-config.yml` once after upgrading: back it up and change only `schema_version` from `"1.0"` to `"1.1"`, as the [manual migration](README.md#manual-migration-from-10) describes. Until then every command stops before using a source and changes no configuration or cache.
+- Migrate `knowledge-config.yml` once after upgrading: back it up and change only `schema_version` from `"1.0"` to `"1.1"`, as the [manual migration](https://github.com/rnoap/spec-kit-shared-knowledge/blob/v1.7.0/README.md#manual-migration-from-10) describes. Until then every command stops before using a source and changes no configuration or cache.
 - Entries the narrower rules refuse are skipped with a message naming the field; the other sources still sync. Correct or remove them as a separate edit.
 - Valid sources keep their cache identities. Caches named by the broken slug procedure are replaced once, on the next sync.
 - The manifest and index formats are unchanged. spec-kit `>=0.15.2` and git `>=2.25` remain the floors, and no tool becomes required.
