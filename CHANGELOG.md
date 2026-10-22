@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-10-22
+
+Documentation for adding a teammate's unmerged spec as a source and for quoting
+local paths with spaces, examples in the hyphenated command form, and a README
+without migration notes. The schema `"1.0"` diagnostic no longer points at them.
+
+### Changed
+
+- `extension.yml` `version` bumped from `1.7.0` to `1.7.1`. The command count stays at 5 and no hook changes.
+
+### Fixed
+
+- `fix(commands): stop citing README migration notes`: the schema `"1.0"` diagnostic in all five commands no longer refers to README migration notes.
+
+### Documentation
+
+- `docs(readme): read a teammate's unmerged spec`: the README and the configuration template show how to add a teammate's pushed, unmerged branch of a shared repository as a source, filtered to its spec folder, and when to remove it.
+- `docs(readme): drop migration notes`: the README and the configuration template no longer carry migration or version-compatibility notes.
+- `docs(readme): quote local paths with spaces`: the README and the configuration template show that configure needs a quoted path only when it contains a space.
+- `docs(readme): show the hyphenated command form`: the README and the configuration template show commands as `/speckit-knowledge-sync`, the form GitHub Copilot, Claude Code and other agents that install commands as skills show. The commands table lists the dot form for agents that install slash commands.
+
 ## [1.7.0] - 2026-10-21
 
 Shell-safe configuration. Every read now rejects shell syntax in `url` and
@@ -21,7 +42,7 @@ now produces the documented cache name in sh, bash and zsh.
 
 ### Changed
 
-- **Breaking configuration change:** `knowledge-config.yml` now requires schema `"1.1"`. A `"1.0"` file is refused until the [manual version-only migration](README.md#manual-migration-from-10); missing and unknown versions also stop before source use or configuration/cache changes. Migration preserves source values and cache identities. The manifest and index formats are unchanged.
+- **Breaking configuration change:** `knowledge-config.yml` now requires schema `"1.1"`. A `"1.0"` file is refused until the [manual version-only migration](https://github.com/rnoap/spec-kit-shared-knowledge/blob/v1.7.0/README.md#manual-migration-from-10); missing and unknown versions also stop before source use or configuration/cache changes. Migration preserves source values and cache identities. The manifest and index formats are unchanged.
 - `~user/` local paths, wildcard filters and filters beginning with `~` are refused. configure keeps a quoted path argument whole, local paths may contain spaces except before `-`, and status reports invalid sources as `invalid` without probing them. Invalid sources prevent orphan pruning.
 - `extension.yml` `version` bumped from `1.6.0` to `1.7.0`. The command count stays at 5 and no hook changes.
 
@@ -42,7 +63,7 @@ now produces the documented cache name in sh, bash and zsh.
 
 ### Compatibility
 
-- Migrate `knowledge-config.yml` once after upgrading: back it up and change only `schema_version` from `"1.0"` to `"1.1"`, as the [manual migration](README.md#manual-migration-from-10) describes. Until then every command stops before using a source and changes no configuration or cache.
+- Migrate `knowledge-config.yml` once after upgrading: back it up and change only `schema_version` from `"1.0"` to `"1.1"`, as the [manual migration](https://github.com/rnoap/spec-kit-shared-knowledge/blob/v1.7.0/README.md#manual-migration-from-10) describes. Until then every command stops before using a source and changes no configuration or cache.
 - Entries the narrower rules refuse are skipped with a message naming the field; the other sources still sync. Correct or remove them as a separate edit.
 - Valid sources keep their cache identities. Caches named by the broken slug procedure are replaced once, on the next sync.
 - The manifest and index formats are unchanged. spec-kit `>=0.15.2` and git `>=2.25` remain the floors, and no tool becomes required.
@@ -275,7 +296,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.1
 [1.7.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.0
 [1.6.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.6.0
 [1.5.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.5.0

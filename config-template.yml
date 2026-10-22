@@ -6,10 +6,12 @@
 # The cache/ directory and knowledge-index.md are local only — add them to .gitignore.
 #
 # Usage:
-#   /speckit.knowledge.configure <url-or-local-path> [--revision <rev>] [path_filter ...]
-#   /speckit.knowledge.sync [--force]
-#   /speckit.knowledge.remove <label> [--disable | --enable]
-#   /speckit.knowledge.status
+#   /speckit-knowledge-configure <url-or-local-path> [--revision <rev>] [path_filter ...]
+#   /speckit-knowledge-sync [--force]
+#   /speckit-knowledge-remove <label> [--disable | --enable]
+#   /speckit-knowledge-status
+#   (agents that install slash commands use the dot form,
+#   such as /speckit.knowledge.sync)
 #
 # A "knowledge source" can be either:
 #   1. A remote Git URL (HTTPS or SSH)
@@ -19,6 +21,8 @@
 # url accepts only ASCII letters, digits and . _ ~ : / @ % + -.
 # A local path starts with /, ./, ../ or ~/ and may also contain spaces,
 # but no space followed by -. Remote addresses write a space as %20.
+# On the configure command line, quote a path that contains a space,
+# '~/My Repos/kb', or it is split at the space. Other paths need no quotes.
 #
 # Path filters are optional. With zero filters, every .md file in the repository
 # is indexed. With one or more filters, indexing is scoped to ONLY those folders.
@@ -56,7 +60,7 @@ schema_version: "1.1"   # required; must be exactly "1.1"
 # Format: <N><unit> where unit is m (minutes), h (hours) or d (days).
 #   30m   4h   7d
 #
-# Omitted (the default) means NO policy: every sync fetches, exactly as in 1.3.0.
+# Omitted (the default) means NO policy: every sync fetches.
 #
 # This is a hint, not an expiry. It governs only whether a refresh is ATTEMPTED.
 # A cache older than its age is still served when the source cannot be reached —
@@ -73,9 +77,8 @@ schema_version: "1.1"   # required; must be exactly "1.1"
 #   max_items: <N>              a whole number, 1 or greater
 #   max_bytes: <N>kb | <N>mb    binary units — 512kb, 2mb
 #
-# Omitted (the default) means NO limit, and the index is exactly what it would
-# have been before this feature existed. No default value is applied: a project
-# that upgrades and changes nothing observes nothing new.
+# Omitted (the default) means NO limit: the index lists every item, and no
+# default value is applied.
 #
 # The budget bounds the INDEX ONLY. Nothing is removed from the cache and nothing
 # stops being searchable — a withheld item is un-injected, not unavailable.
@@ -136,12 +139,12 @@ sources:                 # required; may be empty list []
   #   max_cache_age: 7d                                     # overrides the project-wide value
   #   path_filter: specs/
   #
-  # `revision` omitted → the remote's default revision, exactly as before.
+  # `revision` omitted → the remote's default revision.
   #
   # A pinned source gets its own cache, so the SAME repository may be added twice
   # at two revisions without the two contaminating each other. Because a URL then
   # no longer identifies one source, every source carries a UNIQUE label — that
-  # label is what /speckit.knowledge.remove takes.
+  # label is what /speckit-knowledge-remove takes.
   #
   # Abbreviated SHAs (a1b2c3d) are NOT supported: they are not fetchable and a
   # prefix that is unique today can become ambiguous as the repository grows.
@@ -172,4 +175,36 @@ sources:                 # required; may be empty list []
   # sources that have items; a source needing less than its share releases the
   # remainder to the others. Within a source, items are taken in ascending path
   # order — so you can work out your own index on paper.
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 8 — A TEAMMATE'S UNMERGED SPEC (same repository, pushed branch)
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: https://github.com/your-org/your-repo            # the repository you share
+  #   label: order-tracking-spec                            # unique; /speckit-knowledge-remove takes it
+  #   revision: 012-order-tracking                          # the teammate's PUSHED branch
+  #   path_filter: specs/012-order-tracking/                # only that spec's folder
+  #
+  # The branch also carries everything already on main, so filter to the spec's
+  # folder or you will index your own specs a second time. Use the remote URL: a
+  # local path can only check out branches that exist locally in that clone.
+  #
+  # A branch moves: every refresh fetches its latest commit. To keep the version
+  # you reviewed, pin its full commit SHA instead.
+  #
+  # Remove this source when either branch merges. After the teammate's branch
+  # merges, the spec reaches you through main; merging yours with this source
+  # still here makes every teammate sync a temporary branch. A deleted branch is
+  # not an error: sync keeps serving the last cached copy.
+
+  # ────────────────────────────────────────────────────────────────────────────
+  # Example 9 — LOCAL path containing spaces
+  # ────────────────────────────────────────────────────────────────────────────
+  # - url: "~/My Repos/kb"                                  # spaces are fine inside this file
+  #   label: kb
+  #   path_filter: specs/
+  #
+  # On the configure command line, QUOTE such a path, or it is split at the
+  # space and the rest is read as path filters:
+  #   /speckit-knowledge-configure '~/My Repos/kb' specs/
+  # A path without spaces needs no quotes.
 

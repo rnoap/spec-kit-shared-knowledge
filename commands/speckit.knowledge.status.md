@@ -47,7 +47,7 @@ that is not accepted reaches a shell, not even for its slug or a message
 schema `"1.1"`. For `"1.0"`, print as agent output:
 
 ```text
-Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, review the README migration notes, then change only schema_version. No sources or caches were used or changed.
+Error: knowledge-config.yml schema_version "1.0" requires migration to "1.1". Back up the file, then change only schema_version. No sources or caches were used or changed.
 ```
 
 For a missing or unknown version, print the following, substituting `<missing>`
