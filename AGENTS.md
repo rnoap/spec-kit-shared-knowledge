@@ -97,7 +97,7 @@ bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/sk
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/009-optional-config-label/plan.md
+at specs/010-agents-knowledge-pointer/plan.md
 <!-- SPECKIT END -->
 
 <!-- CODE-GRAPH-GUIDE START -->

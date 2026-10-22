@@ -1,0 +1,632 @@
+{
+  "workflow": "companion",
+  "specName": "Point the agent at shared knowledge from AGENTS.md",
+  "branch": "main",
+  "currentStep": "implement",
+  "status": "completed",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-22T17:09:18.499Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-22T17:11:50.995Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-22T17:17:55.464Z"
+    },
+    {
+      "step": "plan",
+      "substep": "research",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:21:44.006Z"
+    },
+    {
+      "step": "plan",
+      "substep": "design",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:26:46.818Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:27:25.462Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-22T17:34:52.480Z"
+    },
+    {
+      "step": "tasks",
+      "substep": "generate",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:36:23.482Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:36:28.584Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-22T17:56:00.827Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T001",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:56:37.845Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T002",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:56:53.614Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T003",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:57:04.860Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T004",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:58:25.846Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T005",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:59:08.976Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T006",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T17:59:47.151Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T007",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:00:16.189Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T008",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:00:42.581Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T009",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:02:05.575Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T010",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:02:10.657Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T011",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:02:38.794Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T012",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:02:43.255Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T013",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:02:55.413Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T014",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:02:59.195Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T015",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:03:23.093Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T016",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:03:35.381Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T017",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:04:17.989Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-22T18:04:18.055Z"
+    }
+  ],
+  "telemetryInstanceId": "19915f6e-4676-46a3-bb7d-877b79f9cedf",
+  "last_action": "17/17 tasks done; validator 17/17, sync suite 229/229, reference 31/31, smoke passed; fresh-chat SCs not run",
+  "coverage": {
+    "FR-001": {
+      "title": "After a sync that writes the index, root AGENTS.md has one knowledge section with extension-unique markers",
+      "tasks": [
+        "T004",
+        "T006",
+        "T009"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-005 create"
+      ]
+    },
+    "FR-002": {
+      "title": "Section tells the agent to read the index first, open listed files, cite <label> › <path>; suggest sync when the index, a listed source entry or a file is missing",
+      "tasks": [
+        "T004",
+        "T009"
+      ]
+    },
+    "FR-003": {
+      "title": "Section lists enabled source labels and tells the agent to use only their index entries",
+      "tasks": [
+        "T004",
+        "T011",
+        "T012"
+      ]
+    },
+    "FR-004": {
+      "title": "Section is at most 12 lines plus one per label",
+      "tasks": [
+        "T004"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-004 fixed lines"
+      ]
+    },
+    "FR-005": {
+      "title": "Sync creates AGENTS.md when absent, with only the section",
+      "tasks": [
+        "T004",
+        "T009"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-005 create",
+        "whitespace-only file"
+      ]
+    },
+    "FR-006": {
+      "title": "Every byte outside the section is unchanged",
+      "tasks": [
+        "T004",
+        "T010"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-006 bytes outside unchanged"
+      ]
+    },
+    "FR-007": {
+      "title": "No write when the section would be identical",
+      "tasks": [
+        "T004",
+        "T010"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-007 rerun unchanged",
+        "SC-002 bytes identical"
+      ]
+    },
+    "FR-008": {
+      "title": "No timestamps, counts, absolute paths or source content in the section",
+      "tasks": [
+        "T004"
+      ]
+    },
+    "FR-009": {
+      "title": "Section removed in the same run sync deletes the index",
+      "tasks": [
+        "T005"
+      ]
+    },
+    "FR-010": {
+      "title": "Config option turns the behavior off (default on); off removes an existing section",
+      "tasks": [
+        "T001",
+        "T002",
+        "T003",
+        "T004",
+        "T013",
+        "T014"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-010 agents_md false",
+        "R1 invalid value; validate-extension.sh::rule 11"
+      ]
+    },
+    "FR-011": {
+      "title": "Damaged or duplicated markers: file unchanged, warning with the fix",
+      "tasks": [
+        "T004",
+        "T010"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-011 damaged"
+      ]
+    },
+    "FR-012": {
+      "title": "AGENTS.md read/write failure is a warning, never changes sync result or exit code",
+      "tasks": [
+        "T004",
+        "T007",
+        "T010"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-012 read-only file"
+      ]
+    },
+    "FR-013": {
+      "title": "Labels are escaped literals that cannot end the section or inject instructions",
+      "tasks": [
+        "T004",
+        "T010"
+      ],
+      "tests": [
+        "agents_section_ref.py::FR-013 hostile label"
+      ]
+    },
+    "FR-014": {
+      "title": "Sync and remove reports say created / updated / unchanged / removed for AGENTS.md",
+      "tasks": [
+        "T005",
+        "T006",
+        "T011"
+      ]
+    },
+    "FR-015": {
+      "title": "remove, --disable and --enable re-derive the section from enabled sources (or drop it when none), same rules as sync, only when the index exists",
+      "tasks": [
+        "T011",
+        "T012"
+      ],
+      "tests": [
+        "agents_section_ref.py::US3 label change",
+        "US3 last source removed"
+      ]
+    },
+    "FR-016": {
+      "title": "remove never modifies knowledge-index.md; sync stays its only writer",
+      "tasks": [
+        "T011",
+        "T012"
+      ]
+    }
+  },
+  "size": "normal",
+  "classification": {
+    "projectedFiles": 7,
+    "projectedTasks": 12,
+    "scopeSignal": "none",
+    "verdict": "normal"
+  },
+  "expectations": [
+    "CLAUDE.md, .github/copilot-instructions.md and other instruction files",
+    "configure or remove writing the section",
+    "summarizing knowledge content inside AGENTS.md"
+  ],
+  "context": [
+    "area: commands/speckit.knowledge.sync.md (index write/delete lifecycle, completion report, config validation)",
+    "area: knowledge-config.yml schema 1.1 (new optional opt-out key)",
+    "constraint: remove never touches knowledge-index.md; sync owns its lifecycle",
+    "constraint: agent-context extension owns the SPECKIT START/END block in AGENTS.md; never touch it",
+    "constraint: 1.8.1 default exclusions keep a source repo AGENTS.md out of caches"
+  ],
+  "intent": "sync keeps a brief AGENTS.md section that sends the agent to knowledge-index.md for questions about other repos or configured sources",
+  "decisions": [
+    {
+      "decision": "remove/--disable/--enable update only the AGENTS.md section (option A); supersedes the earlier non-goal \"remove writing the section\". The index stays sync-only; the section restricts the agent to enabled sources, hiding stale entries until the next sync."
+    },
+    {
+      "decision": "Opt-out key agents_md (top-level boolean, default true); invalid value leaves AGENTS.md untouched",
+      "why": "the default writes a committed file; a typo like agents_md: no must not be overridden",
+      "rejected": "max_items precedent of treating an invalid value as unconfigured; name agent_context (collides with the agent-context extension)"
+    },
+    {
+      "decision": "No schema_version bump; stays 1.1",
+      "why": "optional additive key, every 1.1 file stays valid (005 precedent)",
+      "rejected": "bump to 1.2"
+    },
+    {
+      "decision": "Markers <!-- KNOWLEDGE START --> / <!-- KNOWLEDGE END -->, whole-line match; damaged = anything but exactly one of each, start before end",
+      "why": "mirrors agent-context SPECKIT markers; label lines start with '- ' so they can never close the section",
+      "rejected": "fuzzy marker matching"
+    },
+    {
+      "decision": "One procedure, § Agent Context Section in sync.md; remove applies it by reference (step 3a)",
+      "why": "a second copy would drift and rule 11 guards only the validation block",
+      "rejected": "duplicating the procedure in remove.md; a shared script (forbidden by §I/§III)"
+    },
+    {
+      "decision": "Append at end with one blank line; replace in place; remove drops the block plus the blank line above it; delete the file if only whitespace remains",
+      "why": "FR-006/FR-007; write-then-remove is byte-neutral",
+      "rejected": "inserting near the top of AGENTS.md"
+    },
+    {
+      "decision": "Sync leaves the section alone when no index exists and none was deleted (offline first sync)",
+      "why": "AGENTS.md is committed but the index is git-ignored; removing it on a teammate's fresh clone causes churn; FR-002 covers the missing-index case",
+      "rejected": "remove the section whenever no index exists"
+    },
+    {
+      "decision": "The persisted section names the sync command by canonical id speckit.knowledge.sync, not the __SPECKIT_COMMAND_KNOWLEDGE_SYNC__ token",
+      "why": "the token renders per host at install, so teammates on different hosts would commit different bytes (FR-007)",
+      "rejected": "install-rendered token in the section"
+    },
+    {
+      "decision": "configure step 4 preserves every other top-level key on edits",
+      "why": "otherwise a rewrite could drop agents_md: false (and the max_* keys)",
+      "rejected": "leave configure unchanged"
+    },
+    {
+      "decision": "A whitespace-only AGENTS.md is treated like a missing one (write replaces it with the section)",
+      "why": "the literal append rule left leading blank lines; found by the reference run",
+      "rejected": "append after the whitespace"
+    },
+    {
+      "decision": "Write-then-remove neutrality documented with one exception: a final line feed added to a file that lacked one",
+      "why": "making it fully neutral would need state about what write added; the reference run showed the claim was false as written",
+      "rejected": "tracking the original trailing newline"
+    },
+    {
+      "decision": "remove step 3 also preserves every top-level key",
+      "why": "same exposure as configure step 4; remove rewrites the config too",
+      "rejected": "fix configure only"
+    }
+  ],
+  "workingBranch": "010-agents-knowledge-pointer",
+  "step_summaries": {
+    "plan": {
+      "summary": "Plan: one § Agent Context Section in sync.md, applied at sync 1a/8b and remove 3a; agents_md opt-out; contracts for the exact section text, config key and report lines; quickstart walkthrough",
+      "key_finding": "The section must be host-neutral and must not be removed when no index exists, because AGENTS.md is committed while the index is git-ignored"
+    },
+    "tasks": {
+      "summary": "17 tasks: Foundational (8, sync.md procedure + byte-identical validation rows), US1/US2 verification (2), US3 remove.md (2), US4 config-template (2), Polish README/CHANGELOG/validation (3)"
+    },
+    "implement": {
+      "summary": "AGENTS.md knowledge section shipped: § Agent Context Section in sync.md (steps 1a/8b), remove step 3a, agents_md key in 3 identical validation tables, template, README, CHANGELOG; 17/17 tasks"
+    }
+  },
+  "approach": "Define § Agent Context Section once in speckit.knowledge.sync.md and apply it with the agent's file-writing tool at sync step 1a (remove), new step 8b (write) and remove step 3a (re-derive from config). Add the optional agents_md key to the byte-identical validation tables, config-template.yml and README; configure preserves top-level keys. Verify with the quickstart walkthrough and validate-extension.sh.",
+  "currentTask": null,
+  "task_summaries": {
+    "T001": {
+      "status": "DONE",
+      "did": "agents_md validation row added; step 4 preserves every other top-level key",
+      "files": [
+        "commands/speckit.knowledge.configure.md"
+      ]
+    },
+    "T002": {
+      "status": "DONE",
+      "did": "agents_md validation row added, byte-identical",
+      "files": [
+        "commands/speckit.knowledge.status.md"
+      ]
+    },
+    "T003": {
+      "status": "DONE",
+      "did": "agents_md validation row added; three blocks hash-identical",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T004": {
+      "status": "DONE",
+      "did": "§ Agent Context Section added: checks, write/remove table, exact 12-line section, label rules, report lines, rationale",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T005": {
+      "status": "DONE",
+      "did": "step 1 reads agents_md (fails closed); step 1a removes the section after deleting the index, with example line",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T006": {
+      "status": "DONE",
+      "did": "step 8b writes the section when the index exists, skips without one (R6); step 9 prints its line after the index pointer",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T007": {
+      "status": "DONE",
+      "did": "5 error-table rows, AGENTS.md side-effect bullet, --no-context-output note",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T008": {
+      "status": "DONE",
+      "did": "validate-extension.sh 17/17: rule 11 identical blocks, check 5 tokens, check 12 quoting",
+      "files": [
+        ".github/scripts/validate-extension.sh"
+      ]
+    },
+    "T009": {
+      "status": "DONE",
+      "did": "Reference run of § Agent Context Section: create (step 1) passes; fresh-chat SC-001 and offline step 14 not exercised (no fresh agent session available)",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T010": {
+      "status": "DONE",
+      "did": "Reference run: rerun byte-identical, SPECKIT block and surrounding text intact, damaged markers untouched, hostile label confined, read-only file warns; found and fixed 2 prose gaps (no-final-LF neutrality, whitespace-only file)",
+      "files": [
+        "commands/speckit.knowledge.sync.md",
+        "specs/010-agents-knowledge-pointer/contracts/agents-md-section.md",
+        "specs/010-agents-knowledge-pointer/research.md"
+      ]
+    },
+    "T011": {
+      "status": "DONE",
+      "did": "remove step 3a applies § Agent Context Section by reference when the index exists; step 3 preserves top-level keys; report example, 4 error rows, side effects",
+      "files": [
+        "commands/speckit.knowledge.remove.md"
+      ]
+    },
+    "T012": {
+      "status": "DONE",
+      "did": "Reference run: label drop updates the section, last source removes it and deletes a section-only file, no file -> no line; FR-016 holds by construction (step 3a never writes the index); SC-006 fresh-chat not exercised",
+      "files": [
+        "commands/speckit.knowledge.remove.md"
+      ]
+    },
+    "T013": {
+      "status": "DONE",
+      "did": "config-template.yml: commented agents_md block (default true, false removes, invalid leaves AGENTS.md untouched)",
+      "files": [
+        "config-template.yml"
+      ]
+    },
+    "T014": {
+      "status": "DONE",
+      "did": "Reference run: agents_md false removes the section then stays silent; invalid value leaves AGENTS.md untouched; template still parses (schema 1.1, no new required key)",
+      "files": [
+        "config-template.yml"
+      ]
+    },
+    "T015": {
+      "status": "DONE",
+      "did": "README: 'Ask in plain language' section (sync/remove behavior, commit safety, opt-out) and agents_md key reference bullet",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T016": {
+      "status": "DONE",
+      "did": "CHANGELOG [Unreleased]: Added (AGENTS.md section, agents_md key), Changed (remove refresh, top-level key preservation)",
+      "files": [
+        "CHANGELOG.md"
+      ]
+    },
+    "T017": {
+      "status": "DONE",
+      "did": "validate-extension 17/17, test-sync-git 229/229, install smoke passed; rendered skills carry the section with the canonical id; SC-001/SC-006 need fresh agent sessions (not run)",
+      "files": [
+        ".github/scripts/validate-extension.sh"
+      ]
+    }
+  },
+  "verified": [
+    {
+      "what": "validate-extension (rule 11 identical blocks, check 5 tokens, check 12 quoting)",
+      "command": "PATH=/tmp/kvenv/bin:$PATH bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.7,
+      "result": "  \u001b[32mPASS\u001b[0m  inert quote scanner fixtures distinguish effective single quotes ·   \u001b[32mPASS\u001b[0m  every configuration placeholder in a bash block is single-quoted · \u001b[32m17 checks passed.\u001b[0m"
+    },
+    {
+      "what": "sync git behavior suite (regression)",
+      "command": "bash .github/scripts/test-sync-git.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 26.3,
+      "result": "  \u001b[32mPASS\u001b[0m  no timeout tool at all: the call still runs ·   \u001b[32mPASS\u001b[0m  no timeout tool at all: one warning says so · \u001b[32m229 checks passed.\u001b[0m"
+    },
+    {
+      "what": "reference run of § Agent Context Section, 31 scenarios",
+      "command": "python3 /Users/r0n0352/.copilot/session-state/275ab7bd-fb27-4ef1-b44f-5d5a64479ad2/files/agents_section_ref.py",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.1,
+      "result": "PASS R1 file unchanged · PASS FR-012 read-only file: write-failed · 0 failed"
+    },
+    {
+      "what": "install smoke test into a clean consumer; rendered sync skill keeps the canonical id in the section and renders printed lines to /speckit-knowledge-sync",
+      "command": "specify init + specify extension add --dev + assert-install.sh",
+      "result": "Smoke test passed"
+    }
+  ],
+  "concerns": [
+    {
+      "note": "SC-001 and SC-006 (fresh-chat answers cite / ignore a source in 4-of-5 / 0-of-5 trials) and quickstart step 14 (offline first sync) were not exercised: they need fresh agent sessions in a consumer project. The file-level behavior was verified with a scratch reference run of the prose, which checks the rules, not an agent following them.",
+      "step": "implement"
+    }
+  ]
+}
