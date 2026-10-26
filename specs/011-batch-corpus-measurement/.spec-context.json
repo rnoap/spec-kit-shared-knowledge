@@ -1,0 +1,771 @@
+{
+  "workflow": "companion",
+  "specName": "Shell-recorded manifests, so a full knowledge sync fits in one turn",
+  "branch": "011-batch-corpus-measurement",
+  "currentStep": "implement",
+  "status": "implementing",
+  "history": [
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-26T14:38:43.440Z"
+    },
+    {
+      "step": "specify",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-26T14:49:47.925Z"
+    },
+    {
+      "step": "clarify",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T15:46:07.386Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-26T15:47:20.293Z"
+    },
+    {
+      "step": "plan",
+      "substep": "research",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:11:50.695Z"
+    },
+    {
+      "step": "plan",
+      "substep": "design",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:37:21.334Z"
+    },
+    {
+      "step": "plan",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:37:32.929Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-26T16:40:30.937Z"
+    },
+    {
+      "step": "tasks",
+      "substep": "generate",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:41:56.786Z"
+    },
+    {
+      "step": "tasks",
+      "substep": null,
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:42:03.925Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "start",
+      "by": "extension",
+      "at": "2026-10-26T16:42:16.709Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T001",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:44:59.010Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T002",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:44:59.214Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T004",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:53:17.323Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T005",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:53:17.569Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T006",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:53:17.807Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T003",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:53:18.001Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T007",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T16:53:41.671Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T008",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:03:09.045Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T009",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:04:29.307Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T010",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:04:29.529Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T011",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:06:36.281Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T012",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:06:36.492Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T013",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:08:01.161Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T014",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:08:16.189Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T015",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:08:41.995Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T016",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:08:42.192Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T017",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:09:21.100Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T018",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:09:48.497Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T019",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:10:13.691Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "task": "T020",
+      "kind": "complete",
+      "by": "ai",
+      "at": "2026-10-26T17:11:13.791Z"
+    }
+  ],
+  "telemetryInstanceId": "33873247-ef74-4424-bde8-0b0dc4c3fa9f",
+  "last_action": "20/22 tasks done; 303/303 sync checks and 18/18 gates pass; T021 and T022 await the maintainer",
+  "coverage": {
+    "FR-001": {
+      "title": "Sync MUST record each source through one procedure run that collects, measures and hashes its items and writes its manifest, so the agent types nothing into the manifest.",
+      "tasks": [
+        "T005",
+        "T006"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::record run per shell"
+      ]
+    },
+    "FR-002": {
+      "title": "The run that records a source MUST report each item's path and size to the agent, so budgeting and the index need no second measurement.",
+      "tasks": [
+        "T005"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::report item lines"
+      ]
+    },
+    "FR-003": {
+      "title": "The manifest MUST list every indexable item of the source, whatever the context budget, as today.",
+      "tasks": [
+        "T006"
+      ]
+    },
+    "FR-004": {
+      "title": "Every file name and source value in the manifest MUST be escaped as JSON requires and MUST read back exactly as it is on disk or in the configuration.",
+      "tasks": [
+        "T003",
+        "T005"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::manifest_valid",
+        "JSON escapes"
+      ]
+    },
+    "FR-005": {
+      "title": "A file name MUST NOT run as a command, act as an option or create a file, as spec 007 requires.",
+      "tasks": [
+        "T003",
+        "T004",
+        "T012"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::no marker",
+        "hostile_values records URL REV"
+      ]
+    },
+    "FR-006": {
+      "title": "An item whose name is not valid UTF-8 MUST be left out of the manifest and the index, and the sync report MUST name every such item on one line under its source, as it names skipped symbolic links, with each byte that is not valid UTF-8 shown as \\xHH.",
+      "tasks": [
+        "T003",
+        "T005",
+        "T013"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::skipped-utf8 (Linux)",
+        "spike/encoder-crosscheck.sh"
+      ]
+    },
+    "FR-007": {
+      "title": "Recording and checking MUST apply the same item rules, every skip rule included, so a manifest the procedure has just written always passes the check.",
+      "tasks": [
+        "T003",
+        "T004",
+        "T009"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::fresh manifest passes the check in every shell"
+      ]
+    },
+    "FR-008": {
+      "title": "A manifest MUST appear whole or not at all: an interrupted sync MUST NOT leave a manifest that passes the check.",
+      "tasks": [
+        "T006"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::missing manifest fails"
+      ]
+    },
+    "FR-009": {
+      "title": "The manifest MUST still be written last, after every item of the source is in place, so its write time keeps marking when the cache became valid.",
+      "tasks": [
+        "T006"
+      ]
+    },
+    "FR-010": {
+      "title": "The manifest format MUST stay unchanged, its schema version included (see Verbatim Constraints), so search, status and every other reader keep reading it as today.",
+      "tasks": [
+        "T005"
+      ]
+    },
+    "FR-011": {
+      "title": "The shared Cache Integrity Check MUST re-derive a source's records in one procedure run and report pass or fail, with no hash compared by the agent.",
+      "tasks": [
+        "T009",
+        "T010"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::check verdicts"
+      ]
+    },
+    "FR-012": {
+      "title": "Status, search, and sync's fallback and policy-fresh paths MUST use the one shared check by reference, and a source that fails it MUST be handled as corrupted, as today.",
+      "tasks": [
+        "T011",
+        "T015",
+        "T016"
+      ]
+    },
+    "FR-013": {
+      "title": "A manifest written by an earlier version MUST either pass because its records match its files, or fail once and be rebuilt; it MUST NOT pass with records that do not match.",
+      "tasks": [
+        "T009",
+        "T010"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::agent-layout manifest fails once"
+      ]
+    },
+    "FR-014": {
+      "title": "The agent MUST still write the knowledge index, with budget allocation, conflict handling and messages unchanged.",
+      "tasks": [
+        "T006",
+        "T011"
+      ]
+    },
+    "FR-015": {
+      "title": "Recording and checking MUST need no tool beyond what the extension already declares and a standard macOS or Linux install provides.",
+      "tasks": [
+        "T004",
+        "T005",
+        "T020"
+      ]
+    },
+    "FR-016": {
+      "title": "Recording and checking MUST behave the same under sh, bash and zsh, on macOS and on Linux back to Ubuntu 20.04 with git 2.25.",
+      "tasks": [
+        "T003",
+        "T007",
+        "T008"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::sh bash zsh dash identical",
+        "spike/encoder-crosscheck.sh"
+      ]
+    },
+    "FR-017": {
+      "title": "The automated sync checks MUST cover recording with a hostile-name set that holds today's hostile names, every character JSON must escape (double quote, backslash, and every control character except line feed) and a name that is not valid UTF-8. Each check MUST confirm valid JSON, names that read back unchanged and no marker file, and that the name that is not valid UTF-8 is left out and shown with \\xHH escapes.",
+      "tasks": [
+        "T003",
+        "T012"
+      ],
+      "tests": [
+        "test-sync-git.sh --records::hostile fixtures"
+      ]
+    },
+    "FR-018": {
+      "title": "The README's troubleshooting section and the sync command MUST state that the first sync after an extension upgrade rebuilds every source, and that running sync again completes a sync that stopped part-way.",
+      "tasks": [
+        "T013",
+        "T017"
+      ]
+    },
+    "FR-019": {
+      "title": "The revision of spec 007's rule that the agent's file tool writes the manifest MUST be recorded with that decision, limited to the manifest; the index stays agent-written.",
+      "tasks": [
+        "T006",
+        "T014"
+      ]
+    },
+    "FR-020": {
+      "title": "Sync MUST treat a cache directory without a manifest or without its own git repository as an interrupted sync: remove it and clone again, so no git command ever acts on the project's own repository.",
+      "tasks": [
+        "T001",
+        "T002"
+      ],
+      "tests": [
+        "test-sync-git.sh --recovery::failed clone dir",
+        "interrupted clone",
+        "project untouched"
+      ]
+    },
+    "FR-021": {
+      "title": "With a freshness policy configured, a source whose manifest is missing MUST be refreshed, not skipped as fresh.",
+      "tasks": [
+        "T001",
+        "T002"
+      ],
+      "tests": [
+        "test-sync-git.sh --recovery::freshness gate missing manifest is stale"
+      ]
+    }
+  },
+  "size": "normal",
+  "classification": {
+    "projectedFiles": 8,
+    "projectedTasks": 18,
+    "scopeSignal": "none",
+    "verdict": "normal"
+  },
+  "expectations": [
+    "generating knowledge-index.md from the shell",
+    "budget and conflict logic",
+    "any change to the manifest format or schema_version",
+    "keeping caches across specify extension add (separate upstream spec-kit request)",
+    "network cost of clone and fetch",
+    "configure and remove",
+    "reworking warm syncs that leave the corpus unchanged"
+  ],
+  "context": [
+    "assessment: .specify/assessments/batch-corpus-measurement (go for Option C, feasibility spike first)",
+    "area: commands/speckit.knowledge.sync.md step 5 (998-1005), step 6 manifest write (1006-1036), Corpus Measurement (165-191), Indexable Items (293-337), Cache Integrity Check (339-351)",
+    "area: status.md:25 and search.md:116-119 use the Cache Integrity Check by reference, no copies",
+    "area: .github/scripts/test-sync-git.sh measurement loop 366-396 feeds only hostile-name asserts; hostile names are $(touch pwned).md, -option.md and LF paths; no quote, backslash, control-char or non-UTF-8 names; no JSON parser; sh/bash/zsh loop covers only the slug procedure (286-323)",
+    "finding: no CI workflow runs test-sync-git.sh, and no awk-variant or git-version matrix exists",
+    "area: specs/007-shell-safe-config/research.md section 7 (75-89): manifest and index written with the agent file tool; 007 FR-006 literal args, FR-014 schema versions",
+    "constraint: manifest per-item keys are path and sha256 only; sizes feed only the budget",
+    "constraint: constitution 1.4.0 section I self-contained Markdown commands, section III Bash + YAML + Markdown only, Quality Gate 12 shell safety",
+    "constraint: extension.yml 1.9.1 declares only git; no Python or jq",
+    "area: README.md Troubleshooting (619-627) has no upgrade or re-run guidance"
+  ],
+  "intent": "The shell procedure that measures a source's corpus also writes its .manifest.json, so a cold full sync finishes in one agent turn with file names kept as data",
+  "unattended": true,
+  "decisions": [
+    {
+      "decision": "Compose three blocks per run: Indexable Items, new Item Records, and a record or check tail, run as one shell command per source",
+      "why": "one definition of item rules and encoder, so record and check cannot drift; one agent step per source",
+      "rejected": "a self-contained block per caller, or a script file (constitution I and III)"
+    },
+    {
+      "decision": "Prefix sed, grep, sort, awk, od and tr with LC_ALL=C, never export it",
+      "why": "macOS sed drops items after an invalid byte and GNU grep 3.4 prints Binary file matches in a UTF-8 locale; one byte order everywhere",
+      "rejected": "keeping the user locale, or exporting LC_ALL into the agent's shell"
+    },
+    {
+      "decision": "Leave out paths containing a line feed at find time with ! -path",
+      "why": "a newline list cannot carry them; fragments created phantom and duplicate items",
+      "rejected": "a -f guard plus de-duplication, which still lets a fragment shadow a real item"
+    },
+    {
+      "decision": "Read links from git ls-files -s -z through tr",
+      "why": "ls-files C-quotes names with quote, backslash or control bytes even with quotePath=false, so such links were indexed",
+      "rejected": "decoding C-quoting in awk, or one ls-files call per item"
+    },
+    {
+      "decision": "Encode names from od hex in one POSIX awk program: strict UTF-8 validation, JSON escapes, raw UTF-8 out via printf %c",
+      "why": "awk only sees hex digits, so no awk variant can misread a hostile byte; BSD awk verified, spike checks mawk and gawk",
+      "rejected": "ASCII-only \\u escapes (kept as fallback), Python, jq or Perl (undeclared)"
+    },
+    {
+      "decision": "Fix the manifest layout exactly and write it to .manifest.json.tmp then mv -f",
+      "why": "whole-or-absent manifest with an mtime that marks validity; a canonical text the check can compare",
+      "rejected": "writing in place"
+    },
+    {
+      "decision": "The check renders the manifest the record run would write, using the stored synced_at, and compares bytes; callers act on the verdict",
+      "why": "byte equality proves valid JSON without a parser and cannot loop; status stays read-only",
+      "rejected": "JSON parsing in awk, or header pattern matching"
+    },
+    {
+      "decision": "Run the check in status step 2, search, both sync fallbacks and the policy-fresh path",
+      "why": "status never ran the full check; the policy-fresh path trusted the manifest unchecked and had no sizes for step 7a",
+      "rejected": "status keeping its JSON-only test"
+    },
+    {
+      "decision": "Missing manifest is stale; warm path only with .git and .manifest.json, else remove the slug directory and clone",
+      "why": "a failed clone left an empty directory from which git reached the user's project and ran checkout --force there; a missing manifest skipped every source under a policy",
+      "rejected": "GIT_CEILING_DIRECTORIES alone, which stops the damage but never recovers the source"
+    },
+    {
+      "decision": "Release as 1.10.0",
+      "why": "new behavior, same manifest format; old manifests fail once and are recorded again",
+      "rejected": "a patch release"
+    },
+    {
+      "decision": "Item Records exports helpers (pick, render_manifest, print_report) that both tails reuse",
+      "why": "one encoder and one renderer, so a manifest the record run writes always passes the check",
+      "rejected": "duplicating the encoder in the check block"
+    },
+    {
+      "decision": "Emit raw UTF-8 bytes from awk with printf %c under LC_ALL=C",
+      "why": "verified on BSD awk 20200816 and mawk (byte-identical output); keeps names readable in the manifest and report",
+      "rejected": "ASCII-only \\u escapes, kept as the fallback if gawk ever differs"
+    },
+    {
+      "decision": "Links filter strips the first tab-separated field with sub() instead of -F tab $2",
+      "why": "a link name containing a tab was truncated at the tab",
+      "rejected": "awk -F '\\t' { print $2 }"
+    },
+    {
+      "decision": "Verify the Linux encoder row with a git-free cross-check against macOS output",
+      "why": "images with git timed out and the internal apt mirror returned 520; mawk, dash, GNU grep and ext4 were the riskiest cells",
+      "rejected": "public ports.ubuntu.com apt or recreating the user's podman machine"
+    }
+  ],
+  "step_summaries": {
+    "plan": {
+      "summary": "Plan: record and check runs composed from command blocks, hex-fed awk encoder, canonical atomic manifest, check by render-and-compare, two recovery fixes, spike first",
+      "key_finding": "1.9.1 can run git checkout --force on the user's own project after a failed clone, and a freshness policy skips every source after an upgrade"
+    },
+    "tasks": {
+      "summary": "22 tasks: Foundational (recovery, spike-gated record run, check; 13 tasks on sync.md and the harness), US2 007 note, US3 status and search, US4 README, Polish release and validation; T021-T022 are maintainer runs"
+    },
+    "implement": {
+      "summary": "Shell-recorded manifests shipped in the commands: record run, check block, recovery fixes; harness 229 -> 303 green; 2 maintainer tasks open"
+    }
+  },
+  "approach": "One shell run per source composes Indexable Items, a new Item Records block and a tail. The record tail writes a canonical manifest atomically; the check tail renders the same text with the stored timestamp and compares bytes. Names reach a single POSIX awk encoder as od hex under LC_ALL=C, and two recovery bugs (failed-clone directory, missing-manifest freshness) are fixed alongside.",
+  "verified": [
+    {
+      "what": "plan blocks check out",
+      "command": "python3 .specify/extensions/companion/scripts/check_plan.py --feature-dir specs/011-batch-corpus-measurement --strict",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 0.0,
+      "result": "[plan-check] plan.md: 1 screen, 6 parts. Every screen holds to its grammar."
+    },
+    {
+      "what": "sync checks, full run (303 expected)",
+      "command": "bash .github/scripts/test-sync-git.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 32.2,
+      "result": "  \u001b[32mPASS\u001b[0m  no timeout tool at all: the call still runs ·   \u001b[32mPASS\u001b[0m  no timeout tool at all: one warning says so · \u001b[32m303 checks passed.\u001b[0m"
+    },
+    {
+      "what": "packaging gates (validate-extension, PyYAML via uv)",
+      "command": "/Users/r0n0352/.local/bin/uv run --quiet --no-project --with pyyaml -- bash .github/scripts/validate-extension.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 3.4,
+      "result": "  \u001b[32mPASS\u001b[0m  inert quote scanner fixtures distinguish effective single quotes ·   \u001b[32mPASS\u001b[0m  every configuration placeholder in a bash block is single-quoted · \u001b[32m18 checks passed.\u001b[0m"
+    },
+    {
+      "what": "Linux encoder row: Ubuntu 20.04 mawk/dash/GNU grep vs macOS",
+      "command": "bash specs/011-batch-corpus-measurement/spike/encoder-crosscheck.sh",
+      "source": "derived",
+      "exitCode": 0,
+      "durationSeconds": 1.2,
+      "result": "  PASS  container bash: the name that is not valid UTF-8 is reported as caf\\xE9.md ·   PASS  container bash: every other report line matches this machine's ·   PASS  container: no marker"
+    },
+    {
+      "what": "Records and recovery groups detect the 1.9.1 behavior",
+      "command": "test-sync-git.sh --records / --recovery with the old sync.md stashed",
+      "result": "37 of 47 and 5 of 11 fail on the old text, all pass on the new"
+    },
+    {
+      "what": "A real record run produces the canonical manifest",
+      "command": "manual run on a scratch repo with a quote, a tab, guía.md and a quoted link",
+      "result": "byte order, escapes and raw UTF-8 as specified; no temporary file left"
+    }
+  ],
+  "planBlocks": [
+    "screens"
+  ],
+  "currentTask": "T020",
+  "task_summaries": {
+    "T001": {
+      "status": "DONE",
+      "did": "--recovery group: failed clone dir, interrupted clone, warm path kept, freshness gate missing/fresh/old; 11 checks, 5 fail on old sync.md",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T002": {
+      "status": "DONE",
+      "did": "Freshness gate reads stale on a missing manifest; step 4 path-choice block removes dirs without .git or manifest and clones (sync_path)",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T004": {
+      "status": "DONE",
+      "did": "Indexable Items: LC_ALL=C on each text tool, links from ls-files -s -z via tr (tab-safe), ! -path LF exclusion, byte-order sort",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T005": {
+      "status": "DONE",
+      "did": "New Item Records block: hex-fed awk encoder (strict UTF-8, JSON and display forms), report, render_manifest, print_report",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T006": {
+      "status": "DONE",
+      "did": "Step 6 record block (date -u, tmp + mv -f, report) and steps 5-6 rewritten as one record run; manifest rule revised, index stays agent-written",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T003": {
+      "status": "DONE",
+      "did": "--records group: hostile fixtures, JSON::PP read-back against git's byte-exact list, escapes, report lines, LF and links left out, sh/bash/zsh/dash identical; 35 checks",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T007": {
+      "status": "DONE",
+      "did": "Spike gate, local: --records 35/35 on macOS BSD awk 20200816, sh/dash/bash/zsh, git 2.54; non-UTF-8 case skipped on APFS",
+      "files": [
+        "specs/011-batch-corpus-measurement/spike.md"
+      ]
+    },
+    "T008": {
+      "status": "DONE",
+      "did": "Linux row: mawk/dash/GNU grep 3.4/ext4 on Ubuntu 20.04 byte-identical to macOS, non-UTF-8 reported as caf\\xE9.md; full rows with git 2.25/gawk/zsh pending (apt mirror 520, blob TLS timeouts)",
+      "files": [
+        "specs/011-batch-corpus-measurement/spike.md",
+        "specs/011-batch-corpus-measurement/spike/encoder-crosscheck.sh"
+      ]
+    },
+    "T009": {
+      "status": "DONE",
+      "did": "Check-run cases: fresh manifest passes in every shell, report matches, changed byte fails and deletes nothing, agent-layout manifest fails, bad synced_at and missing manifest fail; 47/47, 37 fail on old sync.md",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T010": {
+      "status": "DONE",
+      "did": "Cache Integrity Check is now a block: read synced_at, render, cmp, verdict and report; verdict-only with callers acting; older manifests fail once",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T011": {
+      "status": "DONE",
+      "did": "Sync callers act on the check verdict: policy-fresh path (pass current, fail stale), timeout fallback (pass cached, fail unreachable), all-tiers fallback; 7a sizes come from reports",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T012": {
+      "status": "DONE",
+      "did": "Item Records added to hostile_block (URL, REV; 16 checks); bash-only measurement loop replaced by the composed record run under sh; full harness 303/303",
+      "files": [
+        ".github/scripts/test-sync-git.sh"
+      ]
+    },
+    "T013": {
+      "status": "DONE",
+      "did": "Step 9 skipped-utf8 line, Corpus Measurement padding note, upgrade and re-run statement in step 4; harness 303/303, validator 18/18",
+      "files": [
+        "commands/speckit.knowledge.sync.md"
+      ]
+    },
+    "T014": {
+      "status": "DONE",
+      "did": "Recorded under 007 research section 7 that 011 revises the manifest bullet only; index stays agent-written",
+      "files": [
+        "specs/007-shell-safe-config/research.md"
+      ]
+    },
+    "T015": {
+      "status": "DONE",
+      "did": "Status step 2 runs the check run per source: no manifest not synced, no .git or fail corrupted, pass takes synced_at and items from records line; read-only",
+      "files": [
+        "commands/speckit.knowledge.status.md"
+      ]
+    },
+    "T016": {
+      "status": "DONE",
+      "did": "Search runs the check run before trusting a manifest; a failing source is set aside for the search, nothing deleted",
+      "files": [
+        "commands/speckit.knowledge.search.md"
+      ]
+    },
+    "T017": {
+      "status": "DONE",
+      "did": "README Troubleshooting: corrupted cache rewritten, entries for first sync after upgrade, stopped sync, corrupted after upgrade, non-UTF-8 skip; badge and install URL 1.10.0",
+      "files": [
+        "README.md"
+      ]
+    },
+    "T018": {
+      "status": "DONE",
+      "did": "extension.yml version 1.9.1 -> 1.10.0",
+      "files": [
+        "extension.yml"
+      ]
+    },
+    "T019": {
+      "status": "DONE",
+      "did": "CHANGELOG [1.10.0]: Added (record run, harness groups), Changed (check block, status and policy-fresh run it, LC_ALL=C), Fixed (failed-clone reach, missing-manifest freshness, locale, quoted links, LF fragments); compare links",
+      "files": [
+        "CHANGELOG.md"
+      ]
+    },
+    "T020": {
+      "status": "DONE",
+      "did": "Validated: validate-extension 18/18, test-sync-git 303/303 (exit 0), new groups fail on old sync.md as expected; results and maintainer tables in verification.md",
+      "files": [
+        "specs/011-batch-corpus-measurement/verification.md"
+      ]
+    }
+  },
+  "concerns": [
+    {
+      "note": "SC-001 to SC-004 are unverified: T021 needs cold syncs of lookapp on GPT-6 Luna and Claude Opus 5.5 in Copilot in VS Code, 1.9.1 baseline first",
+      "step": "implement"
+    },
+    {
+      "note": "Full Linux rows (Ubuntu 20.04 git 2.25 with mawk and gawk and zsh; current Ubuntu gawk) not run: Proximity apt mirror HTTP 520, ARK unreachable, Artifactory blob TLS timeouts from the podman VM (T022)",
+      "step": "implement"
+    },
+    {
+      "note": "Status now hashes every item of every cached source, so it costs seconds per large source instead of a JSON parse",
+      "step": "implement"
+    },
+    {
+      "note": "Manifests written by agents under 1.9.1 or earlier show corrupted in status until the next sync records them again",
+      "step": "implement"
+    },
+    {
+      "note": "agent-context hook skipped (PyYAML missing for system python3); companion plan-blocks.py template parts missing from the installed extension",
+      "step": "implement"
+    }
+  ]
+}
