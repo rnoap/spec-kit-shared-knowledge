@@ -3,7 +3,7 @@
   "specName": "Shell-recorded manifests, so a full knowledge sync fits in one turn",
   "branch": "011-batch-corpus-measurement",
   "currentStep": "implement",
-  "status": "implementing",
+  "status": "completed",
   "history": [
     {
       "step": "specify",
@@ -241,6 +241,13 @@
       "kind": "complete",
       "by": "ai",
       "at": "2026-10-26T17:11:13.791Z"
+    },
+    {
+      "step": "implement",
+      "substep": null,
+      "kind": "complete",
+      "by": "extension",
+      "at": "2026-10-26T17:37:05.030Z"
     }
   ],
   "telemetryInstanceId": "33873247-ef74-4424-bde8-0b0dc4c3fa9f",
@@ -561,7 +568,7 @@
       "command": "python3 .specify/extensions/companion/scripts/check_plan.py --feature-dir specs/011-batch-corpus-measurement --strict",
       "source": "derived",
       "exitCode": 0,
-      "durationSeconds": 0.0,
+      "durationSeconds": 0,
       "result": "[plan-check] plan.md: 1 screen, 6 parts. Every screen holds to its grammar."
     },
     {
