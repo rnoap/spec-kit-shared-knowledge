@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.1] - 2026-10-26
+
+### Fixed
+
+- `fix(remove): --disable removed the source and purged its cache` — in Copilot's
+  skills mode, `/speckit-knowledge-remove <label> --disable` reached the agent
+  only through `$ARGUMENTS` inside documentation prose. The agent missed both the
+  label and the flag and fell into the no-identifier picker. That picker offered
+  "remove", so the entry was deleted and its cache purged.
+  - Every command now receives its arguments in spec-kit's `## User Input` block,
+    like core spec-kit commands. Hook runs pass no arguments and are unaffected.
+  - `remove` parses its flags first (new step 0). The mode is fixed there, and no
+    later answer or default changes it. `--disable` with `--enable`, or a repeated
+    flag, is refused without changes.
+  - The no-identifier question names the mode: "Which source should I disable?".
+  - Removing a source picked from that list asks for confirmation before the
+    entry is deleted and the cache purged. A source named in the command is still
+    removed at once.
+  - New validator check: every command carries the `## User Input` block.
+
+### Changed
+
+- `extension.yml` `version` bumped from `1.9.0` to `1.9.1`.
+
 ## [1.9.0] - 2026-10-22
 
 ### Added
@@ -369,7 +393,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.9.1...HEAD
+[1.9.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.1
 [1.9.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.0
 [1.8.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.1
 [1.8.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.0

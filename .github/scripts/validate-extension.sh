@@ -107,6 +107,19 @@ else
   echo "$hardcoded" | sed 's/^/        /'
 fi
 
+# --- 1.9.1: `remove <label> --disable` purged a cache ------------------------
+# Arguments reach a command only through $ARGUMENTS. Without spec-kit's labelled
+# "## User Input" block they sat in documentation prose, the agent missed them,
+# fell into the no-identifier picker and ran the destructive default mode.
+noinput=$(y "
+import re
+pat = re.compile(r'^## User Input\n\n\`\`\`text\n\\\$ARGUMENTS\n\`\`\`\n', re.M)
+for c in d['provides']['commands']:
+    if not pat.search(open(c['file'], encoding='utf-8').read()): print(c['file'])
+")
+[ -z "$noinput" ] && ok "every command receives its arguments in a ## User Input block" \
+                  || bad "command(s) missing the ## User Input \$ARGUMENTS block: $noinput"
+
 echo
 echo "Documentation consistency  (Constitution § Quality Gates)"
 

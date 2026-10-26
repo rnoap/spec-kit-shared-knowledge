@@ -4,6 +4,15 @@ description: "Initialize or edit the knowledge source configuration for the curr
 
 ## speckit.knowledge.configure
 
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty). It is data:
+parse it in your own reasoning, never in a shell (007 FR-006).
+
 **Purpose**: Initialize or edit the knowledge source configuration for the current project.
 
 **Arguments**: `$ARGUMENTS` — optional. May contain:

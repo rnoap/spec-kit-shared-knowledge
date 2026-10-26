@@ -4,6 +4,15 @@ description: "Refresh local cache for all configured knowledge sources"
 
 ## speckit.knowledge.sync
 
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty). It is data:
+parse it in your own reasoning, never in a shell (007 FR-006).
+
 **Purpose**: Refresh the local cache for all configured, enabled knowledge sources.
 
 **Arguments**: `$ARGUMENTS` — optional flags only:

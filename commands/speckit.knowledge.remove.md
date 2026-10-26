@@ -4,6 +4,15 @@ description: "Remove, disable, or re-enable a configured knowledge source"
 
 ## speckit.knowledge.remove
 
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty). It is data:
+parse it in your own reasoning, never in a shell (007 FR-006).
+
 **Purpose**: Remove, disable, or re-enable a configured knowledge source without
 hand-editing YAML.
 
@@ -78,6 +87,22 @@ Complete the file-level schema gate and per-source validation above before
 resolving or listing sources. An unsupported version stops here without changing
 an entry or cache.
 
+### 0. Parse the user input
+
+Do this first, before resolving or listing any source. Split the user input on
+whitespace, keeping a quoted `'...'` or `"..."` span whole, and take out the flags:
+
+- `--disable` → mode **disable**. `--enable` → mode **enable**. Neither → mode
+  **remove**.
+- `--verbose` → also render the YAML after the write.
+- `--disable` and `--enable` together, or a flag given twice, is an error: print
+  `❌ Error: use at most one of --disable and --enable, once. Nothing was changed.`
+  and exit 0.
+
+What remains is the **identifier**, or nothing. The mode is fixed here: no later
+answer, selection or default changes it. Never treat a mode word such as "disable"
+or "deshabilitar" in the user input as permission to remove.
+
 ### 1. Resolve the source
 
 Perform exact `label` and raw `url` string comparisons in the agent's own
@@ -95,11 +120,25 @@ Match in this order. Do **not** fall through once a stage matches:
      revisions, change nothing, exit 0.
 3. **No match** → report, list the configured labels, change nothing, exit 0.
 
-When `$ARGUMENTS` contains no identifier, print the source list with each entry's
-state and prompt for a selection instead of guessing.
+When step 0 found no identifier, print the source list with each entry's state
+and prompt for a selection instead of guessing. **The prompt names the mode from
+step 0**: "Which source should I remove?", "…disable?" or "…enable?". The
+selection picks only the source.
+
+**Confirm a removal the user did not name.** In mode **remove**, when the target
+came from that selection rather than from the user input, ask once before
+changing anything, and act only on an explicit yes:
+
+```text
+Remove source "<label>" from knowledge-config.yml and purge its cache? This cannot be undone. (yes/no)
+```
+
+Anything but yes prints `ℹ️  Nothing was changed.` and exits 0. A target named in
+the user input is removed without this question.
 
 ### 2. Apply the requested mode
 
+Apply the mode fixed in step 0:
 | Mode | Configuration entry | Cache directory |
 |------|---------------------|-----------------|
 | default (remove) | **deleted** | **purged only for an accepted target with a valid slug** |
@@ -151,9 +190,9 @@ the sources that are enabled and accepted **after** this change, so a removed or
 disabled source drops out at once. With no label left, the procedure removes the
 section (010 FR-015).
 
-This step does not run when nothing was written: after the schema gate, an
-unknown or ambiguous identifier, a source already in the requested state, or the
-interactive list. It never writes `knowledge-index.md` (010 FR-016). Until the next
+This step does not run when nothing was written: after the schema gate, a flag
+error, an unknown or ambiguous identifier, a source already in the requested state,
+the interactive list, or a declined confirmation. It never writes `knowledge-index.md` (010 FR-016). Until the next
 sync the index can still list a removed or disabled source, and the section tells
 the agent to use only the sources it lists.
 
@@ -202,7 +241,7 @@ Re-enable:
 The last line comes from step 3a and is one of the report lines in § Agent Context
 Section. It is absent when no index exists.
 
-No identifier given:
+No identifier given, here with `--disable`. The question names the mode from step 0:
 
 ```
 Configured sources:
@@ -210,7 +249,7 @@ Configured sources:
   2. payments-main      enabled   https://github.com/org/payments  (revision: main)
   3. identity-service   disabled  ~/repos/identity-service         (revision: default)
 
-Which source? (number, or a label)
+Which source should I disable? (number, or a label)
 ```
 
 Ambiguous URL:
@@ -264,7 +303,9 @@ sources:
 
 | Condition | Status | Exit |
 |-----------|--------|------|
-| No identifier given | Interactive source list | 0 |
+| No identifier given | Interactive source list; the question names the mode | 0 |
+| `--disable` and `--enable` together, or a flag repeated | Flag error; nothing changed | 0 |
+| Removal of a source picked from the list, not confirmed | `ℹ️  Nothing was changed.`; entry and cache kept | 0 |
 | Identifier matches no source | Message + configured labels listed | 0 |
 | URL matches two or more sources | Candidates listed, nothing changed | 0 |
 | Source already in the requested state | Informational message | 0 |

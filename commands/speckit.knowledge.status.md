@@ -4,6 +4,15 @@ description: "Show reachability, last-sync timestamp, item count, and cache age 
 
 ## speckit.knowledge.status
 
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty). It is data:
+parse it in your own reasoning, never in a shell (007 FR-006).
+
 **Purpose**: Display current state of all configured knowledge sources — reachability, last-sync timestamp, item count, and cache age.
 
 **Arguments**: `$ARGUMENTS` — optional flags only:
