@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-10-26
+
+### Added
+
+- `feat(sync): the shell records each source's manifest`. A full sync of a few
+  hundred items no longer asks the agent to copy every path and SHA-256 into
+  `.manifest.json`, the step full syncs stopped at, or skipped with improvised
+  scripts.
+  - One shell command per source runs § Indexable Items, the new § Item Records
+    and step 6. It collects, measures and hashes the items, writes the manifest
+    through `.manifest.json.tmp` and `mv -f`, and prints the path-and-size report
+    the index is built from.
+  - Names reach one POSIX awk encoder only as hex bytes from `od`. It validates
+    UTF-8 strictly and writes JSON escapes and the display form of messages.
+  - A name that is not valid UTF-8 is left out and reported with `\xHH` escapes.
+  - The manifest format and its `schema_version` are unchanged, and its text is
+    now canonical.
+  - The agent still writes `knowledge-index.md`. This revises 007 research §7 for
+    the manifest only.
+- `test-sync-git.sh` gains two groups, taking it from 229 to 303 checks:
+  - `--records`: hostile names (`"`, `\`, tab, CR, ESC, DEL, C1) read back with
+    JSON::PP, the same results under sh, dash, bash and zsh, and check verdicts;
+  - `--recovery`.
+
+### Changed
+
+- The Cache Integrity Check is one block. It renders the manifest the record run
+  would write and compares bytes, and gives a verdict each caller acts on.
+  - Status step 2 now runs it; before, it only parsed the JSON.
+  - So does sync's policy-fresh path, which takes its items and sizes from the
+    check's report.
+- A manifest an agent wrote under 1.9.1 or earlier fails the check once and is
+  recorded again at the next sync.
+- § Indexable Items runs every text tool under `LC_ALL=C`, reads links with
+  `ls-files -s -z`, and leaves out paths that contain a line feed.
+- `extension.yml` `version` bumped from `1.9.1` to `1.10.0`.
+
+### Fixed
+
+- `fix(sync): a failed clone could reach the project's own repository`. The cold
+  path's `mkdir -p` left an empty directory when a clone failed. The next sync
+  took the warm path there, and git, finding no repository inside, ran
+  `sparse-checkout`, `fetch --depth=1` and `checkout --force` on the consuming
+  project. Sync now takes the warm path only when the cache holds `.git` and
+  `.manifest.json`; it removes anything else and clones again.
+- `fix(sync): with max_cache_age set, a missing manifest counted as fresh`. The
+  first sync after an upgrade skipped every source. A missing manifest is now
+  stale.
+- In a UTF-8 locale, macOS `sed` dropped every item after a name with an invalid
+  byte, and GNU grep 3.4 could add "Binary file (standard input) matches" as an
+  item.
+- A symbolic link named with `"`, `\` or a control character was indexed as an
+  item, because git quoted its name.
+- A path containing a line feed produced phantom items, or a duplicate of a real
+  one.
+
 ## [1.9.1] - 2026-10-26
 
 ### Fixed
@@ -393,7 +449,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- Update these links after publishing the repository -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.9.1...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.10.0
 [1.9.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.1
 [1.9.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.0
 [1.8.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.1

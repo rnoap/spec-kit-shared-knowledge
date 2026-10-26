@@ -182,9 +182,15 @@ and `revision`. Before using it, confirm in the agent's own reasoning that it is
 exactly 12 lowercase hex characters (`^[0-9a-f]{12}$`). If it has any other form,
 show `not synced`; do not construct a cache path or read a manifest through it
 (007 FR-006). Only a valid slug may resolve `cache/<slug>/.manifest.json`:
-- If manifest exists and valid: record `synced_at`, `item_count`, derived cache age
-- If manifest absent: status = `not synced`
-- If manifest invalid JSON: status = `corrupted`
+- If the manifest is absent: status = `not synced`.
+- Otherwise, if `cache/<slug>/.git` is missing: status = `corrupted`.
+- Otherwise run the check run of `speckit.knowledge.sync.md` § Cache Integrity
+  Check: § Indexable Items, § Item Records and the check block as one shell
+  command from the project root, with this source's `url`, `revision` and
+  `path_filter` (011 FR-012).
+  - `integrity=pass`: record `synced_at` and `item_count` from its `records:` line
+    (`synced_at=` and `items=`), and derive the cache age.
+  - `integrity=fail`: status = `corrupted`. Delete nothing: status stays read-only.
 
 Cache age is computed from `synced_at` to now:
 - `< 60 min`: display as `N min`
