@@ -141,12 +141,16 @@ Decides whether a source is refreshed at all. Runs **before** any network access
 ```bash
 manifest=".specify/extensions/knowledge/cache/<slug>/.manifest.json"
 
-if [ -n "$(find "$manifest" -maxdepth 0 -mmin +"$max_age_minutes" 2>/dev/null)" ]; then
-  verdict=stale     # over policy, or manifest missing → attempt a refresh
+if [ ! -f "$manifest" ] || [ -n "$(find "$manifest" -maxdepth 0 -mmin +"$max_age_minutes" 2>/dev/null)" ]; then
+  verdict=stale     # manifest missing, or over policy → attempt a refresh
 else
   verdict=fresh     # under policy → skip the network entirely
 fi
 ```
+
+**A missing manifest is `stale`, never `fresh`** (011 FR-021). `find` prints nothing
+for a file that does not exist, so the age test alone would call it fresh and skip a
+source that has never finished syncing, which is every source right after an upgrade.
 
 **Why `find -mmin` and not `date`.** `date -d "$iso8601" +%s` is GNU-only;
 `date -j -f '%Y-%m-%dT%H:%M:%SZ' "$iso8601" +%s` is BSD-only; `stat` differs the
@@ -172,8 +176,9 @@ warning in step 9a reports them.
 size=$(wc -c < "$file")
 ```
 
-**Use `wc -c`, and read via redirection.** `wc -c < file` emits the count alone;
-`wc -c file` appends the filename and pads differently on GNU than on BSD.
+**Use `wc -c`, and read via redirection.** `wc -c < file` emits no filename, but
+BSD pads the count with spaces, so § Item Records reads it as a number. `wc -c file`
+appends the filename and pads differently on GNU than on BSD.
 
 **`du` and `stat` are forbidden here**, for the same reason `date` was rejected in
 favour of `find -mmin` for the freshness gate:
@@ -307,20 +312,39 @@ without their trailing `/`, or `'.'` when there is no filter. Prefix every
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
-links=$(git -c core.quotePath=false ls-files -s -- '<dir1>' ['<dir2>' ...] \
-  | awk -F '\t' '$1 ~ /^120000 / { print $2 }')
-items=$(find './<dir1>' ['./<dir2>' ...] -name .git -prune -o -type f -name '*.md' -print 2>/dev/null \
-  | sed -e ':again' -e 's|^\./||' -e 't again' | grep -vE '(^|/)\.\.(/|$)|^/' | grep -vxF -e "$links")
+nl='
+'
+links=$(git -c core.quotePath=false ls-files -s -z -- '<dir1>' ['<dir2>' ...] \
+  | LC_ALL=C tr '\0' '\n' | LC_ALL=C awk '/^120000 / { sub(/^[^\t]*\t/, ""); print }')
+items=$(LC_ALL=C find './<dir1>' ['./<dir2>' ...] -name .git -prune -o -type f -name '*.md' ! -path "*$nl*" -print 2>/dev/null \
+  | LC_ALL=C sed -e ':again' -e 's|^\./||' -e 't again' | LC_ALL=C grep -vE '(^|/)\.\.(/|$)|^/' \
+  | LC_ALL=C grep -vxF -e "$links" | LC_ALL=C sort)
 if [ -z '<path_filter>' ]; then
-  items=$(printf '%s\n' "$items" | grep -vE '^\.[^/]*/|(^|/)(AGENTS|CLAUDE|GEMINI)\.md$')
+  items=$(printf '%s\n' "$items" | LC_ALL=C grep -vE '^\.[^/]*/|(^|/)(AGENTS|CLAUDE|GEMINI)\.md$')
 fi
 ```
 
-`$items` is what step 5 indexes. Every path in `$links` is skipped and named in
-step 9, never read. Strip every leading `./` and drop any line with a `..` path
-segment or a leading `/`. A directory name containing a line break must never
-forge an item outside the cache (007 FR-006). Read each item only as `"$file"`,
-never paste its name into command text.
+`$items` is what step 5 indexes, one path per line in byte order. Every path in
+`$links` is skipped and named in step 9, never read. Strip every leading `./` and
+drop any line with a `..` path segment or a leading `/`. A directory name
+containing a line break must never forge an item outside the cache (007 FR-006).
+Read each item only as `"$file"`, never paste its name into command text.
+
+**Every text tool runs with `LC_ALL=C`, never exported** (011). In a UTF-8 locale,
+macOS `sed` stops at the first name holding an invalid byte and every later item
+silently disappears, GNU grep 3.4 prints "Binary file (standard input) matches"
+into the list, and `sort` orders by locale. Bytes are the only order every machine
+agrees on.
+
+**A path containing a line feed is left out** by `! -path "*$nl*"`. A
+newline-separated list cannot carry it: split, its fragments became phantom items
+or duplicated a real one. NUL-separated lists stay out (dash has no `read -d ''`,
+007 research §7); git's `-z` output is converted with `tr` only after the item list
+has excluded every such path.
+
+**Links come from `ls-files -s -z`.** Without `-z`, git C-quotes a name holding
+`"`, `\` or a control character even with `core.quotePath=false`, so the link never
+matched its `find` line and its text was indexed as an item.
 
 **The no-filter exclusions are applied here as well as in the sparse patterns.** A
 cache cloned before the default patterns existed holds the whole tree until its
@@ -336,19 +360,182 @@ never follows one. A followed link hands the agent any file the user can read:
 `notes.md -> ../../../../../.env` at a source's root reaches the consuming
 project's `.env`.
 
+### Item Records
+
+Run in the same shell right after § Indexable Items, from the cache root it left
+you in. `'<url>'` is the source's configured `url` (a local path as written, not
+expanded) and `'<revision>'` its revision, or empty:
+
+```bash
+url='<url>'
+revision='<revision>'
+slug='<slug>'
+enc=$(
+  {
+    printf '%s\n' "$items" | while IFS= read -r file; do
+      [ -n "$file" ] && [ -f "$file" ] || continue
+      size=$(wc -c < "$file")
+      if command -v sha256sum >/dev/null 2>&1; then sum=$(sha256sum < "$file"); else sum=$(shasum -a 256 < "$file"); fi
+      printf 'R '
+      printf '%s' "$file" | LC_ALL=C od -An -tx1 -v | LC_ALL=C tr -d ' \n'
+      printf ' %s %s\n' "$size" "$sum"
+    done
+    printf '%s\n' "$links" | while IFS= read -r file; do
+      [ -n "$file" ] || continue
+      printf 'L '
+      printf '%s' "$file" | LC_ALL=C od -An -tx1 -v | LC_ALL=C tr -d ' \n'
+      echo
+    done
+    printf 'U '
+    printf '%s' "$url" | LC_ALL=C od -An -tx1 -v | LC_ALL=C tr -d ' \n'
+    echo
+    if [ -n "$revision" ]; then
+      printf 'V '
+      printf '%s' "$revision" | LC_ALL=C od -An -tx1 -v | LC_ALL=C tr -d ' \n'
+      echo
+    fi
+  } | LC_ALL=C awk '
+    BEGIN { for (i = 0; i < 256; i++) { val[sprintf("%02x", i)] = i; ch[i] = sprintf("%c", i) }; H = "0123456789ABCDEF" }
+    function hx(c) { return substr(H, int(c / 16) + 1, 1) substr(H, c % 16 + 1, 1) }
+    function decode(s,    k, n) { n = length(s) / 2; for (k = 1; k <= n; k++) b[k] = val[substr(s, 2 * k - 1, 2)]; return n }
+    function seqlen(k, n,    c, d, len, j) {
+      c = b[k]
+      if (c < 128) return 1
+      if (c >= 194 && c <= 223) len = 2; else if (c >= 224 && c <= 239) len = 3; else if (c >= 240 && c <= 244) len = 4; else return 0
+      if (k + len - 1 > n) return 0
+      d = b[k + 1]
+      if ((c == 224 && d < 160) || (c == 237 && d > 159) || (c == 240 && d < 144) || (c == 244 && d > 143)) return 0
+      for (j = 1; j < len; j++) if (b[k + j] < 128 || b[k + j] > 191) return 0
+      return len
+    }
+    function valid(n,    k, len) { for (k = 1; k <= n; k += len) if (!(len = seqlen(k, n))) return 0; return 1 }
+    function json(n,    k, c, out) {
+      out = ""
+      for (k = 1; k <= n; k++) {
+        c = b[k]
+        if (c == 34) out = out "\\\""; else if (c == 92) out = out "\\\\"
+        else if (c == 8) out = out "\\b"; else if (c == 12) out = out "\\f"; else if (c == 10) out = out "\\n"
+        else if (c == 13) out = out "\\r"; else if (c == 9) out = out "\\t"
+        else if (c < 32) out = out "\\u00" hx(c); else out = out ch[c]
+      }
+      return "\"" out "\""
+    }
+    function display(n,    k, c, len, j, out) {
+      out = ""
+      for (k = 1; k <= n; k += len) {
+        c = b[k]; len = seqlen(k, n)
+        if (!len) { out = out "\\x" hx(c); len = 1 }
+        else if (len == 1) {
+          if (c == 92) out = out "\\\\"; else if (c == 10) out = out "\\n"; else if (c == 9) out = out "\\t"
+          else if (c == 13) out = out "\\r"; else if (c == 27) out = out "\\e"
+          else if (c < 32 || c == 127) out = out "\\x" hx(c); else out = out ch[c]
+        }
+        else if (c == 194 && b[k + 1] < 160) out = out "\\x" hx(b[k + 1])
+        else for (j = 0; j < len; j++) out = out ch[b[k + j]]
+      }
+      return out
+    }
+    $1 == "R" {
+      n = decode($2)
+      if (!valid(n)) print "s " display(n)
+      else if (length($4) != 64 || $4 ~ /[^0-9a-f]/) print "e hash failed: " display(n)
+      else { count++; bytes += $3; print "I     {\"path\": " json(n) ", \"sha256\": \"" $4 "\"}"; printf "r %.0f %s\n", $3, display(n) }
+      next
+    }
+    $1 == "L" { n = decode($2); print "l " display(n); next }
+    $1 == "U" { n = decode($2); if (valid(n)) print "u " json(n); else print "e url is not valid UTF-8"; next }
+    $1 == "V" { n = decode($2); if (valid(n)) print "v " json(n); else print "e revision is not valid UTF-8"; next }
+    END { printf "n %.0f\nb %.0f\n", count, bytes }
+  '
+)
+pick() { printf '%s\n' "$enc" | LC_ALL=C sed -n "s/^$1 /$2/p"; }
+m_items=$(pick I '')
+m_count=$(pick n '')
+m_bytes=$(pick b '')
+m_url=$(pick u '')
+m_rev=$(pick v '')
+m_errors=$(pick e '')
+[ -n "$m_rev" ] || m_rev=null
+case "$m_count" in '' | *[!0-9]*) m_errors="$m_errors encoder failed" ;; esac
+render_manifest() {
+  printf '{\n  "schema_version": "1.0",\n  "source_url": %s,\n  "source_slug": "%s",\n' "$m_url" "$slug"
+  printf '  "revision": %s,\n  "synced_at": "%s",\n  "item_count": %s,\n' "$m_rev" "$1" "$m_count"
+  if [ "$m_count" = 0 ]; then
+    printf '  "items": []\n'
+  else
+    printf '  "items": [\n'
+    printf '%s\n' "$m_items" | LC_ALL=C sed '$!s/$/,/'
+    printf '  ]\n'
+  fi
+  printf '}\n'
+}
+print_report() {
+  pick r 'item: '
+  pick l 'link: '
+  pick s 'skipped-utf8: '
+}
+```
+
+It leaves what the record run writes and the check compares:
+`render_manifest <synced_at>` prints the canonical `.manifest.json` text, and
+`print_report` prints the `item:`, `link:` and `skipped-utf8:` lines. `m_count` and
+`m_bytes` are the recorded items and their total size. `m_errors` is empty unless a
+hash or a configured value could not be recorded.
+
+**File names reach awk only as hex** (011 FR-004, FR-005). Each name goes from
+`"$file"` into `od`, so awk sees hex digits and numbers, never a byte it could
+misread. It validates UTF-8 strictly (no overlong form, no surrogate, nothing above
+U+10FFFF) and writes two forms of each name:
+
+- **Manifest**: `\"`, `\\`, `\b \f \n \r \t`, and `\u00XX` for any other byte below
+  0x20. Everything else is written as is, including valid UTF-8.
+- **Report**: the display form of § Values in messages, with every byte outside a
+  valid UTF-8 sequence as `\xHH`.
+
+**A name that is not valid UTF-8 is never recorded** (011 FR-006). JSON cannot carry
+it, so it is in neither the manifest nor the index; the report lists it as
+`skipped-utf8:`. macOS refuses such names, so they come only from Linux file
+systems.
+
+Size is § Corpus Measurement's `wc -c`, with BSD's padding dropped by awk. The hash
+is SHA-256 of the content, read through redirection.
+
 ### Cache Integrity Check (`.manifest.json`)
 
-Run this check before using an existing cache as fallback:
+Status, search and sync trust a cache only after this check. Run it as one shell
+command: § Indexable Items, § Item Records and this block, from the project root,
+on a cache directory that holds both `.git` and `.manifest.json`:
 
-1. `.manifest.json` exists AND is valid JSON → pass step 1
-2. `item_count` == `len(items)` == the number of items in the directory, collected as in § Indexable Items → pass step 2
-3. Each item's `sha256` matches `sha256sum < "$file"` (or `shasum -a 256 < "$file"` on macOS), with its name held only in the double-quoted shell variable → pass step 3
-4. All three pass → cache is intact; use it
-5. Any failure → cache is corrupted; discard directory; attempt fresh sync
+```bash
+synced_at=$(LC_ALL=C sed -n 's/^  "synced_at": "\([0-9]\{4\}-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z\)",$/\1/p' .manifest.json 2>/dev/null | head -n 1)
+integrity=fail
+if [ -n "$synced_at" ] && [ -z "$m_errors" ] && render_manifest "$synced_at" | cmp -s - .manifest.json; then
+  integrity=pass
+fi
+printf 'records: %s items=%s bytes=%s synced_at=%s\n' "$slug" "$m_count" "$m_bytes" "$synced_at"
+printf 'integrity=%s\n' "$integrity"
+print_report
+```
 
-A manifest written before § Indexable Items existed may list a symbolic link. It
-fails step 2 once and the cache is rebuilt — the intended outcome, since that
-manifest points the agent at a file outside the cache.
+`integrity=pass` means the manifest is byte for byte what the record run would
+write now with its own `synced_at`: the same items, item count and hashes, in
+canonical JSON (011 FR-011). The agent compares no hash. The report lines are the
+record run's, so a passing source needs no further measuring.
+
+**The check gives a verdict and nothing else.** It never deletes, clones or sets a
+status (011 FR-012). Each caller acts on it:
+
+- **Sync's policy-fresh path** (step 4): pass is `current`; fail is `stale`.
+- **Sync's fallbacks** (§ On timeout or failure, and all three tiers failed): pass
+  is `cached`; fail is `unreachable`.
+- **Status**: pass gives the row from the `records:` line; fail is `corrupted`.
+- **Search**: fail sets the source aside for this search.
+
+A manifest an agent wrote under 1.9.1 or earlier fails once, even when its records
+were right, and is recorded again at the next successful sync (011 FR-013). So does
+one that lists a symbolic link, which would point the agent at a file outside the
+cache. Editing `path_filter`, or editing `url` in a way that keeps the slug, also
+fails the check until the next sync records the source again.
 
 ### `knowledge-index.md` Format
 
@@ -750,18 +937,46 @@ An empty or malformed slug must never become a cache path or a working directory
 **Apply the Cache Freshness Gate first — before choosing a sync path and before
 any network access** (FR-018).
 
-- `verdict=fresh` and `--force` was **not** passed → **skip this source entirely**.
-  Reuse its cached content, read its item list from the existing
-  `.manifest.json`, set status `current`, and move to the next source. No `git`
-  runs. No network is touched.
+- `verdict=fresh` and `--force` was **not** passed → **no fetch**. If the cache
+  holds `.git`, run the Cache Integrity Check on it. `integrity=pass`: set status
+  `current`, take its items and sizes from the check's report, and move to the next
+  source. No network is touched; git runs only the local `ls-files` of § Indexable
+  Items. `integrity=fail`, or no `.git`: treat the source as `stale` and continue
+  below (011 FR-012).
 - `verdict=stale`, or `--force` was passed → continue below.
 
 With no effective policy configured the verdict is always `stale`, so this gate is
 invisible to a project that has not opted in (FR-017, FR-024).
 
-**Determine sync path**:
-- **Cold path**: `cache/<slug>/` does not exist → fresh clone
-- **Warm path**: `cache/<slug>/` exists → fetch update
+**Determine sync path** from the project root, once the slug has passed its guard:
+
+```bash
+cache=.specify/extensions/knowledge/cache/<slug>
+if [ -d "$cache/.git" ] && [ -f "$cache/.manifest.json" ]; then
+  sync_path=warm
+else
+  rm -rf -- "$cache"
+  sync_path=cold
+fi
+```
+
+- **Cold path**: `sync_path=cold` → fresh clone
+- **Warm path**: `sync_path=warm` → fetch update
+
+**A directory without its own `.git` or without `.manifest.json` is an interrupted
+sync, so it is removed and cloned again** (011 FR-020). A failed clone leaves the
+directory that `mkdir -p` created, and from inside it git finds the consuming
+project's repository: the warm path would run `sparse-checkout`, `fetch --depth=1`
+and `checkout --force` on the user's own project. A clone stopped before step 6
+leaves no manifest, and the warm path alone would never record it. The variable is
+`sync_path`, never `path`, which zsh ties to `PATH`.
+
+**After an upgrade, and after a stop** (011 FR-018). `specify extension add`
+recreates `.specify/extensions/knowledge/` and keeps only `knowledge-config.yml`,
+so the first sync after an upgrade finds no cache and rebuilds every source. A sync
+that stops part-way is completed by running sync again: sources already recorded
+take the warm path, and every directory the stop left without a manifest is cloned
+again.
 
 **Detect source type** before choosing clone flags:
 - **Local path**: `url` starts with `/`, `~/`, `./` → expand `~` to `$HOME`
@@ -827,7 +1042,8 @@ branch's tip, not the pin. A pin missing from the fetched history makes
 
 **All three tiers failed** → this is FR-015. Report the source `unreachable` with
 the declared revision named, fall back to its existing cache if the Cache
-Integrity Check passes, and continue to the next source. Exit code stays 0.
+Integrity Check passes, with items and sizes from the check's report, and continue
+to the next source. Exit code stays 0.
 
 ```
   payments-v2        ❌  unreachable — revision "v9.9.9" could not be resolved on the remote
@@ -980,9 +1196,9 @@ cloned before § Indexable Items the same setting as new ones.
 
 #### On timeout or failure
 
-1. Run the Cache Integrity Check on existing `cache/<slug>/`.
-2. If intact: set status = `cached`; read items from existing cache; record `last_synced_at` from `.manifest.json`; continue.
-3. If absent or corrupted: set status = `unreachable`; skip this source; emit warning; continue to next source.
+1. If `cache/<slug>/` holds both `.git` and `.manifest.json`, run the Cache Integrity Check on it.
+2. `integrity=pass`: set status = `cached`; take items and sizes from the check's report and `last_synced_at` from its `synced_at`; continue.
+3. No such cache, or `integrity=fail`: set status = `unreachable`; skip this source and leave its directory as it is; emit warning; continue to next source.
 
 **An over-age cache is still served here** (FR-027). `max_cache_age` governs only
 whether a refresh is *attempted*, never whether cached content may be *served* — a
@@ -997,18 +1213,47 @@ less available knowledge than it had before.
 
 ### 5. Index .md files per source
 
-After a successful sync (cold or warm), collect the source's items as § Indexable Items describes: the `.md` files under the path_filter (or, with no filter, every `.md` file outside root-level dot-directories, other than `AGENTS.md`, `CLAUDE.md` and `GEMINI.md`) that are regular files git does not record as symbolic links. For each item:
-- Record relative path from cache root
-- Hold the name in `file`, never paste it into command text; measure with `wc -c < "$file"` and compute SHA-256 with `sha256sum < "$file"` or `shasum -a 256 < "$file"` (macOS)
+After a successful sync (cold or warm), record the source with **one shell
+command**: § Indexable Items, § Item Records and the block in step 6, in that order,
+from the project root. That run collects, measures and hashes every item, writes
+`.manifest.json`, and prints the report the rest of the sync works from (011 FR-001,
+FR-002):
 
-Keep the skipped links (`$links`): step 9 names each one.
+```text
+records: <slug> items=<N> bytes=<B> synced_at=<ISO8601>
+item: <size> <path>
+link: <path>
+skipped-utf8: <path>
+```
+
+**Never type, copy or paste a hash, a path or a manifest entry.** Build steps 7 to 9
+from the report: each `item:` line is an item and its size, each `link:` line a
+skipped link and each `skipped-utf8:` line a name that could not be recorded. Paths
+are already escaped for display. A run that prints no `records:` line wrote no
+manifest: report the source as failed and continue.
 
 ### 6. Write `.manifest.json` (last step)
 
-Write `.specify/extensions/knowledge/cache/<slug>/.manifest.json` with the agent's
-file-writing tool, never a shell, **as the final step** after all `.md` files are
-written. Escape every string as JSON requires, including file names and source
-values; keep the existing format and schema version (007 FR-005, FR-006):
+The record run's last block writes
+`.specify/extensions/knowledge/cache/<slug>/.manifest.json`, after every `.md` file
+is in place:
+
+```bash
+synced_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+if [ -z "$m_errors" ] && render_manifest "$synced_at" > .manifest.json.tmp \
+  && mv -f .manifest.json.tmp .manifest.json; then
+  printf 'records: %s items=%s bytes=%s synced_at=%s\n' "$slug" "$m_count" "$m_bytes" "$synced_at"
+  print_report
+else
+  rm -f .manifest.json.tmp
+  printf '%s\n' "$m_errors" 'manifest not written'
+fi
+```
+
+**The shell writes the manifest; the agent writes the index** (011 FR-019). This
+revises 007 research §7 for the manifest only: copying 224 hashes by hand was the
+step full syncs stopped at, or skipped with improvised scripts. The format and its
+schema version stay as they were (007 FR-014):
 
 ```json
 {
@@ -1025,15 +1270,20 @@ values; keep the existing format and schema version (007 FR-005, FR-006):
 }
 ```
 
-`revision` is `null` when the source pins none. It is written for diagnosability
-only — nothing reads it to make a decision, because the slug already guarantees
-that two revisions never share a directory. A manifest written by 1.3.0 has no
-`revision` field at all; readers treat absent as `null`, and no migration or
-re-sync is needed.
+The text is canonical: two-space indent, one item per line in byte order of the
+path, `"items": []` when there is none, and a line feed after the closing `}`. The
+Cache Integrity Check compares bytes against exactly this text. `revision` is `null`
+when the source pins none. It is written for diagnosability only: nothing reads it
+to make a decision, because the slug already guarantees that two revisions never
+share a directory. A manifest an agent wrote under 1.9.1 or earlier, including
+1.3.0's without `revision`, fails the check once and is recorded again at the next
+successful sync (011 FR-013).
 
-Writing the manifest last signals cache integrity — an absent manifest means the
-sync was interrupted. Its **mtime** therefore marks the instant the cache became
-valid, which is what the freshness gate in step 4a relies on.
+**Whole or absent** (011 FR-008). The text goes to `.manifest.json.tmp`, and `mv -f`
+replaces `.manifest.json` in one step, so an interrupted run never leaves a manifest
+that passes the check. Writing the manifest last signals cache integrity: an absent
+manifest means the sync was interrupted. Its **mtime** therefore marks the instant
+the cache became valid, which is what the freshness gate in step 4a relies on.
 
 ### 7. Detect conflicts
 
@@ -1078,7 +1328,9 @@ With no budget the index is exactly what it was before this feature existed
 The budget applies to the assembled corpus **regardless of how each source's
 content was obtained** — freshly fetched, served from a policy-fresh cache
 (`current`), or served from a stale cache after an unreachable source (FR-011).
-The agent reads one index in all three cases.
+The agent reads one index in all three cases. Every item and size comes from the
+report of the run that recorded or checked its source (step 5, § Cache Integrity
+Check); nothing is measured again.
 
 **1 — Resolve effective limits.** Per source, per dimension, using § Context
 Budget Allocation. Report any per-source ceiling clamped down to the project
@@ -1221,7 +1473,12 @@ thinned:
 ```
   payment-service    ✅ fresh    12 items  (synced 2026-06-11T14:00:00Z)
                      🔗 2 symbolic links not followed: specs/notes.md, specs/shared
+                     ⚠️ 1 file skipped, name not valid UTF-8: specs/caf\xE9.md
 ```
+
+Names that are not valid UTF-8 get the line below it, built from the report's
+`skipped-utf8:` lines, which are already escaped (011 FR-006). The file is in
+neither the manifest nor the index; renaming it in the source brings it back.
 
 Final summary line:
 ```

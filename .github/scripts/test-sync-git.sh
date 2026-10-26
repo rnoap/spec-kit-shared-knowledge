@@ -120,6 +120,16 @@ items_of() {
 }
 joined() { sed '/^$/d' "$T/$1.out" | sort | tr '\n' ' ' | sed 's/ $//'; }
 
+RECORDS='### Item Records'
+RECORD_TAIL='### 6. Write `.manifest.json`'
+CHECK_TAIL='### Cache Integrity Check'
+
+# compose <tail>: § Indexable Items, § Item Records and one tail, rendered as one
+# script: the record run (step 6) or the check run, as the agent runs it.
+compose() {
+  { block "$SYNC" '### Indexable Items'; block "$SYNC" "$RECORDS"; block "$SYNC" "$1"; } | render
+}
+
 cache()   { printf '%s' "$P/.specify/extensions/knowledge/cache/$1"; }
 head_of() { git -C "$(cache "$1")" rev-parse HEAD 2>/dev/null; }
 content() { cat "$(cache "$1")/$2" 2>/dev/null || echo '<missing>'; }
@@ -223,6 +233,8 @@ hostile_block() {
           printf '%s\0' '[' "$value/.git" git "$value" >> "$case_dir/expected" ;;
         warm-sparse:FILTER|warm-remote:REV|warm-local:REV)
           printf '%s\0' '[' "$value" git "$value" >> "$case_dir/expected" ;;
+        records:REV) printf '%s\0' '[' "$value" >> "$case_dir/expected" ;;
+        records:URL) ;;   # reaches only printf, into od; no program sees it as an argument
         *) printf '%s\0' git "$value" >> "$case_dir/expected" ;;
       esac
       {
@@ -279,6 +291,7 @@ hostile_values() {
   hostile_block "$SYNC" "$WARM_REMOTE" warm-remote REV
   hostile_block "$SYNC" "$WARM_LOCAL" warm-local REV
   hostile_block "$SYNC" '### Indexable Items' indexable DIRS FILTER
+  hostile_block "$SYNC" "$RECORDS" records URL REV
   hostile_block "$STATUS" '**Remote URL** (`with_timeout`' status-remote URL
   hostile_block "$STATUS" '**Local path** (expand' status-local LOCAL
 }
@@ -324,7 +337,7 @@ slug_checks() {
 
 if [ "${1:-}" = --slugs ]; then slug_checks; finish; fi
 case "${1:-}" in
-  --local-space|--hostile-files) ;;
+  --local-space|--hostile-files|--recovery|--records) ;;
   *) hostile_values ;;
 esac
 if [ "${1:-}" = --hostile-values ]; then finish; fi
@@ -363,29 +376,16 @@ hostile_file_checks() {
   else
     ok 'newline directory cannot forge traversal or absolute item paths'
   fi
-  {
-    block "$SYNC" '### Indexable Items' | render
-    printf '%s\n' 'while IFS= read -r file; do' '[ -f "$file" ] || continue'
-    block "$SYNC" '### Corpus Measurement'
-    printf '%s\n' \
-      'if command -v sha256sum >/dev/null 2>&1; then' \
-      '  hash=$(sha256sum < "$file" | cut -d " " -f1)' \
-      'else' \
-      '  hash=$(shasum -a 256 < "$file" | cut -d " " -f1)' \
-      'fi'
-    printf 'printf "%%s\\t%%s\\t%%s\\n" "$file" "$size" "$hash" >> %q\n' "$T/measured.out"
-    printf '%s\n' 'done <<< "$items"'
-  } > "$T/hostile-files.sh"
-  : > "$T/measured.out"
-  ( cd "$P" && "$BASH" "$T/hostile-files.sh" ) >> "$T/run.log" 2>&1
+  compose "$RECORD_TAIL" > "$T/hostile-files.sh"
+  ( cd "$P" && sh "$T/hostile-files.sh" ) > "$T/measured.out" 2>> "$T/run.log"
   expect 'literal file name is measured without command evaluation' \
-    "$(awk -F '\t' '$1 == "$(touch pwned).md" { print $2 }' "$T/measured.out" | tr -d ' ')" 13
+    "$(grep -Fx -- 'item: 13 $(touch pwned).md' "$T/measured.out")" 'item: 13 $(touch pwned).md'
   expected_hash=$(shasum -a 256 < "$source/-option.md" | cut -d ' ' -f1)
   expect 'leading-dash file is measured and hashed as content, not an option' \
-    "$(awk -F '\t' '$1 == "-option.md" { print $2 "|" $3 }' "$T/measured.out" | tr -d ' ')" \
-    "13|$expected_hash"
+    "$(grep -Fxc -- 'item: 13 -option.md' "$T/measured.out")|$(grep -Fc -- "{\"path\": \"-option.md\", \"sha256\": \"$expected_hash\"}" "$(cache "$SLUG")/.manifest.json")" \
+    "1|1"
   outside_hash=$(shasum -a 256 < "$outside_file" | cut -d ' ' -f1)
-  if grep -Fq -- "$outside_hash" "$T/measured.out"; then
+  if grep -Fq -- "$outside_hash" "$(cache "$SLUG")/.manifest.json"; then
     bad 'no measured item content comes from outside the cache'
   else
     ok 'no measured item content comes from outside the cache'
@@ -398,6 +398,246 @@ hostile_file_checks() {
 }
 
 if [ "${1:-}" = --hostile-files ]; then hostile_file_checks; finish; fi
+
+# --- recovery: failed clones and missing manifests (011 FR-020, FR-021) --------
+
+PATH_CHOICE='**Determine sync path**'
+FRESHNESS='### Cache Freshness Gate'
+
+# block_vars <prelude> <anchor> <var>...: one rendered block run from $P after
+# <prelude>; each named variable is written to $T/<var>.out.
+block_vars() {
+  local prelude=$1 anchor=$2 var
+  shift 2
+  {
+    printf '%s\n' "$prelude"
+    block "$SYNC" "$anchor" | render
+    for var in "$@"; do printf 'printf "%%s\\n" "${%s-}" > %q\n' "$var" "$T/$var.out"; done
+  } > "$T/vars.sh"
+  ( cd "$P" && bash "$T/vars.sh" ) >> "$T/run.log" 2>&1
+}
+out() { cat "$T/$1.out" 2>/dev/null; }
+
+# sync_source: what the agent does in step 4, for a local source.
+sync_source() {
+  block_vars '' "$PATH_CHOICE" sync_path
+  if [ "$(out sync_path)" = warm ]; then
+    run "$SYNC" "$WARM" "$WARM_LOCAL"
+  else
+    run "$SYNC" "$LOCAL_COLD" "$NOFILTER"
+  fi
+}
+
+recovery_checks() {
+  local P=$T/recovery URL LOCAL REV='' FILTER='' DIRS=. SLUG=0123456789ab
+  local source=$T/recovery-source c head_before status_before
+  echo
+  echo 'Recovery from failed clones and missing manifests'
+  new_repo "$P"
+  printf 'tracked\n' > "$P/tracked.txt"
+  printf '/.specify/extensions/knowledge/cache/\n' > "$P/.gitignore"
+  commit "$P" consumer >/dev/null
+  printf 'uncommitted edit\n' >> "$P/tracked.txt"
+  head_before=$(git -C "$P" rev-parse HEAD)
+  status_before=$(git -C "$P" status --porcelain)
+  new_repo "$source"
+  printf 'doc\n' > "$source/doc.md"
+  commit "$source" source >/dev/null
+  c=$(cache "$SLUG")
+
+  URL=$T/no-such-repo LOCAL=$T/no-such-repo
+  run "$SYNC" "$LOCAL_COLD"
+  check 'a failed clone leaves its directory behind, the case FR-020 handles' [ -d "$c" ]
+  check '...and from inside it git reaches the consuming project' \
+    [ "$(cd "$c" && git rev-parse --show-toplevel 2>/dev/null)" = "$(cd "$P" && pwd -P)" ]
+  block_vars '' "$PATH_CHOICE" sync_path
+  expect 'a cache directory without .git takes the cold path, removed first' \
+    "$(out sync_path)|$(exists "$SLUG" .)" "cold|no"
+
+  URL=$source LOCAL=$source
+  sync_source
+  expect 'the next sync clones the source afresh' "$(out sync_path)|$(content "$SLUG" doc.md)" "cold|doc"
+  expect "the consuming project's HEAD and working tree are untouched" \
+    "$(git -C "$P" rev-parse HEAD)|$(git -C "$P" status --porcelain)" "$head_before|$status_before"
+  expect 'the consuming project is neither sparse nor shallow' \
+    "$(git -C "$P" config core.sparseCheckout || echo unset)|$([ -f "$P/.git/shallow" ] && echo shallow || echo full)" \
+    "unset|full"
+
+  block_vars '' "$PATH_CHOICE" sync_path
+  expect 'a clone with no manifest is an interrupted sync: cold path, removed first' \
+    "$(out sync_path)|$(exists "$SLUG" .)" "cold|no"
+  sync_source
+  printf '{}\n' > "$c/.manifest.json"
+  block_vars '' "$PATH_CHOICE" sync_path
+  expect 'a cache with .git and a manifest takes the warm path and is kept' \
+    "$(out sync_path)|$(exists "$SLUG" .manifest.json)" "warm|yes"
+
+  rm -f "$c/.manifest.json"
+  block_vars 'max_age_minutes=60' "$FRESHNESS" verdict
+  expect 'freshness gate: a missing manifest is stale, never fresh' "$(out verdict)" stale
+  printf '{}\n' > "$c/.manifest.json"
+  block_vars 'max_age_minutes=60' "$FRESHNESS" verdict
+  expect 'freshness gate: a manifest under the policy is fresh' "$(out verdict)" fresh
+  touch -t 200001010000 "$c/.manifest.json"
+  block_vars 'max_age_minutes=60' "$FRESHNESS" verdict
+  expect 'freshness gate: a manifest over the policy is stale' "$(out verdict)" stale
+}
+
+if [ "${1:-}" = --recovery ]; then recovery_checks; finish; fi
+
+# --- records: the record run and the check run (011 FR-004 to FR-007, FR-011, FR-016, FR-017)
+
+# manifest_valid <manifest> <cache>: JSON::PP reads it; keys, values, the path set
+# (git's own byte-exact list) and every hash agree with the cache on disk.
+manifest_valid() {
+  git -C "$2" -c core.quotePath=false ls-files -s -z > "$T/lsfiles.z"
+  perl -MJSON::PP -MDigest::SHA=sha256_hex -e '
+    my ($manifest, $cache, $lsfiles, $slug, $url, $rev) = @ARGV;
+    my @errors;
+    open my $fh, "<:raw", $manifest or do { print "no manifest\n"; exit 1 };
+    my $text = do { local $/; <$fh> };
+    my $m = eval { JSON::PP->new->utf8->decode($text) } or do { print "invalid JSON: $@"; exit 1 };
+    my $keys = join " ", sort keys %$m;
+    push @errors, "keys: $keys" unless $keys eq "item_count items revision schema_version source_slug source_url synced_at";
+    push @errors, "schema_version" unless $m->{schema_version} eq "1.0";
+    push @errors, "source_slug" unless $m->{source_slug} eq $slug;
+    my $source_url = $m->{source_url}; utf8::encode($source_url);
+    push @errors, "source_url" unless $source_url eq $url;
+    push @errors, "revision" unless length $rev ? ($m->{revision} // "") eq $rev : !defined $m->{revision};
+    push @errors, "synced_at" unless $m->{synced_at} =~ /\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/;
+    my @items = @{ $m->{items} };
+    push @errors, "item_count" unless $m->{item_count} == @items;
+    open my $ls, "<:raw", $lsfiles or die "$lsfiles: $!\n";
+    my @expected;
+    for my $entry (split /\0/, do { local $/; <$ls> } // "") {
+      my ($meta, $path) = split /\t/, $entry, 2;
+      next unless defined $path && $meta =~ /^100/ && $path =~ /\.md\z/ && $path !~ /\n/;
+      my $copy = $path;
+      push @expected, $path if utf8::decode($copy);
+    }
+    @expected = sort @expected;
+    my @paths;
+    for my $item (@items) {
+      my $item_keys = join " ", sort keys %$item;
+      push @errors, "item keys: $item_keys" unless $item_keys eq "path sha256";
+      my $path = $item->{path}; utf8::encode($path); push @paths, $path;
+      open my $file, "<:raw", "$cache/$path" or do { push @errors, "unreadable item"; next };
+      push @errors, "sha256 differs" unless $item->{sha256} eq sha256_hex(do { local $/; <$file> } // "");
+    }
+    push @errors, "paths differ from git, in byte order" unless join("\0", @paths) eq join("\0", @expected);
+    print map { "$_\n" } @errors;
+    exit(@errors ? 1 : 0);
+  ' "$1" "$2" "$T/lsfiles.z" "$SLUG" "$URL" "$REV"
+}
+
+records_checks() {
+  local source=$T/records-source URL LOCAL REV='' FILTER='' DIRS=. SLUG=records
+  local c shell_name shells=() outside_file=$T/records-outside/escape.md bad_name=$'caf\xe9.md' utf8_bad=no
+  echo
+  echo 'Record run: hostile names, JSON, every shell'
+  mkdir -p "${outside_file%/*}"
+  printf 'OUTSIDE-CACHE\n' > "$outside_file"
+  new_repo "$source"
+  mkdir -p "$source/docs" "$source/"$'relative\n..'
+  for name in '$(touch pwned).md' '-option.md' 'a"quote.md' 'back\slash.md' $'tab\tname.md' $'cr\rname.md' \
+              $'esc\x1bname.md' $'ctl\x01name.md' $'del\x7fname.md' $'c1\xc2\x85name.md' 'guía.md' \
+              $'emoji-\xf0\x9f\x98\x80.md' docs/plain.md $'nl\nname.md' $'relative\n../escape.md'; do
+    printf '%s\n' "$name" > "$source/$name"
+  done
+  ln -s "$outside_file" "$source/"'link"q.md'
+  ln -s ../../../../../../.env "$source/"'link\b.md'
+  if { printf 'NOT-UTF-8\n' > "$source/$bad_name"; } 2>/dev/null; then utf8_bad=yes; fi
+  commit "$source" records >/dev/null
+  URL=$source LOCAL=$source
+  run "$SYNC" "$LOCAL_COLD" "$NOFILTER"
+  c=$(cache "$SLUG")
+
+  shells=(sh bash zsh)
+  if command -v dash >/dev/null 2>&1; then shells+=(dash); fi
+  compose "$RECORD_TAIL" > "$T/record.sh"
+  for shell_name in "${shells[@]}"; do
+    if ! command -v "$shell_name" >/dev/null 2>&1; then
+      bad "record run: required shell $shell_name is missing"; continue
+    fi
+    rm -f "$c/.manifest.json"
+    ( cd "$P" && "$shell_name" "$T/record.sh" ) > "$T/record.$shell_name.out" 2>> "$T/run.log"
+    if manifest_valid "$c/.manifest.json" "$c" > "$T/valid.$shell_name.out" 2>&1; then
+      ok "$shell_name: the manifest parses as JSON and matches git's byte-exact paths and every hash"
+    else
+      bad "$shell_name: manifest invalid: $(tr '\n' ';' < "$T/valid.$shell_name.out")"
+    fi
+    sed 's/"synced_at": "[^"]*"/"synced_at": "-"/' "$c/.manifest.json" > "$T/manifest.$shell_name"
+    sed 's/ synced_at=[^ ]*$/ synced_at=-/' "$T/record.$shell_name.out" > "$T/report.$shell_name"
+  done
+  for shell_name in "${shells[@]:1}"; do
+    check "$shell_name writes the same manifest as sh" cmp -s "$T/manifest.sh" "$T/manifest.$shell_name"
+    check "$shell_name prints the same report as sh" cmp -s "$T/report.sh" "$T/report.$shell_name"
+  done
+
+  local manifest=$c/.manifest.json report=$T/record.sh.out
+  check 'the record run prints its records: line' grep -q "^records: $SLUG items=[0-9][0-9]* bytes=[0-9][0-9]* synced_at=" "$report"
+  check 'JSON escapes: \" and \\' grep -Fq '{"path": "a\"quote.md", "sha256": "' "$manifest"
+  check 'JSON escapes: \\ for a backslash' grep -Fq '"back\\slash.md"' "$manifest"
+  check 'JSON escapes: \t for a tab' grep -Fq '"tab\tname.md"' "$manifest"
+  check 'JSON escapes: \r for a carriage return' grep -Fq '"cr\rname.md"' "$manifest"
+  check 'JSON escapes: \u00XX in upper case for other controls' grep -Fq -e '"esc\u001Bname.md"' "$manifest"
+  check 'JSON: valid UTF-8 is written as it is' grep -Fq '"guía.md"' "$manifest"
+  check 'JSON: DEL is written as it is' grep -Fq $'"del\x7fname.md"' "$manifest"
+  check 'JSON: a C1 character is written as its UTF-8 bytes' grep -Fq $'"c1\xc2\x85name.md"' "$manifest"
+  for line in 'item: 18 $(touch pwned).md' 'item: 11 -option.md' 'item: 11 a"quote.md' 'item: 14 back\\slash.md' \
+              'item: 12 tab\tname.md' 'item: 11 cr\rname.md' 'item: 12 esc\ename.md' 'item: 12 ctl\x01name.md' \
+              'item: 12 del\x7Fname.md' 'item: 12 c1\x85name.md' 'item: 9 guía.md' 'link: link"q.md' 'link: link\\b.md'; do
+    check "report: $line" grep -Fxq -- "$line" "$report"
+  done
+  if grep -Fq 'escape.md' "$manifest" || grep -Fq 'nl\nname' "$manifest"; then
+    bad 'paths with a line feed are left out: no fragment, phantom or duplicate'
+  else
+    ok 'paths with a line feed are left out: no fragment, phantom or duplicate'
+  fi
+  if grep -Fq 'link' "$manifest"; then bad 'links named with " and \ are not recorded'; else ok 'links named with " and \ are not recorded'; fi
+  if [ "$utf8_bad" = yes ]; then
+    check 'a name that is not valid UTF-8 is reported with \xHH' grep -Fxq 'skipped-utf8: caf\xE9.md' "$report"
+    if grep -Fq 'caf' "$manifest"; then bad '...and left out of the manifest'; else ok '...and left out of the manifest'; fi
+  else
+    echo '  SKIP  a name that is not valid UTF-8: this file system refuses it (APFS)'
+  fi
+  if [ -e "$T/pwned" ] || [ -e "$P/pwned" ] || [ -e "$c/pwned" ]; then
+    bad 'no hostile name ever creates a marker'
+  else
+    ok 'no hostile name ever creates a marker'
+  fi
+
+  echo
+  echo 'Check run: verdicts from one run (011 FR-011, FR-013)'
+  local item=$c/docs/plain.md
+  compose "$CHECK_TAIL" > "$T/check.sh"
+  check_verdict() { ( cd "$P" && "$1" "$T/check.sh" ) > "$T/check.out" 2>> "$T/run.log"; sed -n 's/^integrity=//p' "$T/check.out"; }
+  for shell_name in "${shells[@]}"; do
+    expect "$shell_name: a manifest the record run just wrote passes" "$(check_verdict "$shell_name")" pass
+  done
+  check 'a passing check prints the record run'"'"'s report' \
+    cmp -s <(grep -v '^integrity=' "$T/check.out" | sed 's/ synced_at=[^ ]*$/ synced_at=-/') "$T/report.sh"
+  cp "$c/.manifest.json" "$T/manifest.good"
+  printf 'x' >> "$item"
+  expect 'one changed byte in an item fails' "$(check_verdict sh)" fail
+  expect '...and the failing check deletes nothing' \
+    "$(exists "$SLUG" docs/plain.md)|$(cmp -s "$c/.manifest.json" "$T/manifest.good" && echo kept)" "yes|kept"
+  git -C "$c" checkout -q -- docs/plain.md
+  expect 'restoring the item passes again' "$(check_verdict sh)" pass
+  perl -MJSON::PP -e '
+    open my $f, "<:raw", $ARGV[0] or die; my $m = JSON::PP->new->utf8->decode(do { local $/; <$f> });
+    print JSON::PP->new->utf8->canonical->pretty->encode($m);
+  ' "$T/manifest.good" > "$c/.manifest.json"
+  expect 'an agent-written manifest with the same records, in another layout, fails once' "$(check_verdict sh)" fail
+  sed 's/"synced_at": "[^"]*"/"synced_at": "yesterday"/' "$T/manifest.good" > "$c/.manifest.json"
+  expect 'a malformed synced_at line fails' "$(check_verdict sh)" fail
+  rm -f "$c/.manifest.json"
+  expect 'a missing manifest fails' "$(check_verdict sh)" fail
+  cp "$T/manifest.good" "$c/.manifest.json"
+  expect 'the original manifest passes again' "$(check_verdict sh)" pass
+}
+
+if [ "${1:-}" = --records ]; then records_checks; finish; fi
 
 echo
 echo 'A local path containing a space'
@@ -436,6 +676,8 @@ if [ "${1:-}" = --local-space ]; then finish; fi
 
 slug_checks
 hostile_file_checks
+recovery_checks
+records_checks
 
 echo
 echo "git $(git --version | sed 's/^git version //')"

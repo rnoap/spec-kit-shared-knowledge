@@ -7,7 +7,7 @@
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <img alt="Spec Kit" src="https://img.shields.io/badge/spec--kit-%E2%89%A50.15.2-7d4cdb">
-  <img alt="Status" src="https://img.shields.io/badge/status-v1.9.1-success">
+  <img alt="Status" src="https://img.shields.io/badge/status-v1.10.0-success">
 </p>
 
 ## 📖 Overview
@@ -39,7 +39,7 @@ When working in a microservices or multi-repo environment, architectural decisio
 `specify extension search` finds extensions in spec-kit's community catalog, but that catalog is searchable, not installable, by default. Install the published release from its archive:
 
 ```bash
-specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.9.1.zip
+specify extension add knowledge --from https://github.com/rnoap/spec-kit-shared-knowledge/archive/refs/tags/v1.10.0.zip
 ```
 
 spec-kit first shows an `Untrusted Source` prompt naming the URL. Confirm it to install.
@@ -620,7 +620,15 @@ The `knowledge-config.yml` config file **should** be committed — it declares y
 
 📡 **Source unreachable**: The command falls back to the existing cache and reports `⚠️ cached` with the last-sync timestamp and cache age. The command always exits 0.
 
-💥 **Corrupted cache**: If `.manifest.json` is absent or fails integrity checks, the cache directory is discarded and a fresh sync is attempted. If the fresh sync also fails, the source is marked `❌ unreachable`.
+💥 **Corrupted cache**: When `.manifest.json` no longer matches the cached files, the Cache Integrity Check fails. Status shows `corrupted`, search leaves the source out, and the next sync records it again. A cache directory left without a manifest or without its own `.git`, by a failed or stopped clone, is removed and cloned again. If the source is unreachable at that moment, it is marked `❌ unreachable`.
+
+🔄 **First sync after an upgrade**: `specify extension add` recreates the extension's folder and keeps only `knowledge-config.yml`, so the cache and the index are gone. The next sync rebuilds every source.
+
+⏯️ **A sync that stopped part-way**: Run `/speckit-knowledge-sync` again. Sources already recorded take the warm path, and every source left without a manifest is cloned again.
+
+🧾 **`corrupted` right after upgrading from 1.9.1 or earlier**: Sync now writes each manifest itself, in one exact layout, so a manifest an agent wrote before fails the check once. The next sync records it again and the row clears.
+
+🔤 **File skipped, name not valid UTF-8**: JSON cannot hold that name, so sync leaves the file out of the manifest and the index and names it with `\xHH` escapes. Rename it in the source repository to bring it back.
 
 🐢 **More than 10 sources**: A soft warning is emitted before the sync loop. The command continues normally — the warning is informational only. Use `path_filter` to reduce per-source clone size.
 

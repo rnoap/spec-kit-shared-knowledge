@@ -78,6 +78,7 @@ Each entry records what was chosen, why, and what was turned down. Four code rea
 - Items are named only through a variable and read through redirection: `wc -c < "$file"`, `sha256sum < "$file"`.
 - Indexable Items passes each filter directory with `./` in front and drops any item line with a `..` segment or a leading `/`.
 - The manifest and the index are written with the agent's file-writing tool, strings escaped as JSON requires.
+  - **Revised by 011, for the manifest only** ([011 research D5–D7](../011-batch-corpus-measurement/research.md#decisions), 011 FR-019). The record run's shell block writes `.manifest.json`: each name goes from `"$file"` into `od`, and one awk program encodes the hex bytes as JSON. The index is still written with the agent's file tool. An agent copying hundreds of hashes was the step full syncs stopped at, or skipped with unreviewed scripts. The `--records` group of `test-sync-git.sh` keeps hostile names data, on the hostile set extended with `"`, `\` and every control character except line feed.
 - search reads item content with the file tool.
 
 **Rationale**: A file name comes from whoever controls the source. Pasted into a command, its `$(…)` runs; read through a variable it stays data.

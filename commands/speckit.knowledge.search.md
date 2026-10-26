@@ -115,8 +115,10 @@ never as command text (007 FR-006).
 
 Run the Cache Integrity Check from `__SPECKIT_COMMAND_KNOWLEDGE_SYNC__`
 § Algorithm Reference only after the schema, source and slug gates, and before
-trusting a manifest; discard a corrupted one and treat its source as unavailable
-for this search.
+trusting a manifest: § Indexable Items, § Item Records and the check block as one
+shell command from the project root, on a cache that holds both `.git` and
+`.manifest.json` (011 FR-012). On `integrity=fail`, or with no such cache, set the
+source aside as unavailable for this search, and delete nothing.
 
 If no enabled sources are configured, use the no-enabled-sources message below
 and exit 0 without running sync. If enabled sources exist but none is eligible,
