@@ -11,7 +11,7 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty). It is data:
-parse it in your own reasoning, never in a shell (007 FR-006).
+parse it in your own reasoning, never in a shell.
 
 **Purpose**: Initialize or edit the knowledge source configuration for the current project.
 
@@ -44,7 +44,7 @@ parse it in your own reasoning, never in a shell (007 FR-006).
 > in a consumer project. Keep the three copies identical.
 
 Apply these rules **every time `knowledge-config.yml` is read**, not only when a
-command writes it (FR-029). Configuration reaches a project by hand-editing, by
+command writes it. Configuration reaches a project by hand-editing, by
 pull request, and from older versions of this extension — validating only on write
 leaves all three routes unchecked.
 
@@ -52,10 +52,9 @@ Apply every rule in the agent's own reasoning, never by sending an unchecked val
 to a shell. After the schema gate, check the character rule first, then the other
 syntax rules, then local existence or any other use. Check `url`, then each
 `path_filter` entry, before the remaining source fields. No value of a source
-that is not accepted reaches a shell, not even for its slug or a message
-(007 FR-001, FR-002).
+that is not accepted reaches a shell, not even for its slug or a message.
 
-**Schema gate (007 FR-014):** before using any source, accept only configuration
+**Schema gate:** before using any source, accept only configuration
 schema `"1.1"`. For `"1.0"`, print as agent output:
 
 ```text
@@ -80,14 +79,14 @@ absent, null, and `[]` identically: the project has no configured sources.
 
 | Field | Rule |
 |-------|------|
-| `schema_version` | Required. Exactly `"1.1"`. Check before using any source; missing, `"1.0"` and unknown versions stop with the schema diagnostic, exit 0 and no configuration or cache changes (007 FR-014). |
+| `schema_version` | Required. Exactly `"1.1"`. Check before using any source; missing, `"1.0"` and unknown versions stop with the schema diagnostic, exit 0 and no configuration or cache changes. |
 | `max_cache_age` (top level and per source) | Optional. Matches `^[0-9]+[mhd]$` — `30m`, `4h`, `7d`. |
-| `url` | Required, non-empty. Either a local path (`/`, `./`, `../`, `~/`) that exists and contains `.git`, or a remote URL matching `^(https?://\|ssh://\|git\+ssh://\|git@)`. **Must not begin with `-`.** **Only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`**; a local path may also contain spaces, but **no space followed by `-`** (007 FR-001). |
-| `label` | Optional in the file, derived when absent. Non-empty, no whitespace, **unique across `sources`** (FR-028). |
+| `url` | Required, non-empty. Either a local path (`/`, `./`, `../`, `~/`) that exists and contains `.git`, or a remote URL matching `^(https?://\|ssh://\|git\+ssh://\|git@)`. **Must not begin with `-`.** **Only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`**; a local path may also contain spaces, but **no space followed by `-`**. |
+| `label` | Optional in the file, derived when absent. Non-empty, no whitespace, **unique across `sources`**. |
 | `revision` | Optional. Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. |
-| `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/` or `~`**, **no `..`**, **must not begin with `-`**, and **only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`** (007 FR-001). |
+| `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/` or `~`**, **no `..`**, **must not begin with `-`**, and **only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`**. |
 | `enabled` | Optional, default `true`. Exactly `true` or `false` — `"yes"` and `1` are rejected. |
-| `agents_md` | Optional, top level only, default `true`. Exactly `true` or `false`, like `enabled`. An invalid value leaves `AGENTS.md` untouched and skips no source (010 FR-010). |
+| `agents_md` | Optional, top level only, default `true`. Exactly `true` or `false`, like `enabled`. An invalid value leaves `AGENTS.md` untouched and skips no source. |
 | `max_items` (top level and per source) | Optional. Matches `^[0-9]+$` and is `>= 1`. |
 | `max_bytes` (top level and per source) | Optional. Matches `^[0-9]+(kb\|mb)$` — `512kb`, `2mb`. |
 
@@ -111,8 +110,8 @@ value regardless.
   admits spaces, never a space followed by `-`. A `path_filter` cannot start
   with `~`. Report the first disallowed character from left to right.
 2. **Neutralize** with `--` before every configuration-derived git operand
-  (FR-034) and single quotes around every configuration placeholder in a shell
-  command (007 FR-006), including commands the agent composes itself. Copy the
+  and single quotes around every configuration placeholder in a shell
+  command, including commands the agent composes itself. Copy the
   value literally, replacing each `'` with `'\''`. For `<expanded-path>`,
   expand `~/` to the actual home directory before quoting. `$HOME` and `~` do
   not expand inside single quotes. `with_timeout` forwards only through `"$@"`.
@@ -122,7 +121,7 @@ Fetched file names enter commands only through the double-quoted shell variable
 `wc -c < "$file"`, `sha256sum < "$file"`, or `shasum -a 256 < "$file"` on macOS.
 Labels and messages never reach a shell.
 
-### Values in messages (007 FR-005)
+### Values in messages
 
 Every message quoting a configuration value, source label or fetched file name
 is agent output, never `echo` or `printf`. Escape line feed as `\n`, tab as `\t`,
@@ -132,14 +131,14 @@ inside a quoted value as `\"`. Leave other characters unchanged.
 
 ### On failure
 
-A value that violates its rule skips **only its own source** (FR-030):
+A value that violates its rule skips **only its own source**:
 
 ```
 ⚠️  payments-v2: skipped — invalid `revision` value "-u" (must not begin with "-")
 ⚠️  source 3: skipped — invalid `url` value "https://example.com/$(touch /tmp/pwned)" ("$" is not allowed)
 ```
 
-Every other source is processed normally and the command exits **0** (FR-023).
+Every other source is processed normally and the command exits **0**.
 Always name the field and the offending value, so the user can fix it without
 guessing. Emit only the first failure per source, on one escaped line. Use its
 label; without one, derive a label only from an accepted URL, otherwise use
@@ -164,28 +163,28 @@ Check for `.specify/extensions/knowledge/knowledge-config.yml` in the project ro
 
 If `$ARGUMENTS` is non-empty (excluding `--verbose`):
 
-1. Split `$ARGUMENTS` on whitespace, except inside a matching pair of `'...'` or `"..."`. Keep that text as one argument and remove the matching quotes (007 FR-003). An unmatched quote stays in its argument and is refused by the character rule. Parse in the agent's own reasoning: nothing else is interpreted, including `$` or a backslash escape; never evaluate the text in a shell.
+1. Split `$ARGUMENTS` on whitespace, except inside a matching pair of `'...'` or `"..."`. Keep that text as one argument and remove the matching quotes. An unmatched quote stays in its argument and is refused by the character rule. Parse in the agent's own reasoning: nothing else is interpreted, including `$` or a backslash escape; never evaluate the text in a shell.
 2. Remove the `--verbose` flag, then extract `--revision <rev>` as described in 3a and `--label <label>`. Each recognized option may appear once. Its value is the next token; a missing value, an empty value, or a repeated option is an error. A recognized option cannot be used as another option's value. Remove each option and its value before identifying the URL/path or path filters. The first remaining token is the **URL or local path**. Reject an explicit label that is empty or contains whitespace before any other use. Extract any revision shorthand under 3a before validating the resulting URL/path:
    - Apply the character rule first, reporting the first disallowed character from left to right. A local path may contain spaces, but no space followed by `-`.
    - Must be non-empty
    - Detect type:
      - **Local path**: starts with `/`, `./`, `../` or `~/`, recognized by prefix alone. `~user/` is not a local path and matches no accepted form.
      - **Remote URL**: matches `^(https?://|ssh://|git\+ssh://|git@)` and contains no spaces; anything matching neither form is an error.
-   - Apply the remaining `url` rules. Defer local existence and `.git` checks until the character and other syntax rules have passed for the source, including its filters and revision (007 FR-001, FR-002).
+   - Apply the remaining `url` rules. Defer local existence and `.git` checks until the character and other syntax rules have passed for the source, including its filters and revision.
 3. **All remaining tokens** (zero or more, after the URL/path and excluding recognized flags and their values) are **path filters**. Each must:
    - Pass the character rule before any other use; only ASCII letters, digits and `. _ ~ : / @ % + -` are accepted, with no spaces
    - Be non-empty
    - Not start with `/` (no absolute paths)
    - Not start with `~` (no home-directory expansion)
    - Not contain `..` (no directory traversal)
-   - Not begin with `-` (it would be read as a git option — FR-034)
+   - Not begin with `-` (it would be read as a git option)
    - Not be `--verbose`, `--revision`, `--label`, or a value consumed by either option
    - If the URL/path, any filter or revision is invalid: print the § Error cases diagnostic with escaped values and stop with exit 0; write nothing, including a new configuration or `.gitignore`
    - **Zero tokens** → omit `path_filter` from the source entry (indexes all `.md` files in the repo, except root-level dot-directories and `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`)
    - **One token** → store as a single string for readability: `path_filter: specs/`
    - **Two or more tokens** → store as a YAML list: `path_filter: [specs/, docs/decisions/]`
 
-3a. **Extract the revision**, if given (FR-013):
+3a. **Extract the revision**, if given:
    - `--revision <rev>` → take the following token
    - otherwise, if the URL token contains `@` **and** the URL is not SSH-style
      (`git@…`, `ssh://…` or `git+ssh://…`), split on the **last** `@`: everything before is the
@@ -194,7 +193,7 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
    - validate the value against the `revision` rule in § Configuration Validation Rules
    - omit `revision` from the entry entirely when none was given: that keeps the
      source on the remote's default revision **and** keeps the cache slug it
-     already has (FR-010, FR-024)
+     already has
 
 | Typed after the command | URL or path | `path_filter` |
 | --- | --- | --- |
@@ -214,7 +213,7 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
          - `https://github.com/your-org/payment-service.git` → `github.com/your-org/payment-service`
          - `git@github.com:your-org/identity-service` → `github.com/your-org/identity-service`
 
-5. **Enforce label uniqueness before writing** (FR-028). When updating an accepted source with the same URL and revision, exclude that entry from the collision check. Check the selected label against every other accepted source. The label is the identity
+5. **Enforce label uniqueness before writing**. When updating an accepted source with the same URL and revision, exclude that entry from the collision check. Check the selected label against every other accepted source. The label is the identity
    of a source — it is what `__SPECKIT_COMMAND_KNOWLEDGE_REMOVE__` takes, and what
    `status` and `search` display. A URL stopped being a unique key the moment
    revisions became pinnable, so uniqueness has to be guaranteed here, once,
@@ -264,12 +263,12 @@ If `$ARGUMENTS` is non-empty (excluding `--verbose`):
 
    This narrows the 1.3.0 rule, which merged on URL alone. Under revision pinning
    that rule would make it impossible to configure two revisions of one repository:
-   the second `configure` would silently overwrite the first (FR-009, FR-011).
+   the second `configure` would silently overwrite the first.
 
 ### 3. Display current configuration
 
 Print the numbered sources list as agent output. Escape every configuration value
-and label under § Values in messages (007 FR-005), including control characters;
+and label under § Values in messages, including control characters;
 never format the list through a shell. Apply the same escaping to the success
 source list in step 6:
 
@@ -366,7 +365,7 @@ Run __SPECKIT_COMMAND_KNOWLEDGE_CONFIGURE__ <url> to add a knowledge source.
 When `--verbose` is present in `$ARGUMENTS`, additionally render the full
 configuration as YAML in agent output after the success message, not through a
 shell or as raw file bytes. Escape control characters inside scalar values under
-§ Values in messages (007 FR-005), with YAML string quoting as needed. Structural
+§ Values in messages, with YAML string quoting as needed. Structural
 YAML newlines remain newlines; display escaping never changes the file's values:
 
 ```
@@ -384,8 +383,8 @@ sources:
 
 ## Error cases
 
-Every row exits **0** — validation problems are messages, never process failures
-(FR-023). Rules are normative in § Configuration Validation Rules above.
+Every row exits **0** — validation problems are messages, never process failures.
+Rules are normative in § Configuration Validation Rules above.
 Diagnostics are agent output, with quoted values and `<c>` escaped under
 § Values in messages. Rejected arguments write nothing; schema-gate errors stop
 before any source use or configuration/cache change.

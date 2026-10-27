@@ -1,8 +1,8 @@
 # TinySpec: Strip internal spec references from shipped files
 
-**Branch**: next functional release, from `main`
+**Branch**: main
 **Date**: 2026-10-27
-**Status**: draft
+**Status**: done
 **Complexity**: small
 
 ## What
@@ -16,7 +16,8 @@ The command files cite this repo's own requirement IDs: `(007 FR-006)`, `(FR-024
 | [commands/*.md](../../commands/) | Modify: remove the IDs, keep every instruction's meaning |
 | [extension.yml](../../extension.yml) | Modify: 2 IDs in the hook comment |
 | [.github/scripts/validate-extension.sh](../../.github/scripts/validate-extension.sh) | Modify: new static check 13 |
-| [.specify/memory/constitution.md](../../.specify/memory/constitution.md) | Modify: list check 13 under § Quality Gates |
+| [.specify/memory/constitution.md](../../.specify/memory/constitution.md) | Modify: list check 13 under § Quality Gates (1.6.0) |
+| [AGENTS.md](../../AGENTS.md) | Modify: point agents at check 13 instead of this spec |
 | [CHANGELOG.md](../../CHANGELOG.md) | Modify: `Changed` entry under `[Unreleased]` |
 
 ## Requirements
@@ -46,14 +47,14 @@ The command files cite this repo's own requirement IDs: `(007 FR-006)`, `(FR-024
 
 ## Tasks
 
-- [ ] T1 Remove the parenthetical IDs from `commands/*.md` and `extension.yml`
-- [ ] T2 Rewrite the five sentences in `sync.md` that use an ID as content
-- [ ] T3 Keep the Configuration Validation Rules block identical across its copies
-- [ ] T4 Static check 13 in `validate-extension.sh`: fails before T1, passes after
-- [ ] T5 Constitution § Quality Gates item 13 and `CHANGELOG.md` entry
+- [x] T1 Remove the parenthetical IDs from `commands/*.md` and `extension.yml` (176 of the 193, by script; the other 17 in T2)
+- [x] T2 Rewrite the sentences that use an ID as content: 14, not five (12 in `sync.md`, 1 in `status.md`, 1 in `extension.yml`)
+- [x] T3 Keep the Configuration Validation Rules block identical across its copies
+- [x] T4 Static check 13 in `validate-extension.sh`: failed on 173 lines before T1, passes after
+- [x] T5 Constitution § Quality Gates item 13 and `CHANGELOG.md` entry
 
 ## Done When
 
-- [ ] The inventory grep finds 0 matches in the shipped files
-- [ ] `validate-extension.sh` passes 19/19
-- [ ] `test-sync-git.sh` and the install smoke test still pass
+- [x] The inventory grep finds 0 matches in the shipped files, and 0 in an installed copy
+- [x] `validate-extension.sh` passes 19/19
+- [x] `test-sync-git.sh` passes 303/303 (git 2.54, macOS), and the install smoke test passes against spec-kit 1.2.3

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `docs(commands): state rules instead of citing requirement IDs`. The command
+  files cited 193 of this repository's requirement IDs, such as `(007 FR-006)`.
+  They run as prompts in a consumer project, which has no copy of this repo's
+  specs and whose own specs carry their own `FR-` numbers. The IDs are gone. A
+  sentence that relied on one now states the rule itself, and no instruction
+  changed meaning.
+- `ci(validate): static check 13`. It fails when a shipped file cites a
+  requirement ID, a spec number, a task ID or a path into this repository's
+  development workspace. Constitution 1.6.0 lists it under § Quality Gates.
+
 ## [1.10.1] - 2026-10-27
 
 No command, configuration or runtime change: the command files and

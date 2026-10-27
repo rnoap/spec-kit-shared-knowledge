@@ -184,6 +184,21 @@ else
   note "check .gitattributes export-ignore rules"
 fi
 
+# --- Constitution §I: shipped files run as prompts in a consumer project, which
+# --- has no specs/ from this repo. A cited requirement ID points nowhere, and the
+# --- consumer's own specs carry their own FR- numbers. specs/NNN-… paths are not
+# --- matched: README and config-template.yml show specs/012-order-tracking/ as a
+# --- user example.
+citations=$(grep -nE '\b(FR|SC)-[0-9]+[a-z]?\b|\bspec [0-9]{3}\b|\bT[0-9]{3}\b|specs/tiny/|\.specify/(memory|bugs|assessments)/' \
+            commands/*.md extension.yml config-template.yml README.md || true)
+if [ -z "$citations" ]; then
+  ok "shipped files cite no requirement IDs or dev-workspace paths"
+else
+  bad "shipped files cite this repo's specs ($(printf '%s\n' "$citations" | wc -l | tr -d ' ') lines)"
+  printf '%s\n' "$citations" | head -5 | cut -c1-140 | sed 's/^/        /'
+  note "state the rule itself, not its number (Constitution §I)"
+fi
+
 echo
 echo "Repository invariants"
 

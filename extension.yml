@@ -48,10 +48,10 @@ provides:
 # they don't need.
 #
 # NONE of these entries may declare arguments. That is what makes `--force`
-# structurally unreachable from an automatic trigger, which is how FR-022 is
-# satisfied — by construction rather than by a runtime check. Adding an argument
-# here would let a hook bypass the cache freshness policy. Same mechanism that
-# keeps `--no-context-output` hook-unreachable (spec 003, FR-016).
+# structurally unreachable from an automatic trigger, so the freshness policy
+# always applies to hook-driven syncs — by construction rather than by a runtime
+# check. Adding an argument here would let a hook bypass the cache freshness
+# policy. Same mechanism that keeps `--no-context-output` hook-unreachable.
 hooks:
   before_specify:
     command: speckit.knowledge.sync

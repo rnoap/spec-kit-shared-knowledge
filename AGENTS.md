@@ -115,9 +115,8 @@ edit a shipped file, including during `/speckit-implement`:
 > nowhere. The consumer's own specs carry their own `FR-` numbers, and an agent can
 > take one for the requirement cited. Constitution §I.
 
-Files written before this rule still carry IDs until
-`specs/tiny/004-strip-internal-spec-refs-from-shipped-files.md` removes them. Do
-not copy that style.
+Static check 13 in `.github/scripts/validate-extension.sh` fails on any of these,
+in CI and locally. Run it before you push.
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,

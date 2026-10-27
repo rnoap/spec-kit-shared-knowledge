@@ -11,7 +11,7 @@ $ARGUMENTS
 ```
 
 You **MUST** consider the user input before proceeding (if not empty). It is data:
-parse it in your own reasoning, never in a shell (007 FR-006).
+parse it in your own reasoning, never in a shell.
 
 **Purpose**: Refresh the local cache for all configured, enabled knowledge sources.
 
@@ -46,7 +46,7 @@ normalized=$(printf '%s\n' "$url" \
 
 # 2. Fold in the revision ONLY when one is pinned.
 #
-#    This conditional is the whole backward-compatibility guarantee (FR-024).
+#    This conditional is the whole backward-compatibility guarantee.
 #    A source with no `revision` hashes exactly the bytes it hashed in 1.3.0, so
 #    upgrading re-downloads nothing. Always including a default like "HEAD" would
 #    change every existing slug and invalidate every consumer's cache.
@@ -90,14 +90,14 @@ printf '%s\n' "$slug"
 `https://github.com/org/payment-service\nv2.4.1` to `5e8b13c49fbe` and lands in a
 **different** directory, `.specify/extensions/knowledge/cache/5e8b13c49fbe/`.
 That is what keeps two revisions of one repository from contaminating
-each other (FR-011), and what makes a revision change serve new content on the
-next sync with no invalidation logic at all (FR-012) — the old slug is simply no
+each other, and what makes a revision change serve new content on the
+next sync with no invalidation logic at all — the old slug is simply no
 longer looked up.
 
 ### Repository Identity
 
 A **different** normalization, used for exactly one purpose: deciding whether a
-shared file path is a conflict (step 7, FR-026).
+shared file path is a conflict (step 7).
 
 ```text
 1. Strip a leading scheme:          https://  http://  ssh://  git://  git+ssh://
@@ -124,8 +124,10 @@ it was cloned from — an accepted limitation, documented in the README.
 **Identity is deliberately broader than the slug.** The slug must separate
 `https://…` from `git@…` because they are different fetch targets with different
 credentials and different cache state. Identity must unite them because they are
-the same body of knowledge. Collapsing the two functions into one would break
-either FR-011 or FR-026.
+the same body of knowledge. Collapsing the two into one key breaks one side: a key
+that unites them would make different fetch targets and revisions share one cache,
+and a key that separates them would report one repository as conflicting with
+itself.
 
 ### Cache Freshness Gate
 
@@ -133,7 +135,7 @@ Decides whether a source is refreshed at all. Runs **before** any network access
 
 **Effective policy** = the source's own `max_cache_age`, else the project-level
 `max_cache_age`, else **none**. With no policy, every source fetches, exactly as in
-1.3.0 (FR-017).
+1.3.0.
 
 **Convert the duration to minutes** with integer arithmetic — `Nm` → `N`, `Nh` →
 `N × 60`, `Nd` → `N × 1440`.
@@ -148,7 +150,7 @@ else
 fi
 ```
 
-**A missing manifest is `stale`, never `fresh`** (011 FR-021). `find` prints nothing
+**A missing manifest is `stale`, never `fresh`**. `find` prints nothing
 for a file that does not exist, so the age test alone would call it fresh and skip a
 source that has never finished syncing, which is every source right after an upgrade.
 
@@ -187,18 +189,18 @@ favour of `find -mmin` for the freshness gate:
   versus 512 B on BSD. The same corpus would measure differently on two machines.
 - `stat` needs `-c%s` on GNU and `-f%z` on BSD — mutually exclusive spellings.
 
-Either one would break FR-007: two developers with identical configuration would
+Either one would make selection machine-dependent: two developers with identical configuration would
 select different subsets, and the index would stop being explainable by the
 configuration alone.
 
 Size is measured over **the file content the agent is instructed to read**, never
-over `knowledge-index.md` itself (FR-010). The index is a small fraction of what
+over `knowledge-index.md` itself. The index is a small fraction of what
 its own instruction pulls in.
 
 ### Context Budget Allocation
 
 Applies when `max_items` or `max_bytes` is in effect. Runs entirely on already
-cached content — it never influences what is fetched (FR-012a).
+cached content — it never influences what is fetched.
 
 **Effective limit** for one source, per dimension, is the **lower** of:
 
@@ -208,7 +210,7 @@ cached content — it never influences what is fetched (FR-012a).
 Taking the source's own value in preference to its share would let the total
 exceed the project ceiling — with 120 items across three sources, a source
 declaring 60 against a 40 share would push the total to 140. A per-source ceiling
-above the project ceiling is clamped down to it and the clamp reported (FR-003a);
+above the project ceiling is clamped down to it and the clamp reported;
 it never costs the source its place.
 
 > This is a **sub-ceiling**, not an override. `max_cache_age` occupies the same
@@ -233,17 +235,18 @@ capacity a small source cannot use back to the others is what fills the ceiling.
 With 120 items across four sources needing 312 / 55 / 88 / 12, a flat
 `floor(120/4)` injects only 30 + 30 + 30 + 12 = 102 and strands 18. Progressive
 fill gives 36 + 36 + 36 + 12 = 120. **An implementation that stops after one pass
-satisfies neither FR-006 nor FR-007a, and the shortfall is invisible unless the
-injected total is compared against the ceiling.**
+never releases unused share to the other sources, so it injects less than the
+ceiling allows, and the shortfall is invisible unless the injected total is
+compared against the ceiling.**
 
 Terminates in at most `|S|` passes — each pass either removes a source or exits.
-Labels are unique by construction (FR-028), so step 4's tiebreak is never
+Labels are unique by construction, so step 4's tiebreak is never
 ambiguous. With no project ceiling on a dimension, every share on that dimension
 is unbounded and only the source's own value binds.
 
-No configuration value influences **which** items are chosen (FR-007a) — only how
+No configuration value influences **which** items are chosen — only how
 many. The rule is fixed and owned by this extension so that a user can reproduce
-their own index on paper (FR-007b).
+their own index on paper.
 
 ### Bounded Network Call
 
@@ -292,8 +295,7 @@ a hung host. Callers distinguish only zero from non-zero.
 
 **With none of the three, calls run unbounded** and one warning says so. Failing
 the source instead would cost the project its knowledge over a missing safeguard —
-the same reasoning that serves an over-age cache when its source is unreachable
-(FR-027).
+the same reasoning that serves an over-age cache when its source is unreachable.
 
 ### Indexable Items
 
@@ -327,7 +329,7 @@ fi
 `$items` is what step 5 indexes, one path per line in byte order. Every path in
 `$links` is skipped and named in step 9, never read. Strip every leading `./` and
 drop any line with a `..` path segment or a leading `/`. A directory name
-containing a line break must never forge an item outside the cache (007 FR-006).
+containing a line break must never forge an item outside the cache.
 Read each item only as `"$file"`, never paste its name into command text.
 
 **Every text tool runs with `LC_ALL=C`, never exported** (011). In a UTF-8 locale,
@@ -482,7 +484,7 @@ It leaves what the record run writes and the check compares:
 `m_bytes` are the recorded items and their total size. `m_errors` is empty unless a
 hash or a configured value could not be recorded.
 
-**File names reach awk only as hex** (011 FR-004, FR-005). Each name goes from
+**File names reach awk only as hex**. Each name goes from
 `"$file"` into `od`, so awk sees hex digits and numbers, never a byte it could
 misread. It validates UTF-8 strictly (no overlong form, no surrogate, nothing above
 U+10FFFF) and writes two forms of each name:
@@ -492,7 +494,7 @@ U+10FFFF) and writes two forms of each name:
 - **Report**: the display form of § Values in messages, with every byte outside a
   valid UTF-8 sequence as `\xHH`.
 
-**A name that is not valid UTF-8 is never recorded** (011 FR-006). JSON cannot carry
+**A name that is not valid UTF-8 is never recorded**. JSON cannot carry
 it, so it is in neither the manifest nor the index; the report lists it as
 `skipped-utf8:`. macOS refuses such names, so they come only from Linux file
 systems.
@@ -519,11 +521,11 @@ print_report
 
 `integrity=pass` means the manifest is byte for byte what the record run would
 write now with its own `synced_at`: the same items, item count and hashes, in
-canonical JSON (011 FR-011). The agent compares no hash. The report lines are the
+canonical JSON. The agent compares no hash. The report lines are the
 record run's, so a passing source needs no further measuring.
 
 **The check gives a verdict and nothing else.** It never deletes, clones or sets a
-status (011 FR-012). Each caller acts on it:
+status. Each caller acts on it:
 
 - **Sync's policy-fresh path** (step 4): pass is `current`; fail is `stale`.
 - **Sync's fallbacks** (§ On timeout or failure, and all three tiers failed): pass
@@ -532,7 +534,7 @@ status (011 FR-012). Each caller acts on it:
 - **Search**: fail sets the source aside for this search.
 
 A manifest an agent wrote under 1.9.1 or earlier fails once, even when its records
-were right, and is recorded again at the next successful sync (011 FR-013). So does
+were right, and is recorded again at the next successful sync. So does
 one that lists a symbolic link, which would point the agent at a file outside the
 cache. Editing `path_filter`, or editing `url` in a way that keeps the slug, also
 fails the check until the next sync records the source again.
@@ -571,9 +573,9 @@ are not indexed (§ Indexable Items).
 The four `withheld_*` / `limit_*` fields and the `⚠️ Partial` line are **omitted
 entirely** when the budget withheld nothing — including when no budget is
 configured. A non-binding budget therefore leaves the index indistinguishable from
-an unbudgeted one, apart from the generation timestamp (FR-016).
+an unbudgeted one, apart from the generation timestamp.
 
-**No withheld path is ever named here** (FR-014). This is the one document the
+**No withheld path is ever named here**. This is the one document the
 agent is instructed to read in full; naming the excluded files would invite it to
 open exactly what the budget removed.
 
@@ -694,7 +696,7 @@ content.
 > in a consumer project. Keep the three copies identical.
 
 Apply these rules **every time `knowledge-config.yml` is read**, not only when a
-command writes it (FR-029). Configuration reaches a project by hand-editing, by
+command writes it. Configuration reaches a project by hand-editing, by
 pull request, and from older versions of this extension — validating only on write
 leaves all three routes unchecked.
 
@@ -702,10 +704,9 @@ Apply every rule in the agent's own reasoning, never by sending an unchecked val
 to a shell. After the schema gate, check the character rule first, then the other
 syntax rules, then local existence or any other use. Check `url`, then each
 `path_filter` entry, before the remaining source fields. No value of a source
-that is not accepted reaches a shell, not even for its slug or a message
-(007 FR-001, FR-002).
+that is not accepted reaches a shell, not even for its slug or a message.
 
-**Schema gate (007 FR-014):** before using any source, accept only configuration
+**Schema gate:** before using any source, accept only configuration
 schema `"1.1"`. For `"1.0"`, print as agent output:
 
 ```text
@@ -730,14 +731,14 @@ absent, null, and `[]` identically: the project has no configured sources.
 
 | Field | Rule |
 |-------|------|
-| `schema_version` | Required. Exactly `"1.1"`. Check before using any source; missing, `"1.0"` and unknown versions stop with the schema diagnostic, exit 0 and no configuration or cache changes (007 FR-014). |
+| `schema_version` | Required. Exactly `"1.1"`. Check before using any source; missing, `"1.0"` and unknown versions stop with the schema diagnostic, exit 0 and no configuration or cache changes. |
 | `max_cache_age` (top level and per source) | Optional. Matches `^[0-9]+[mhd]$` — `30m`, `4h`, `7d`. |
-| `url` | Required, non-empty. Either a local path (`/`, `./`, `../`, `~/`) that exists and contains `.git`, or a remote URL matching `^(https?://\|ssh://\|git\+ssh://\|git@)`. **Must not begin with `-`.** **Only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`**; a local path may also contain spaces, but **no space followed by `-`** (007 FR-001). |
-| `label` | Optional in the file, derived when absent. Non-empty, no whitespace, **unique across `sources`** (FR-028). |
+| `url` | Required, non-empty. Either a local path (`/`, `./`, `../`, `~/`) that exists and contains `.git`, or a remote URL matching `^(https?://\|ssh://\|git\+ssh://\|git@)`. **Must not begin with `-`.** **Only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`**; a local path may also contain spaces, but **no space followed by `-`**. |
+| `label` | Optional in the file, derived when absent. Non-empty, no whitespace, **unique across `sources`**. |
 | `revision` | Optional. Non-empty, matching `^[A-Za-z0-9._/-]+$`. **Must not begin with `-`**, must not contain `..`, must not end with `.lock`. |
-| `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/` or `~`**, **no `..`**, **must not begin with `-`**, and **only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`** (007 FR-001). |
+| `path_filter` | Optional. A string or a list of strings. Each entry non-empty, **no leading `/` or `~`**, **no `..`**, **must not begin with `-`**, and **only ASCII letters, digits and `.` `_` `~` `:` `/` `@` `%` `+` `-`**. |
 | `enabled` | Optional, default `true`. Exactly `true` or `false` — `"yes"` and `1` are rejected. |
-| `agents_md` | Optional, top level only, default `true`. Exactly `true` or `false`, like `enabled`. An invalid value leaves `AGENTS.md` untouched and skips no source (010 FR-010). |
+| `agents_md` | Optional, top level only, default `true`. Exactly `true` or `false`, like `enabled`. An invalid value leaves `AGENTS.md` untouched and skips no source. |
 | `max_items` (top level and per source) | Optional. Matches `^[0-9]+$` and is `>= 1`. |
 | `max_bytes` (top level and per source) | Optional. Matches `^[0-9]+(kb\|mb)$` — `512kb`, `2mb`. |
 
@@ -761,8 +762,8 @@ value regardless.
   admits spaces, never a space followed by `-`. A `path_filter` cannot start
   with `~`. Report the first disallowed character from left to right.
 2. **Neutralize** with `--` before every configuration-derived git operand
-  (FR-034) and single quotes around every configuration placeholder in a shell
-  command (007 FR-006), including commands the agent composes itself. Copy the
+  and single quotes around every configuration placeholder in a shell
+  command, including commands the agent composes itself. Copy the
   value literally, replacing each `'` with `'\''`. For `<expanded-path>`,
   expand `~/` to the actual home directory before quoting. `$HOME` and `~` do
   not expand inside single quotes. `with_timeout` forwards only through `"$@"`.
@@ -772,7 +773,7 @@ Fetched file names enter commands only through the double-quoted shell variable
 `wc -c < "$file"`, `sha256sum < "$file"`, or `shasum -a 256 < "$file"` on macOS.
 Labels and messages never reach a shell.
 
-### Values in messages (007 FR-005)
+### Values in messages
 
 Every message quoting a configuration value, source label or fetched file name
 is agent output, never `echo` or `printf`. Escape line feed as `\n`, tab as `\t`,
@@ -782,14 +783,14 @@ inside a quoted value as `\"`. Leave other characters unchanged.
 
 ### On failure
 
-A value that violates its rule skips **only its own source** (FR-030):
+A value that violates its rule skips **only its own source**:
 
 ```
 ⚠️  payments-v2: skipped — invalid `revision` value "-u" (must not begin with "-")
 ⚠️  source 3: skipped — invalid `url` value "https://example.com/$(touch /tmp/pwned)" ("$" is not allowed)
 ```
 
-Every other source is processed normally and the command exits **0** (FR-023).
+Every other source is processed normally and the command exits **0**.
 Always name the field and the offending value, so the user can fix it without
 guessing. Emit only the first failure per source, on one escaped line. Use its
 label; without one, derive a label only from an accepted URL, otherwise use
@@ -816,22 +817,22 @@ safe to iterate over:
 
 **`sources` present but empty** — written as `sources:` with no value (which parses
 as null), or as `sources: []`. This is a valid state, not an error: the project
-declares no knowledge. Skip to step 10's empty-configuration path (FR-031).
+declares no knowledge. Skip to step 10's empty-configuration path.
 
 **Per-source validation** — apply every rule in § Configuration Validation Rules to
-each entry **before using any of its values** (FR-029). Then:
+each entry **before using any of its values**. Then:
 
 - A source whose values all pass is processed normally.
 - A source with **any** failing value is skipped, with one line naming the field
   and the offending value. Every other source still synchronizes and the command
-  still exits 0 (FR-030).
+  still exits 0.
 - Label uniqueness is checked across the whole list. On a collision, skip **all**
   sources sharing that label — there is no safe way to tell which one a later
-  command means (FR-028).
+  command means.
 
 Validate enabled and disabled sources alike. Print each escaped refusal line
-before `🔄 Syncing cross-repo knowledge sources...`, with no shell involved
-(007 FR-004). Do not compute a failing source's slug, read its manifest or check
+before `🔄 Syncing cross-repo knowledge sources...`, with no shell involved.
+Do not compute a failing source's slug, read its manifest or check
 its reachability. Keep track of any source that is not accepted: step 8a must
 then prune nothing.
 
@@ -848,8 +849,8 @@ then prune nothing.
   radius is naturally bounded.
 - A malformed **project-wide** value has no such boundary. Treating it as a
   binding ceiling would strip every source's knowledge on the strength of one
-  typo, so it is **reported and treated as though it were not configured**
-  (FR-021). Per-source ceilings still apply.
+  typo, so it is **reported and treated as though it were not configured**.
+  Per-source ceilings still apply.
 
 ```
 ⚠️  Ignoring project-wide `max_items` value "banana" (must be a whole number ≥ 1).
@@ -859,7 +860,7 @@ then prune nothing.
 Failing **open** here is the same reasoning that keeps an over-age cache readable
 when its source is unreachable: a configuration mistake must never leave the
 project with less knowledge than it had before the setting existed. Exit code
-stays 0 (FR-022).
+stays 0.
 
 The top-level `agents_md` is read here too, and governs only § Agent Context
 Section. An invalid value fails **closed** instead: `AGENTS.md` is a committed
@@ -875,12 +876,12 @@ this extension is checked exactly like one this extension wrote.
 
 When **no enabled sources remain** — because `sources` is empty or null, because
 every source was removed, or because every source was disabled — do all of the
-following and then stop (FR-031):
+following and then stop:
 
 1. Report the project as having no configured knowledge.
 2. **Delete `knowledge-index.md`** if it exists.
 3. Apply § Agent Context Section in `remove` mode, and print its line, if any,
-   after the lines below (010 FR-009).
+   after the lines below.
 4. Do **not** emit the Context Output for AI Agents block.
 5. Exit 0.
 
@@ -898,7 +899,7 @@ failure that looks like success. Deleting it costs nothing in interface terms,
 because `status` already reports and explains a missing index. The knowledge
 section goes with it, so `AGENTS.md` stops pointing the agent at the index.
 
-Disabled sources keep their cache directories through this path (FR-004); only the
+Disabled sources keep their cache directories through this path; only the
 index is removed. Cache pruning is a separate concern, handled in step 8a.
 
 ### 2. Source-count warning
@@ -919,12 +920,12 @@ Continue normally — this is informational only.
 ### 4. For each enabled source
 
 Skip sources where `enabled: false`. A disabled source is not fetched, contributes
-no items to the index, and appears in no status line (FR-008) — but its cache
-directory is left intact so that re-enabling it costs no download (FR-004).
+no items to the index, and appears in no status line — but its cache
+directory is left intact so that re-enabling it costs no download.
 
 For each accepted, enabled source, compute the slug using the Source Slug
 Generation algorithm above. Before **any** use of the result, confirm it is
-exactly 12 lowercase hexadecimal characters, `^[0-9a-f]{12}$` (007 FR-002).
+exactly 12 lowercase hexadecimal characters, `^[0-9a-f]{12}$`.
 Otherwise skip that source, keep its cache untouched, prune nothing this run,
 and print as escaped agent output:
 
@@ -935,18 +936,18 @@ and print as escaped agent output:
 An empty or malformed slug must never become a cache path or a working directory.
 
 **Apply the Cache Freshness Gate first — before choosing a sync path and before
-any network access** (FR-018).
+any network access**.
 
 - `verdict=fresh` and `--force` was **not** passed → **no fetch**. If the cache
   holds `.git`, run the Cache Integrity Check on it. `integrity=pass`: set status
   `current`, take its items and sizes from the check's report, and move to the next
   source. No network is touched; git runs only the local `ls-files` of § Indexable
   Items. `integrity=fail`, or no `.git`: treat the source as `stale` and continue
-  below (011 FR-012).
+  below.
 - `verdict=stale`, or `--force` was passed → continue below.
 
 With no effective policy configured the verdict is always `stale`, so this gate is
-invisible to a project that has not opted in (FR-017, FR-024).
+invisible to a project that has not opted in.
 
 **Determine sync path** from the project root, once the slug has passed its guard:
 
@@ -964,14 +965,14 @@ fi
 - **Warm path**: `sync_path=warm` → fetch update
 
 **A directory without its own `.git` or without `.manifest.json` is an interrupted
-sync, so it is removed and cloned again** (011 FR-020). A failed clone leaves the
+sync, so it is removed and cloned again**. A failed clone leaves the
 directory that `mkdir -p` created, and from inside it git finds the consuming
 project's repository: the warm path would run `sparse-checkout`, `fetch --depth=1`
 and `checkout --force` on the user's own project. A clone stopped before step 6
 leaves no manifest, and the warm path alone would never record it. The variable is
 `sync_path`, never `path`, which zsh ties to `PATH`.
 
-**After an upgrade, and after a stop** (011 FR-018). `specify extension add`
+**After an upgrade, and after a stop**. `specify extension add`
 recreates `.specify/extensions/knowledge/` and keeps only `knowledge-config.yml`,
 so the first sync after an upgrade finds no cache and rebuilds every source. A sync
 that stops part-way is completed by running sync again: sources already recorded
@@ -985,11 +986,11 @@ again.
 #### Cold path (fresh clone)
 
 **Remote URL** — three tiers, tried in order. Every `git` call keeps the `--`
-separator required by FR-034.
+separator, so a configured value is never read as an option.
 
 **Tier 1 — no revision pinned, or a branch or tag.** The common case, and the
 cheapest. A source with **no** `revision` omits `--branch` entirely and clones the
-remote's default revision, byte-identically to 1.3.0 (FR-010).
+remote's default revision, byte-identically to 1.3.0.
 
 ```bash
 mkdir -p .specify/extensions/knowledge/cache/<slug>
@@ -1040,7 +1041,7 @@ Name the revision itself here: after `--unshallow`, `FETCH_HEAD` is the default
 branch's tip, not the pin. A pin missing from the fetched history makes
 `update-ref` fail, which is a Tier 3 failure like any other.
 
-**All three tiers failed** → this is FR-015. Report the source `unreachable` with
+**All three tiers failed** → the declared revision cannot be resolved. Report the source `unreachable` with
 the declared revision named, fall back to its existing cache if the Cache
 Integrity Check passes, with items and sizes from the check's report, and continue
 to the next source. Exit code stays 0.
@@ -1065,7 +1066,7 @@ failure, as an unresolvable revision rather than degrading silently:
 For `<expanded-path>`, replace a leading `~/` with the actual home directory
 written out, for example `/Users/alice/My Repos/kb`; leave any other local path
 unchanged. Expand before quoting: `$HOME` and `~` do not expand inside single
-quotes (007 FR-006).
+quotes.
 
 ```bash
 mkdir -p .specify/extensions/knowledge/cache/<slug>
@@ -1105,7 +1106,7 @@ cd .specify/extensions/knowledge/cache/<slug>
 # regardless of the pattern, which violates the path_filter contract.
 git sparse-checkout init --no-cone
 # `--` before the patterns keeps a pattern beginning with "-" from being read as an
-# option (FR-034).
+# option.
 git sparse-checkout set -- '<pattern1>' ['<pattern2>' ...]
 git checkout
 ```
@@ -1138,7 +1139,7 @@ Before pulling new content, **re-apply the sparse-checkout configuration in `--n
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
 git sparse-checkout init --no-cone
-# same patterns and same `--` as the cold path (FR-034); `set` also removes files
+# same patterns and same `--` as the cold path; `set` also removes files
 # an older checkout left outside them
 if [ -n '<path_filter>' ]; then
   git sparse-checkout set -- '<pattern1>' ['<pattern2>' ...]
@@ -1151,7 +1152,8 @@ Do not add `git sparse-checkout reapply` here. It does not exist in git 2.25, th
 minimum this extension supports, and `set` already updates the working tree.
 
 **Remote URL** — check out the declared revision when one is pinned, and the
-remote's default when none is (FR-010, FR-012). `--` retained per FR-034.
+remote's default when none is. `--` is retained, so a configured value is never
+read as an option.
 
 ```bash
 cd .specify/extensions/knowledge/cache/<slug>
@@ -1200,7 +1202,7 @@ cloned before § Indexable Items the same setting as new ones.
 2. `integrity=pass`: set status = `cached`; take items and sizes from the check's report and `last_synced_at` from its `synced_at`; continue.
 3. No such cache, or `integrity=fail`: set status = `unreachable`; skip this source and leave its directory as it is; emit warning; continue to next source.
 
-**An over-age cache is still served here** (FR-027). `max_cache_age` governs only
+**An over-age cache is still served here**. `max_cache_age` governs only
 whether a refresh is *attempted*, never whether cached content may be *served* — a
 source that is past its policy **and** unreachable falls back to exactly the same
 cache it would have used before any policy existed, and reports its staleness.
@@ -1216,8 +1218,7 @@ less available knowledge than it had before.
 After a successful sync (cold or warm), record the source with **one shell
 command**: § Indexable Items, § Item Records and the block in step 6, in that order,
 from the project root. That run collects, measures and hashes every item, writes
-`.manifest.json`, and prints the report the rest of the sync works from (011 FR-001,
-FR-002):
+`.manifest.json`, and prints the report the rest of the sync works from:
 
 ```text
 records: <slug> items=<N> bytes=<B> synced_at=<ISO8601>
@@ -1250,10 +1251,10 @@ else
 fi
 ```
 
-**The shell writes the manifest; the agent writes the index** (011 FR-019). This
+**The shell writes the manifest; the agent writes the index**. This
 revises 007 research §7 for the manifest only: copying 224 hashes by hand was the
 step full syncs stopped at, or skipped with improvised scripts. The format and its
-schema version stay as they were (007 FR-014):
+schema version stay as they were:
 
 ```json
 {
@@ -1277,9 +1278,9 @@ when the source pins none. It is written for diagnosability only: nothing reads 
 to make a decision, because the slug already guarantees that two revisions never
 share a directory. A manifest an agent wrote under 1.9.1 or earlier, including
 1.3.0's without `revision`, fails the check once and is recorded again at the next
-successful sync (011 FR-013).
+successful sync.
 
-**Whole or absent** (011 FR-008). The text goes to `.manifest.json.tmp`, and `mv -f`
+**Whole or absent**. The text goes to `.manifest.json.tmp`, and `mv -f`
 replaces `.manifest.json` in one step, so an interrupted run never leaves a manifest
 that passes the check. Writing the manifest last signals cache integrity: an absent
 manifest means the sync was interrupted. Its **mtime** therefore marks the instant
@@ -1291,7 +1292,7 @@ After indexing all sources, compare relative paths across all `fresh`, `cached`,
 and `current` sources.
 
 A shared path is a conflict **only when the two sources' repository identities
-differ** (FR-026). Derive each identity with the Repository Identity algorithm in
+differ**. Derive each identity with the Repository Identity algorithm in
 § Algorithm Reference above.
 
 - **Different identity, same path** → conflict. Two teams disagree about the same
@@ -1316,35 +1317,35 @@ the index is what the budget bounds.
 
 It runs **after step 6 by requirement**: `.manifest.json` is already on disk
 holding the **complete** item list for its source. Nothing here removes a cached
-file or shortens a manifest (FR-012a). That separation is what makes three
+file or shortens a manifest. That separation is what makes three
 requirements satisfiable at once — the cache stays whole, `search` still reaches
-every item (FR-017, FR-035), and the verbose withheld list is simply
-*manifest items − indexed items* (FR-034) with no third record to maintain.
+every item, and the verbose withheld list is simply
+*manifest items − indexed items* with no third record to maintain.
 
 Skip this step entirely when neither `max_items` nor `max_bytes` is in effect.
-With no budget the index is exactly what it was before this feature existed
-(FR-004), and nothing below runs.
+With no budget the index is exactly what it was before this feature existed,
+and nothing below runs.
 
 The budget applies to the assembled corpus **regardless of how each source's
 content was obtained** — freshly fetched, served from a policy-fresh cache
-(`current`), or served from a stale cache after an unreachable source (FR-011).
+(`current`), or served from a stale cache after an unreachable source.
 The agent reads one index in all three cases. Every item and size comes from the
 report of the run that recorded or checked its source (step 5, § Cache Integrity
 Check); nothing is measured again.
 
 **1 — Resolve effective limits.** Per source, per dimension, using § Context
 Budget Allocation. Report any per-source ceiling clamped down to the project
-ceiling (FR-003a).
+ceiling.
 
 **2 — Select per source.** Take the longest **ascending relative-path** prefix of
-the source's items that fits within **both** effective limits (FR-006).
+the source's items that fits within **both** effective limits.
 
 > Path order, not smallest-first. Smallest-first packs more items into the same
 > byte ceiling, but adding one large file would silently change which unrelated
-> small files survive — no user could predict their own corpus, defeating
-> FR-007b. Path order confines the effect of any change to files after it.
+> small files survive — no user could predict their own corpus from the documented
+> rule. Path order confines the effect of any change to files after it.
 
-**3 — Reconcile conflicts (FR-033).** For each path reported as a conflict in
+**3 — Reconcile conflicts.** For each path reported as a conflict in
 step 7:
 
 - If **every** version was selected, keep them all.
@@ -1352,8 +1353,8 @@ step 7:
   keeps one team's version of a contested contract and hides the other
   manufactures precisely the silent winner conflict reporting exists to prevent.
 - **Do not reallocate the freed capacity.** Reuse would make the result depend on
-  how many passes the selection makes, breaking the on-paper predictability
-  FR-007b requires. The slack is wasted deliberately.
+  how many passes the selection makes, breaking the on-paper predictability the
+  documented rule promises. The slack is wasted deliberately.
 - Report the withdrawal as **one** conflict event, not as unrelated per-source
   exclusions. A source left holding nothing by a withdrawal is named the same way
   a source that received no allocation is named — the user cannot infer the
@@ -1363,7 +1364,7 @@ step 7:
 counts and sizes with the limit applied, oversized items named individually,
 starved sources named, conflict withdrawals named.
 
-**Oversized items are removed before allocation** (FR-009). An item larger than
+**Oversized items are removed before allocation**. An item larger than
 the effective size ceiling on its own can never be included; it is excluded, named
 with its size, and **neither consumes nor blocks** the budget available to
 everything else.
@@ -1382,9 +1383,9 @@ and carries the withholding fields and the `⚠️ Partial` line from the format
 When nothing was withheld — including when no budget is configured — those fields
 and that line are **omitted entirely**, leaving the index indistinguishable from
 the one produced before this feature existed, apart from the generation timestamp
-every sync writes (FR-016).
+every sync writes.
 
-**No withheld path is ever named in the index** (FR-014). This is the one document
+**No withheld path is ever named in the index**. This is the one document
 the agent is instructed to read in full; listing the excluded files here would
 invite it to open exactly what the budget removed. The verbose output carries the
 identities instead.
@@ -1392,7 +1393,7 @@ identities instead.
 ### 8a. Prune orphaned caches
 
 After the per-source loop, delete an orphaned cache directory only when all
-three conditions hold (FR-032, 007 FR-002, FR-004):
+three conditions hold:
 
 1. Every configured source, enabled or disabled, was accepted this run.
 2. Every expected slug is exactly 12 lowercase hexadecimal characters.
@@ -1409,14 +1410,15 @@ prune      actual − expected
 ```
 
 **Computing `expected` over disabled sources too is essential.** Restricting it to
-enabled sources would delete exactly the caches FR-004 promises to keep, and turn
+enabled sources would delete exactly the caches a disabled source keeps so that
+re-enabling needs no download, and turn
 `--disable` into a slow `remove`.
 
-This exists because a **revision change** strands a directory. FR-003 purges the
+This exists because a **revision change** strands a directory. `remove` purges the
 cache when a source is removed, but editing `revision` in place gives the source a
 new slug, and nothing would ever read or delete the old one. Over a few revision
-bumps a project would accumulate dead trees — the same outcome FR-003 was written
-to prevent.
+bumps a project would accumulate dead trees — the same outcome purging on `remove`
+exists to prevent.
 
 Report each removal on its own line:
 
@@ -1440,8 +1442,7 @@ tells the agent to suggest a sync when the index is missing.
 ### 9. Print summary
 
 For each source, print one status line. All source labels and names in symbolic-link
-and conflict lines use § Values in messages, with control characters escaped
-(007 FR-005):
+and conflict lines use § Values in messages, with control characters escaped:
 
 ```
   payment-service    ✅ fresh    12 items  (synced 2026-06-11T14:00:00Z)
@@ -1449,7 +1450,7 @@ and conflict lines use § Values in messages, with control characters escaped
 ```
 
 Skipped for freshness — reported **distinctly** from `fresh`, so the user can see
-that no network access occurred (FR-019):
+that no network access occurred:
 
 ```
   payments-v2        ⏭️  current   12 items  (cached 12m ago; policy 4h — no network)
@@ -1477,7 +1478,7 @@ thinned:
 ```
 
 Names that are not valid UTF-8 get the line below it, built from the report's
-`skipped-utf8:` lines, which are already escaped (011 FR-006). The file is in
+`skipped-utf8:` lines, which are already escaped. The file is in
 neither the manifest nor the index; renaming it in the source brings it back.
 
 Final summary line:
@@ -1495,7 +1496,7 @@ Then the line from step 8b, if any:
 #### Withholding report (only when the budget withheld something)
 
 Print a second line under each affected source giving injected-of-total counts and
-sizes and **the limit that produced them** (FR-013, FR-018). A reported reduction
+sizes and **the limit that produced them**. A reported reduction
 must never be unexplained.
 
 ```
@@ -1527,15 +1528,15 @@ The summary line then carries the totals:
 **A source that indexes nothing for its own reasons — empty, or a path filter
 matching nothing — MUST NOT be reported as withheld by the budget at all.** The
 starvation line above is authorised only when the item ceiling is genuinely below
-the number of sources holding items (FR-008a).
+the number of sources holding items.
 
 When the budget withheld nothing, none of these lines appear and the summary keeps
-its original form (FR-016).
+its original form.
 
 #### 9a. Advisory threshold (only when NO budget is configured)
 
 When neither `max_items` nor `max_bytes` is in effect and the corpus exceeds either
-built-in threshold, emit one informational line (FR-032):
+built-in threshold, emit one informational line:
 
 | Dimension | Threshold |
 |-----------|-----------|
@@ -1551,7 +1552,7 @@ built-in threshold, emit one informational line (FR-032):
 
 Name **both** the measured value and the threshold, for whichever dimension
 triggered it, so the user can judge the recommendation against their own corpus
-rather than taking it on trust (FR-032a).
+rather than taking it on trust.
 
 There is one threshold per dimension because the two ceilings are independent — a
 corpus can hit either wall alone, and a single-dimension warning would stay silent
@@ -1574,7 +1575,7 @@ This is the LAST thing printed on stdout. Nothing follows it.
 
 **Emit the block when** (`suppress_context_output` is false AND one of):
 - ≥ 1 source returned status `fresh`, OR
-- ≥ 1 source returned status `current` — skipped for freshness (FR-020), OR
+- ≥ 1 source returned status `current` — skipped for freshness, OR
 - All sources are `cached` but ≥ 1 has a usable cache (i.e., `knowledge-index.md` exists), OR
 - Mix of `cached` + `unreachable`, ≥ 1 source has a usable cache.
 
@@ -1586,10 +1587,10 @@ This is the LAST thing printed on stdout. Nothing follows it.
 **Do NOT emit the block when** any of:
 - `suppress_context_output = true` (flag `--no-context-output` was passed), OR
 - An early-exit error was printed in step 1 (config absent, invalid YAML, unknown schema_version, missing sources key) — there is no `knowledge-index.md` to point to on these paths, OR
-- **No enabled sources remain** — step 1a already deleted the index and reported the project as unconfigured (FR-031), OR
+- **No enabled sources remain** — step 1a already deleted the index and reported the project as unconfigured, OR
 - All sources are `unreachable` AND no prior `knowledge-index.md` exists — instead print the soft warning below.
 
-**Soft warning (all unreachable + no cache, FR-013a)**:
+**Soft warning (all unreachable + no cache)**:
 
 ```
 ⚠️  No knowledge-index.md found yet. Run __SPECKIT_COMMAND_KNOWLEDGE_SYNC__ once when sources are reachable.
@@ -1619,7 +1620,7 @@ You are about to draft a spec or plan in this project. Before you do:
 The top and bottom rules are exactly 70 × U+2550 (`═`), on their own lines with no trailing whitespace. Exit code remains 0 on all emission paths.
 
 **When the context budget withheld anything**, insert one additional numbered line
-immediately after line 4, before the closing rule (FR-015):
+immediately after line 4, before the closing rule:
 
 ```
 5. This corpus is PARTIAL — a context budget withheld some items. Do not
@@ -1649,7 +1650,7 @@ decisions/retry-policy.md
 ```
 
 When the context budget withheld anything from that source, follow it with the
-**withheld identities** (FR-034). Derive them as *manifest items − indexed items* —
+**withheld identities**. Derive them as *manifest items − indexed items* —
 both already on disk, so no third record is maintained:
 
 ```
@@ -1669,7 +1670,7 @@ excluded files there would invite it to open them.
 ### No flag raises or bypasses the budget
 
 `--force` overrides the **cache freshness policy** only. There is deliberately no
-flag that raises, relaxes, or disables a context ceiling (FR-012): the automatic
+flag that raises, relaxes, or disables a context ceiling: the automatic
 sync points are exactly where a context overflow does the most damage, so an escape
 hatch reachable from them would defeat the guarantee.
 
@@ -1680,8 +1681,8 @@ hatch reachable from them would defeat the guarantee.
 ## --force flag
 
 When `--force` is present in `$ARGUMENTS`, the Cache Freshness Gate is bypassed:
-every enabled source is fetched regardless of how recently its cache was written
-(FR-021). Nothing else changes — status values, the summary, and the Context
+every enabled source is fetched regardless of how recently its cache was written.
+Nothing else changes — status values, the summary, and the Context
 Output block behave exactly as they would without a freshness policy configured.
 
 Parsed with the same `$ARGUMENTS` token scan as `--verbose`, and composes
@@ -1689,9 +1690,9 @@ orthogonally with both `--verbose` and `--no-context-output`.
 
 **`--force` is unreachable from an automatic trigger.** The four `hooks.*` entries
 in `extension.yml` declare no arguments, so a hook-driven sync cannot pass it —
-the freshness policy always applies to automatic runs (FR-022). This is enforced
+the freshness policy always applies to automatic runs. This is enforced
 by construction rather than by a runtime check, the same mechanism that keeps
-`--no-context-output` hook-unreachable (spec 003, FR-016). **Adding an argument to
+`--no-context-output` hook-unreachable. **Adding an argument to
 a hook entry would break this**; `extension.yml` carries a comment saying so.
 
 ## --no-context-output flag

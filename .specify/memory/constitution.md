@@ -120,6 +120,10 @@ locally before you push:
    value reaches the shell as one literal argument. Double-quoted, escaped and
    ambiguous quote contexts fail the check; inert scanner fixtures enforce this
    distinction. `<slug>`, which the extension computes, is the only exemption.
+13. No shipped file (`commands/*.md`, `extension.yml`, `config-template.yml`,
+    `README.md`) cites a requirement ID (`FR-…`, `SC-…`), a spec number, a task
+    ID, or a path into `specs/tiny/` or `.specify/memory|bugs|assessments/` (§I).
+    `specs/NNN-…` paths are not matched, because user-facing examples use them.
 
 **Install smoke test** — a real `specify extension add` into a clean consumer
 project, asserting against the manifest rather than hardcoded numbers. It runs
@@ -147,7 +151,7 @@ package, not the prose.
   pull request. Everything else — principles, naming, boundaries, and whether a
   command actually behaves as its prose claims — is verified by human review.
 
-**Version**: 1.5.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-27
+**Version**: 1.6.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-27
 
 > **1.1.0 rationale.** §III previously stated "No CI/CD pipeline exists yet;
 > quality gates are manual." That principle was the root cause of the v1.2.0
@@ -184,3 +188,8 @@ package, not the prose.
 > §I now forbids such citations in shipped files. The existing IDs are removed by
 > `specs/tiny/004-strip-internal-spec-refs-from-shipped-files.md`, which also adds static check
 > 13 to enforce the rule. § Quality Gates lists that check only once it exists.
+>
+> **1.6.0 rationale.** Static check 13 now enforces the §I rule from 1.5.0 on every
+> pull request. The shipped files no longer cite any requirement ID: a sentence that
+> leaned on one now states the rule it stood for. A rule nothing checks drifts back,
+> as the 193 IDs showed.
