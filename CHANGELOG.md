@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `docs(agents): release-extension skill`. The release and community-catalog
+  procedure now lives in the repository, in `.agents/skills/release-extension/`,
+  linked for Claude Code and Copilot. Two scripts come with it:
+  - `verify-release.sh` checks a published archive and installs it from its URL.
+  - `submission.py` renders the catalog submission from `extension.yml` and
+    refuses on any disagreement.
+
 ## [1.10.2] - 2026-10-27
 
 No behavior change: every instruction says the same thing, and

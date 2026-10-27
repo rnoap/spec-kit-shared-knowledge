@@ -118,6 +118,18 @@ edit a shipped file, including during `/speckit-implement`:
 Static check 13 in `.github/scripts/validate-extension.sh` fails on any of these,
 in CI and locally. Run it before you push.
 
+## 🚀 Releasing a new version
+
+Follow the `release-extension` skill in `.agents/skills/release-extension/SKILL.md`,
+which `.claude/skills/` and `.github/skills/` link to. It covers:
+
+- bumping the version and waiting for CI on that commit;
+- tagging and publishing the release;
+- verifying the published archive;
+- updating spec-kit's community catalog.
+
+**Release tags are immutable:** fix a bad release with a new patch version.
+
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan

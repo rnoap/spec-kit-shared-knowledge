@@ -14,7 +14,12 @@ Thumbs.db
 *.tmp
 .idea/
 .vscode/
-.claude/
+# .claude/ is per-developer (settings, generated speckit-* skills, tool symlinks),
+# except the project-owned skills linked below, which must travel with the repo.
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/release-extension
 .code_puppy/
 
 # code-review-graph index (local only)
