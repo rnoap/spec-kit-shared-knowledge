@@ -12,6 +12,15 @@ This project IS a spec-kit extension, so every change must remain installable by
 - `config-template.yml` is the canonical user-facing config schema. Its `schema_version` must be bumped on any breaking schema change.
 - Commands (`commands/*.md`) are **agent prompts**; they must be self-contained Markdown documents — no hidden runtime dependencies outside of what `extension.yml` declares.
 - Installation is delegated entirely to the spec-kit CLI (`specify extension add` / `specify extension add --dev`). The repository ships no install script and no project may mutate a consumer's `.specify/` directory outside of what spec-kit's own auto-registration covers.
+- **Shipped files cite nothing the consumer does not have.** `commands/*.md`, `extension.yml`,
+  `config-template.yml` and `README.md` MUST NOT carry this repository's requirement IDs
+  (`FR-…`, `SC-…`), spec numbers (`spec 004`, `007 FR-006`) or task IDs (`T012`), and the
+  agent-facing files MUST NOT point into this repository's development workspace (`specs/NNN-…/`,
+  `specs/tiny/`, `.specify/memory/`, `.specify/bugs/`, `.specify/assessments/`). State the rule
+  itself, not its number. Requirement traceability lives in `specs/` (each feature's `tasks.md`)
+  and in git history. Not citations: the extension's runtime paths in the consumer project
+  (`.specify/extensions/knowledge/…`) and example paths shown to users, such as
+  `specs/012-order-tracking/` in a configuration example.
 
 ### II. Source-of-Truth Hierarchy
 
@@ -138,7 +147,7 @@ package, not the prose.
   pull request. Everything else — principles, naming, boundaries, and whether a
   command actually behaves as its prose claims — is verified by human review.
 
-**Version**: 1.4.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-19
+**Version**: 1.5.0 | **Ratified**: 2026-06-17 | **Last Amended**: 2026-10-27
 
 > **1.1.0 rationale.** §III previously stated "No CI/CD pipeline exists yet;
 > quality gates are manual." That principle was the root cause of the v1.2.0
@@ -167,3 +176,11 @@ package, not the prose.
 > arguments even when validation is bypassed. Static check 12 tracks effective
 > quote context, and inert fixtures reject double-quoted and escaped lookalikes.
 > This extends the packaging gates without executing command prose in CI.
+>
+> **1.5.0 rationale.** The command files cited 193 of this repository's requirement IDs, such as
+> `(007 FR-006)`. They are the prompts an agent runs in a consumer project, where `specs/` does
+> not exist: it is excluded from the published archive. The IDs pointed nowhere, and the
+> consumer's own specs carry their own `FR-` numbers, which an agent can take for the one cited.
+> §I now forbids such citations in shipped files. The existing IDs are removed by
+> `specs/tiny/004-strip-internal-spec-refs-from-shipped-files.md`, which also adds static check
+> 13 to enforce the rule. § Quality Gates lists that check only once it exists.

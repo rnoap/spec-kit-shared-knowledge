@@ -94,6 +94,31 @@ bash "${CLAUDE_PLUGIN_ROOT:-$HOME/.$SPECKIT_RUNTIME/plugins/spec-kit-walmart}/sk
   elsewhere. Leave unnumbered files to `/speckit-update`.
 <!-- SPECKIT-TINY-SPECS END -->
 
+## 📦 Shipped files cite nothing the consumer does not have
+
+`commands/*.md`, `extension.yml`, `config-template.yml` and `README.md` ship to
+consumer projects. This repo's `specs/` and `.specify/` do not. When you write or
+edit a shipped file, including during `/speckit-implement`:
+
+- **Never add a requirement ID, spec number or task ID**: no `(FR-022)`,
+  `(007 FR-006)`, `spec 004` or `T012`. State the rule itself: "the hooks declare
+  no arguments, so an automatic sync cannot pass `--force`", not "(FR-022)".
+- **Never point the agent-facing files at this repo's workspace**: `specs/NNN-…/`,
+  `specs/tiny/`, `.specify/memory/`, `.specify/bugs/`, `.specify/assessments/`.
+- **Fine**: the extension's runtime paths in the consumer
+  (`.specify/extensions/knowledge/…`) and example paths shown to users, such as
+  `specs/012-order-tracking/`.
+- **Traceability goes elsewhere**: in `specs/` (the feature's `tasks.md` names the
+  files it changed) and in the commit message.
+
+> **Why:** a consumer project has no `specs/` from this repo, so a cited ID points
+> nowhere. The consumer's own specs carry their own `FR-` numbers, and an agent can
+> take one for the requirement cited. Constitution §I.
+
+Files written before this rule still carry IDs until
+`specs/tiny/004-strip-internal-spec-refs-from-shipped-files.md` removes them. Do
+not copy that style.
+
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
