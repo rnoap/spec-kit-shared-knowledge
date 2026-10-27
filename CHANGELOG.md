@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `ci: install smoke test pins spec-kit v1.2.3`, the current release, instead of
+  v1.2.0. The minimum-version job still installs the manifest's floor.
+- `docs(changelog): link 1.7.1, 1.3.0, 1.1.0 and 1.0.0 to their release commits`.
+  Those versions were never tagged, so their release links returned 404.
+
 ## [1.10.0] - 2026-10-26
 
 ### Added
@@ -448,19 +455,19 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - Repository name preserved as `spec-kit-shared-knowledge`
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
-<!-- Update these links after publishing the repository -->
+<!-- 1.7.1, 1.3.0, 1.1.0 and 1.0.0 were never tagged; their links show the tree at the release commit. -->
 [Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.10.0...HEAD
 [1.10.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.10.0
 [1.9.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.1
 [1.9.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.0
 [1.8.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.1
 [1.8.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.8.0
-[1.7.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.1
+[1.7.1]: https://github.com/rnoap/spec-kit-shared-knowledge/tree/4bffa48450c57e3e8a311f4b1fe667c9946ab884
 [1.7.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.7.0
 [1.6.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.6.0
 [1.5.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.5.0
 [1.4.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.4.0
-[1.3.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.3.0
+[1.3.0]: https://github.com/rnoap/spec-kit-shared-knowledge/tree/52aba10fee835cecadff5b0ed11bbed8c7728fc0
 [1.2.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.2.0
-[1.1.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.1.0
-[1.0.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.0.0
+[1.1.0]: https://github.com/rnoap/spec-kit-shared-knowledge/tree/767dc0b5f2218ba582fcd1a60e3eb8a083043569
+[1.0.0]: https://github.com/rnoap/spec-kit-shared-knowledge/tree/533c32631c2096a7c047ea487604608e7c8e6add

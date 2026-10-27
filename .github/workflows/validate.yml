@@ -23,7 +23,7 @@ env:
   # change into a red build on an unrelated PR — `specify init --ai` became
   # `--integration` mid-development, which would have done exactly that. Bump
   # this line on purpose, and let the smoke test tell you what broke.
-  SPEC_KIT_REF: v1.2.0
+  SPEC_KIT_REF: v1.2.3
 
 jobs:
   validate:
