@@ -7,12 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.1] - 2026-10-27
+
+No command, configuration or runtime change: the command files and
+`config-template.yml` are identical to 1.10.0.
+
 ### Changed
 
 - `ci: install smoke test pins spec-kit v1.2.3`, the current release, instead of
   v1.2.0. The minimum-version job still installs the manifest's floor.
 - `docs(changelog): link 1.7.1, 1.3.0, 1.1.0 and 1.0.0 to their release commits`.
   Those versions were never tagged, so their release links returned 404.
+- `docs(constitution): 1.5.0`. Shipped files must not cite this repository's
+  requirement IDs, spec numbers or task IDs, which point nowhere in a consumer
+  project. `AGENTS.md` carries the rule for agents. The IDs already in the
+  command files are removed in a later release.
+- `extension.yml` `version` bumped from `1.10.0` to `1.10.1`.
 
 ## [1.10.0] - 2026-10-26
 
@@ -456,7 +466,8 @@ mv .specify/extensions/knowledge/knowledge.yml \
 - All commands, install paths (`.specify/extensions/knowledge/`), config file (`knowledge.yml`), and `.claude/skills/speckit-knowledge-*/SKILL.md` wrappers aligned with the final id
 
 <!-- 1.7.1, 1.3.0, 1.1.0 and 1.0.0 were never tagged; their links show the tree at the release commit. -->
-[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/rnoap/spec-kit-shared-knowledge/compare/v1.10.1...HEAD
+[1.10.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.10.1
 [1.10.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.10.0
 [1.9.1]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.1
 [1.9.0]: https://github.com/rnoap/spec-kit-shared-knowledge/releases/tag/v1.9.0
