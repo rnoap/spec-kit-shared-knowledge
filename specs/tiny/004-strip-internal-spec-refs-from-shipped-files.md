@@ -43,7 +43,7 @@ The command files cite this repo's own requirement IDs: `(007 FR-006)`, `(FR-024
 
 **Traceability stays in `specs/`.** Each feature's `tasks.md` names the files it changed, and `git log -S` finds where a rule came from.
 
-**Ship it with the next functional release, not as a release of its own.** Each release needs a new catalog update issue on github/spec-kit (see #5137).
+**Shipped on its own, in 1.10.2.** The plan was to wait for the next functional release, because each release needs a catalog update issue on github/spec-kit. Submission #5137 had not been processed yet, so it moved to 1.10.2 at no extra cost. Retagging 1.10.1 was ruled out: release tags are immutable by repository ruleset.
 
 ## Tasks
 
